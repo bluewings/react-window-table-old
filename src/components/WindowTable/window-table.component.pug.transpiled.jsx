@@ -7,8 +7,6 @@ export default function (params = {}) {
     center,
     colSpan,
     left,
-    overallHeight,
-    overallWidth,
     right,
     rowSpan,
     scrollbarProps,
@@ -17,10 +15,7 @@ export default function (params = {}) {
   } = params;
   return (
     <div>
-      <pre>{rowSpan + ' x ' + colSpan}</pre>
-      <pre>{overallWidth + ' x ' + overallHeight}</pre>
-      <pre>{this.props.width + ' x ' + this.props.height}</pre>
-      <table border={1} className={styles.table}>
+      <table border={0} cellPadding={0} cellSpacing={0} className={styles.table}>
         <tbody>
           {(top) && (
           <tr>
@@ -106,8 +101,6 @@ export default function (params = {}) {
 //        center,
 //        colSpan,
 //        left,
-//        overallHeight,
-//        overallWidth,
 //        right,
 //        rowSpan,
 //        scrollbarProps,
@@ -120,8 +113,6 @@ export default function (params = {}) {
 //        center,
 //        colSpan,
 //        left,
-//        overallHeight,
-//        overallWidth,
 //        right,
 //        rowSpan,
 //        scrollbarProps,

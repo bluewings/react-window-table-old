@@ -24,34 +24,87 @@ class WindowTable extends PureComponent {
       x: React.createRef(),
       y: React.createRef(),
     };
+
+    this.metric = {
+      scrollTop: props.scrollTop,
+      scrollLeft: props.scrollLeft,
+    };
   }
 
   columnWidth = index => this.props.columns[index].width || 80
 
   rowHeight = index => 40
 
+  scrollTo = ({ scrollTop, scrollLeft }) => {
+    // console.log(scrollTop, scrollLeft);
+    if (typeof scrollTop !== 'undefined') {
+      this.metric.scrollTop = scrollTop;
+    }
+    if (typeof scrollLeft !== 'undefined') {
+      this.metric.scrollLeft = scrollLeft;
+    }
+    Object.keys(this.gridRef)
+    .filter(key => this.gridRef[key].current)
+    .forEach((key) => {
+      this.gridRef[key].current.scrollTo(this.metric);
+    });
+    if (this.scrollbarRef.x.current) {
+      this.scrollbarRef.x.current.scrollTo(this.metric);
+    }
+    if (this.scrollbarRef.y.current) {
+      this.scrollbarRef.y.current.scrollTo(this.metric);
+    }
+  }
+
   handleScroll = (event, section) => {
     if (event.scrollUpdateWasRequested === false) {
       const { scrollTop, scrollLeft } = event;
-      const scrollTo = { scrollTop, scrollLeft };
+      switch (section) {
+        case 'left':
+        case 'right':
+          this.metric.scrollTop = scrollTop;
+          break;
+        case 'top':
+        case 'bottom':
+          this.metric.scrollLeft = scrollLeft;
+          break;
+        default:
+          this.metric.scrollTop = scrollTop;
+          this.metric.scrollLeft = scrollLeft;
+          break;
+      }
+      // if (section === 'left' || section === 'right') {
+        
+      // } else if (section === 'top' || section === 'bottom') {
+        
+      // } else {
+
+      // }
+
+      // console.log(section, this.metric);
+
 
       Object.keys(this.gridRef)
         .filter(key => key !== section && this.gridRef[key].current)
         .forEach((key) => {
-          if (key === 'left' || key === 'right') {
-            this.gridRef[key].current.scrollTo({ scrollTop, scrollLeft: 0 });
-          } else if (key === 'top' || key === 'bottom') {
-            this.gridRef[key].current.scrollTo({ scrollTop: 0, scrollLeft });
-          } else {
-            this.gridRef[key].current.scrollTo(scrollTo);
-          }
+          this.gridRef[key].current.scrollTo(this.metric);
+          // if (key === 'left' || key === 'right') {
+          //   // this.gridRef[key].current.scrollTo({ scrollTop, scrollLeft: 0 });
+          //   this.gridRef[key].current.scrollTo(this.metric);
+          // } else if (key === 'top' || key === 'bottom') {
+          //   // this.gridRef[key].current.scrollTo({ scrollTop: 0, scrollLeft });
+          //   this.gridRef[key].current.scrollTo(this.metric);
+          // } else {
+          //   this.gridRef[key].current.scrollTo(this.metric);
+          // }
         });
+    
 
       if (this.scrollbarRef.x.current) {
-        this.scrollbarRef.x.current.scrollTo(scrollTo);
+        this.scrollbarRef.x.current.scrollTo(this.metric);
       }
       if (this.scrollbarRef.y.current) {
-        this.scrollbarRef.y.current.scrollTo(scrollTo);
+        this.scrollbarRef.y.current.scrollTo(this.metric);
       }
     }
   }
@@ -73,15 +126,20 @@ class WindowTable extends PureComponent {
 
   columnCount = memoize(columns => (columns || []).length)
 
-  center = memoize((topCount, rightCount, bottomCount, leftCount, rowCount, columnCount, width, height) =>
-    ({
+  center = memoize((topCount, rightCount, bottomCount, leftCount, rowCount, columnCount, width, height) => {
+
+    // console.log(width, this.gridWidth(0, leftCount), this.gridWidth(columnCount - rightCount, rightCount))
+    return {
       width: width - this.gridWidth(0, leftCount) - this.gridWidth(columnCount - rightCount, rightCount),
       height: height - this.gridHeight(0, topCount) - this.gridHeight(rowCount - bottomCount, bottomCount),
       rowOffset: topCount,
       rowCount: rowCount - topCount - bottomCount,
       columnOffset: leftCount,
       columnCount: columnCount - leftCount - rightCount,
-    }))
+    }
+
+  })
+
 
   top = memoize((topCount, rightCount, bottomCount, leftCount, rowCount, columnCount, width, height) =>
     (topCount <= 0 ? null : {
@@ -146,6 +204,8 @@ class WindowTable extends PureComponent {
 
   render() {
     let {
+      columns,
+      rows,
       width,
       height,
       fixedTopCount: topCount,
@@ -155,23 +215,19 @@ class WindowTable extends PureComponent {
       scrollbarWidth,
     } = this.props;
 
-    console.log('render');
+    // console.log('render');
 
-    const columnCount = this.rowCount(this.props.columns);
-    const rowCount = this.rowCount(this.props.rows);
+    const columnCount = this.rowCount(columns);
+    const rowCount = this.rowCount(rows);
 
-    const overallWidth = this.overallWidth(this.props.columns);
-    const overallHeight = this.overallHeight(this.props.rows);
+    const overallWidth = this.overallWidth(columns);
+    const overallHeight = this.overallHeight(rows);
 
 
-    if (overallWidth <= this.props.width) {
+    if (overallWidth <= width) {
       leftCount = 0;
       rightCount = 0;
     }
-
-
-    const fullWidth = this.gridWidth(0, columnCount);
-    const fullHeight = this.gridHeight(0, (this.props.rows || []).length);
 
     const center = this.center(topCount, rightCount, bottomCount, leftCount, rowCount, columnCount, width, height);
     const top = this.top(topCount, rightCount, bottomCount, leftCount, width, height);
@@ -183,17 +239,14 @@ class WindowTable extends PureComponent {
     const colSpan = [left, center, right].filter(e => e).length;
 
 
-
     return template.call(this, {
       // variables
       bottom,
       center,
       colSpan,
-      unused_fullHeight: fullHeight,
-      unused_fullWidth: fullWidth,
       left,
-      overallHeight,
-      overallWidth,
+      unused_overallHeight: overallHeight,
+      unused_overallWidth: overallWidth,
       right,
       rowSpan,
       scrollbarProps: {
@@ -202,6 +255,7 @@ class WindowTable extends PureComponent {
         overallWidth,
         overallHeight,
         scrollbarWidth,
+        onScroll: this.scrollTo
       },
       top,
       // components
@@ -217,7 +271,7 @@ const enhance = compose(defaultProps({
   fixedLeftCount: 1,
   fixedRightCount: 1,
   fixedBottomCount: 1,
-  scrollbarWidth: 10,
+  scrollbarWidth: 15,
   columns: [],
   rows: null,
 }));
