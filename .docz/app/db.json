@@ -1,0 +1,29 @@
+{
+  "config": {
+    "title": "Widget Table 2",
+    "description": "My awesome app using docz",
+    "themeConfig": {},
+    "ordering": "descending",
+    "version": "0.1.0",
+    "repository": null
+  },
+  "entries": {
+    "src/components/WidgetTable/widget-table.component.mdx": {
+      "name": "WidgetTable",
+      "id": "6694d63e70f878fe71a7ab822310b5e1",
+      "filepath": "src/components/WidgetTable/widget-table.component.mdx",
+      "link": null,
+      "slug": "src-components-widget-table-widget-table-component",
+      "route": "/src-components-widget-table-widget-table-component",
+      "order": 0,
+      "menu": null,
+      "headings": [
+        {
+          "depth": 1,
+          "slug": "widgettable",
+          "value": "Widgettable"
+        }
+      ]
+    }
+  }
+}
