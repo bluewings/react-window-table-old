@@ -1,7 +1,7 @@
 // @import .scss => styles
 div
   pre {rowSpan + ' x ' + colSpan}
-  pre {tableWidth + ' x ' + tableHeight}
+  pre {overallWidth + ' x ' + overallHeight}
   pre {this.props.width + ' x ' + this.props.height}
   table(className='{styles.table}', border='{1}')
     tbody
@@ -13,7 +13,7 @@ div
         td(@if='right', className='{styles.bg_200}')
           | {this.renderGrid({ ...top, ...right })}
         td(rowSpan='{rowSpan}')
-          | y
+          Scrollbar(type='y', ref='{this.scrollbarRef.y}', __jsx='{...scrollbarProps}')
       tr
         td(@if='left', className='{styles.bg_100}')
           | {this.renderGrid({ section: 'left', ...center, ...left })}
@@ -22,7 +22,7 @@ div
         td(@if='right', className='{styles.bg_300}')
           | {this.renderGrid({ section: 'right', ...center, ...right })}
         td(@if='!top', rowSpan='{rowSpan}')
-          | y
+          Scrollbar(type='y', ref='{this.scrollbarRef.y}', __jsx='{...scrollbarProps}')
       tr(@if='bottom')
         td(@if='left', className='{styles.bg_200}')
           | {this.renderGrid({ ...bottom, ...left })}
@@ -32,9 +32,16 @@ div
           | {this.renderGrid({ ...bottom, ...right })}
       tr
         td(colSpan='{colSpan}')
-          | x
+          Scrollbar(type='x', ref='{this.scrollbarRef.x}', __jsx='{...scrollbarProps}')
+                //- {/* <ScrollBar
+                //-   ref={this.scrollbarRef.x}
+                //-   type="x"
+                //-   width={this.props.width}
+                //-   height={this.props.height}
+                //-   overallWidth={overallWidth}
+                //-   overallHeight={overallHeight}
+                //- /> */}
         td
-          | .
 
             //- <tr>
             //-   {left && (<td className={styles.bg_100}>{this.renderGrid({ section: 'left', ...center, ...left })} </td>)}
@@ -52,5 +59,5 @@ div
 
         
       //-   <pre>{`${rowSpan} x ${colSpan}`}</pre>
-      //-   <pre>{`${tableWidth} x ${tableHeight}`}</pre>
+      //-   <pre>{`${overallWidth} x ${overallHeight}`}</pre>
       //-   <pre>{`${this.props.width} x ${this.props.height}`}</pre>

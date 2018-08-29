@@ -7,16 +7,18 @@ export default function (params = {}) {
     center,
     colSpan,
     left,
+    overallHeight,
+    overallWidth,
     right,
     rowSpan,
-    tableHeight,
-    tableWidth,
+    scrollbarProps,
     top,
+    Scrollbar,
   } = params;
   return (
     <div>
       <pre>{rowSpan + ' x ' + colSpan}</pre>
-      <pre>{tableWidth + ' x ' + tableHeight}</pre>
+      <pre>{overallWidth + ' x ' + overallHeight}</pre>
       <pre>{this.props.width + ' x ' + this.props.height}</pre>
       <table border={1} className={styles.table}>
         <tbody>
@@ -35,7 +37,9 @@ export default function (params = {}) {
               {this.renderGrid({ ...top, ...right })}
             </td>
             )}
-            <td rowSpan={rowSpan}>y</td>
+            <td rowSpan={rowSpan}>
+              <Scrollbar {...scrollbarProps} ref={this.scrollbarRef.y} type="y" />
+            </td>
           </tr>
           )}
           <tr>
@@ -53,7 +57,9 @@ export default function (params = {}) {
             </td>
             )}
             {(!top) && (
-            <td rowSpan={rowSpan}>y</td>
+            <td rowSpan={rowSpan}>
+              <Scrollbar {...scrollbarProps} ref={this.scrollbarRef.y} type="y" />
+            </td>
             )}
           </tr>
           {(bottom) && (
@@ -74,8 +80,10 @@ export default function (params = {}) {
           </tr>
           )}
           <tr>
-            <td colSpan={colSpan}>x</td>
-            <td>.</td>
+            <td colSpan={colSpan}>
+              <Scrollbar {...scrollbarProps} ref={this.scrollbarRef.x} type="x" />
+            </td>
+            <td />
           </tr>
         </tbody>
       </table>
@@ -84,6 +92,9 @@ export default function (params = {}) {
 }
 
 //  /* USAGE EXAMPLE */
+//  // Components
+//  import Scrollbar from '__modulePath__/Scrollbar';
+//
 //  // jsx
 //  import template from './window-table.component.pug';
 //
@@ -95,10 +106,11 @@ export default function (params = {}) {
 //        center,
 //        colSpan,
 //        left,
+//        overallHeight,
+//        overallWidth,
 //        right,
 //        rowSpan,
-//        tableHeight,
-//        tableWidth,
+//        scrollbarProps,
 //        top,
 //      } = this;
 //
@@ -108,11 +120,14 @@ export default function (params = {}) {
 //        center,
 //        colSpan,
 //        left,
+//        overallHeight,
+//        overallWidth,
 //        right,
 //        rowSpan,
-//        tableHeight,
-//        tableWidth,
-//        top
+//        scrollbarProps,
+//        top,
+//        // components
+//        Scrollbar,
 //      });
 //    }
 //

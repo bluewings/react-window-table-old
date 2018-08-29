@@ -3,6 +3,7 @@ import React, { PureComponent } from 'react';
 import { VariableSizeGrid as Grid } from 'react-window';
 import { compose, defaultProps } from 'recompose';
 import memoize from 'memoize-one';
+import Scrollbar from '../Scrollbar';
 
 // jsx
 import template from './window-table.component.pug';
@@ -110,10 +111,10 @@ class WindowTable extends PureComponent {
       columnCount: rightCount,
     }))
 
-  tableWidth = memoize(columns =>
+  overallWidth = memoize(columns =>
     (columns || []).reduce((prev, column, index) => prev + this.columnWidth(index, column), 0))
 
-  tableHeight = memoize(rows =>
+  overallHeight = memoize(rows =>
     (rows || []).reduce((prev, row, index) => prev + this.rowHeight(index, row), 0))
 
   renderGrid = ({ section, width, height, columnCount, columnOffset, rowCount, rowOffset }) => {
@@ -151,6 +152,7 @@ class WindowTable extends PureComponent {
       fixedBottomCount: bottomCount,
       fixedLeftCount: leftCount,
       fixedRightCount: rightCount,
+      scrollbarWidth,
     } = this.props;
 
     console.log('render');
@@ -158,18 +160,18 @@ class WindowTable extends PureComponent {
     const columnCount = this.rowCount(this.props.columns);
     const rowCount = this.rowCount(this.props.rows);
 
-    const tableWidth = this.tableWidth(this.props.columns);
-    const tableHeight = this.tableHeight(this.props.rows);
+    const overallWidth = this.overallWidth(this.props.columns);
+    const overallHeight = this.overallHeight(this.props.rows);
 
 
-    if (tableWidth <= this.props.width) {
+    if (overallWidth <= this.props.width) {
       leftCount = 0;
       rightCount = 0;
     }
 
 
-    // const fullWidth = this.gridWidth(0, columnCount);
-    // const fullHeight = this.gridHeight(0, (this.props.rows || []).length);
+    const fullWidth = this.gridWidth(0, columnCount);
+    const fullHeight = this.gridHeight(0, (this.props.rows || []).length);
 
     const center = this.center(topCount, rightCount, bottomCount, leftCount, rowCount, columnCount, width, height);
     const top = this.top(topCount, rightCount, bottomCount, leftCount, width, height);
@@ -180,19 +182,30 @@ class WindowTable extends PureComponent {
     const rowSpan = [top, center, bottom].filter(e => e).length;
     const colSpan = [left, center, right].filter(e => e).length;
 
-    
+
 
     return template.call(this, {
       // variables
       bottom,
       center,
       colSpan,
+      unused_fullHeight: fullHeight,
+      unused_fullWidth: fullWidth,
       left,
+      overallHeight,
+      overallWidth,
       right,
       rowSpan,
-      tableHeight,
-      tableWidth,
+      scrollbarProps: {
+        width,
+        height,
+        overallWidth,
+        overallHeight,
+        scrollbarWidth,
+      },
       top,
+      // components
+      Scrollbar,
     });
   }
 }
@@ -204,7 +217,7 @@ const enhance = compose(defaultProps({
   fixedLeftCount: 1,
   fixedRightCount: 1,
   fixedBottomCount: 1,
-  scrollbarWidth: 20,
+  scrollbarWidth: 10,
   columns: [],
   rows: null,
 }));
