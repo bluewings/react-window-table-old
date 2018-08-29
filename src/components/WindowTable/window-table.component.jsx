@@ -1,42 +1,24 @@
-import React, { PureComponent } from 'react';
-// import PropTypes from 'prop-types';
 /* eslint-disable */
+import React, { PureComponent } from 'react';
 import { VariableSizeGrid as Grid } from 'react-window';
-import { Map } from 'immutable';
-import { compose,
-  withState,
-  withHandlers,
-  defaultProps, withPropsOnChange } from 'recompose';
-// import ScrollBar from '../ScrollBar';
+import { compose, defaultProps } from 'recompose';
+import memoize from 'memoize-one';
 
-// const columns = [...Array(100)].map((e, i) => {
-//   return { name: 'col-' + i, width: 60 }
-// })
-
-// const data = [...Array(100)].map((e, i) => {
-//   return columns.reduce((prev, f, j) => {
-//     return {
-//       ...prev,
-//       [f.name]: i + ',' + j
-//     }
-//   }, {})
-// })
-
-// // console.log(data);
-
-// const data =
+// jsx
+import template from './window-table.component.pug';
 
 class WindowTable extends PureComponent {
   constructor(props) {
     super(props);
-    // this.gridRef = React.createRef();
+
     this.gridRef = {
+      center: React.createRef(),
       top: React.createRef(),
       right: React.createRef(),
       bottom: React.createRef(),
       left: React.createRef(),
-      center: React.createRef(),
     };
+
     this.scrollbarRef = {
       x: React.createRef(),
       y: React.createRef(),
@@ -46,108 +28,31 @@ class WindowTable extends PureComponent {
   columnWidth = index => this.props.columns[index].width || 80
 
   rowHeight = index => 40
-  // handleScroll = (event) => {
-  //   // // console.log(event);
-  //   const { scrollLeft, scrollTop } = event;
-  //   if (this.gridRef.current) {
-  //     // // console.log(this.gridRef.current);
-  //     // requestAnimationFrame(() => {
-  //     this.gridRef.current.scrollTo({
-  //       scrollLeft, scrollTop
-  //     })
-  //     // })
 
-  //   }
-  // }
-  handleScroll = (event, type) => {
-    if (event.scrollUpdateWasRequested !== false) {
-      return;
+  handleScroll = (event, section) => {
+    if (event.scrollUpdateWasRequested === false) {
+      const { scrollTop, scrollLeft } = event;
+      const scrollTo = { scrollTop, scrollLeft };
+
+      Object.keys(this.gridRef)
+        .filter(key => key !== section && this.gridRef[key].current)
+        .forEach((key) => {
+          if (key === 'left' || key === 'right') {
+            this.gridRef[key].current.scrollTo({ scrollTop, scrollLeft: 0 });
+          } else if (key === 'top' || key === 'bottom') {
+            this.gridRef[key].current.scrollTo({ scrollTop: 0, scrollLeft });
+          } else {
+            this.gridRef[key].current.scrollTo(scrollTo);
+          }
+        });
+
+      if (this.scrollbarRef.x.current) {
+        this.scrollbarRef.x.current.scrollTo(scrollTo);
+      }
+      if (this.scrollbarRef.y.current) {
+        this.scrollbarRef.y.current.scrollTo(scrollTo);
+      }
     }
-
-    const { scrollTop, scrollLeft } = event;
-
-    Object.keys(this.gridRef)
-      .filter(key => key !== type && this.gridRef[key].current)
-      .forEach((key) => {
-        this.gridRef[key].current.scrollTo({ scrollTop, scrollLeft });
-      });
-
-
-    // if (type !== 'left' && this.gridRef.left.current) {
-    //   this.gridRef.left.current.scrollTo({
-    //     scrollLeft: 0,
-    //     scrollTop: event.scrollTop,
-    //   });
-    // }
-    // type !== 'right' && this.gridRef.right.current && this.gridRef.right.current.scrollTo({
-    //   scrollLeft: 0,
-    //   scrollTop: event.scrollTop,
-    // });
-    // type !== 'top' && this.gridRef.top.current && this.gridRef.top.current.scrollTo({
-    //   scrollLeft: event.scrollLeft,
-    //   scrollTop: 0,
-    // });
-    // type !== 'bottom' && this.gridRef.bottom.current && this.gridRef.bottom.current.scrollTo({
-    //   scrollLeft: event.scrollLeft,
-    //   scrollTop: 0,
-    // });
-    // type !== 'center' && this.gridRef.center.current && this.gridRef.center.current.scrollTo({
-    //   scrollLeft: event.scrollLeft,
-    //   scrollTop: event.scrollTop,
-    // });
-
-    this.scrollbarRef.x.current && this.scrollbarRef.x.current.scrollTo({
-      scrollLeft: event.scrollLeft,
-      scrollTop: event.scrollTop,
-    });
-
-    this.scrollbarRef.y.current && this.scrollbarRef.y.current.scrollTo({
-      scrollLeft: event.scrollLeft,
-      scrollTop: event.scrollTop,
-    });
-  }
-  _renderGrid = ({
-    type, width, height, columnOffset, columnCount,
-    rowOffset, rowCount,
-  }) => {
-    let gridProps = {};
-    // if (type === 'center' || type === 'right') {
-    if (type) { // // console.log(type);
-      gridProps = {
-        ...gridProps,
-        ref: this.gridRef[type],
-        onScroll: (event) => {
-          // // console.log(event);
-          this.handleScroll(event, type);
-        },
-      };
-    }
-    return (
-      <Grid
-
-        columnCount={columnCount}
-        // columnWidth={100}
-        height={height || 300}
-        rowCount={rowCount || 100}
-        // rowHeight={35}
-        width={width || 300}
-        // scrollTop={100}
-        columnWidth={this.columnWidth}
-        rowHeight={this.rowHeight}
-        // overscanCount={5}
-
-        {...gridProps}
-        // onScroll={this.handleScroll}
-      >
-        {({ columnIndex, rowIndex, style }) => (
-          <div style={style}>
-            {/* row {rowIndex}, column {columnIndex} */}
-            {rowOffset + rowIndex}, {columnOffset + columnIndex}
-            {/* {소ㅑㄴ. */}
-          </div>
-        )}
-      </Grid>
-    );
   }
 
   gridWidth = (from, limit) => this.props.columns.slice(from, from + limit).reduce((prev, e) => prev + e.width, 0)
@@ -161,318 +66,147 @@ class WindowTable extends PureComponent {
   //   return prev + e.width;
   // }, 0 )
 
+  // _top = (memoize)
+
+  rowCount = memoize(rows => (rows || []).length)
+
+  columnCount = memoize(columns => (columns || []).length)
+
+  center = memoize((topCount, rightCount, bottomCount, leftCount, rowCount, columnCount, width, height) =>
+    ({
+      width: width - this.gridWidth(0, leftCount) - this.gridWidth(columnCount - rightCount, rightCount),
+      height: height - this.gridHeight(0, topCount) - this.gridHeight(rowCount - bottomCount, bottomCount),
+      rowOffset: topCount,
+      rowCount: rowCount - topCount - bottomCount,
+      columnOffset: leftCount,
+      columnCount: columnCount - leftCount - rightCount,
+    }))
+
+  top = memoize((topCount, rightCount, bottomCount, leftCount, rowCount, columnCount, width, height) =>
+    (topCount <= 0 ? null : {
+      height: this.gridHeight(0, topCount),
+      rowOffset: 0,
+      rowCount: topCount,
+    }))
+
+  bottom = memoize((topCount, rightCount, bottomCount, leftCount, rowCount, columnCount, width, height) =>
+    (bottomCount <= 0 ? null : {
+      height: this.gridHeight(rowCount - bottomCount, bottomCount),
+      rowOffset: rowCount - bottomCount,
+      rowCount: bottomCount,
+    }))
+
+  left = memoize((topCount, rightCount, bottomCount, leftCount, rowCount, columnCount, width, height) =>
+    (leftCount <= 0 ? null : {
+      width: this.gridWidth(0, leftCount),
+      columnOffset: 0,
+      columnCount: leftCount,
+    }))
+
+  right = memoize((topCount, rightCount, bottomCount, leftCount, rowCount, columnCount, width, height) =>
+    (rightCount <= 0 ? null : {
+      width: this.gridWidth(columnCount - rightCount, rightCount),
+      columnOffset: columnCount - rightCount,
+      columnCount: rightCount,
+    }))
+
+  tableWidth = memoize(columns =>
+    (columns || []).reduce((prev, column, index) => prev + this.columnWidth(index, column), 0))
+
+  tableHeight = memoize(rows =>
+    (rows || []).reduce((prev, row, index) => prev + this.rowHeight(index, row), 0))
+
+  renderGrid = ({ section, width, height, columnCount, columnOffset, rowCount, rowOffset }) => {
+    let gridProps = {
+      width,
+      height,
+      columnCount,
+      columnWidth: this.columnWidth,
+      rowCount,
+      rowHeight: this.rowHeight,
+    };
+    if (section) {
+      gridProps = {
+        ...gridProps,
+        ref: this.gridRef[section],
+        onScroll: event => this.handleScroll(event, section),
+      };
+    }
+    return (
+      <Grid {...gridProps} >
+        {({ columnIndex, rowIndex, style }) => (
+          <div style={style}>
+            {rowOffset + rowIndex}, {columnOffset + columnIndex}
+          </div>
+          )}
+      </Grid>
+    );
+  }
 
   render() {
+    let {
+      width,
+      height,
+      fixedTopCount: topCount,
+      fixedBottomCount: bottomCount,
+      fixedLeftCount: leftCount,
+      fixedRightCount: rightCount,
+    } = this.props;
+
     console.log('render');
-    // console.log(this.props);
 
-    const fullWidth = this.gridWidth(0, this.props.columns.length);
-    const fullHeight = this.gridHeight(0, (this.props.data || []).length);
-    return (
-      <div>
-        <pre>{JSON.stringify(this.props.scrollPos)}</pre>
-        <table border={1}>
-          <tbody>
-            {this.props._top && (
-            <tr>
-              {this.props._left && (
-              <td>{this._renderGrid({
-                // columnWidth: this
-                width: this.gridWidth(0, this.props.fixedLeftCount),
-                height: this.gridHeight(0, this.props.fixedTopCount),
-                rowOffset: this.props.__top.rowOffset,
-                rowCount: this.props.__top.rowCount,
-                columnOffset: this.props.__left.columnOffset,
-                columnCount: this.props.__left.columnCount,
-              })}
-              </td>
-            )}
-              {/* <td>top</td> */}
+    const columnCount = this.rowCount(this.props.columns);
+    const rowCount = this.rowCount(this.props.rows);
+
+    const tableWidth = this.tableWidth(this.props.columns);
+    const tableHeight = this.tableHeight(this.props.rows);
 
 
-              <td>{this._renderGrid({
-                // columnWidth: this
-                type: 'top',
-                width: this.props.width -
-                this.gridWidth(0, this.props.fixedLeftCount) -
-                this.gridWidth(this.props.columns.length - this.props.fixedRightCount, this.props.fixedRightCount),
-                height: this.gridHeight(0, this.props.fixedTopCount),
-                rowOffset: this.props.__top.rowOffset,
-                rowCount: this.props.__top.rowCount,
-                columnOffset: this.props.__center.columnOffset,
-                columnCount: this.props.__center.columnCount,
-              })}
-              </td>
+    if (tableWidth <= this.props.width) {
+      leftCount = 0;
+      rightCount = 0;
+    }
 
-              {this.props._right && (
-              <td>{this._renderGrid({
-                // columnWidth: this
-                width: this.gridWidth(this.props.columns.length - this.props.fixedRightCount, this.props.fixedRightCount),
-                height: this.gridHeight(0, this.props.fixedTopCount),
-                rowOffset: this.props.__top.rowOffset,
-                rowCount: this.props.__top.rowCount,
-                columnOffset: this.props.__right.columnOffset,
-                columnCount: this.props.__right.columnCount,
-              })}
-              </td>
-            )}
-              <td rowSpan={3} vAlign="top">
-                {/* <ScrollBar
-                  type="y"
-                  ref={this.scrollbarRef.y}
-                  width={this.props.width}
-                  height={this.props.height}
-                  fullWidth={fullWidth}
-                  fullHeight={fullHeight}
-                /> */}
-              </td>
-            </tr>
-          )}
-            <tr>
-              {this.props._left && (
-              <td>{this._renderGrid({
-                // columnWidth: this
-                type: 'left',
-                width: this.gridWidth(0, this.props.fixedLeftCount),
-                height: this.props.height -
-                this.gridHeight(0, this.props.fixedTopCount) -
-                this.gridHeight(this.props.data.length - this.props.fixedBottomCount, this.props.fixedBottomCount),
 
-                rowOffset: this.props.__center.rowOffset,
-                rowCount: this.props.__center.rowCount,
-                columnOffset: this.props.__left.columnOffset,
-                columnCount: this.props.__left.columnCount,
-              })}
-              </td>
-            )}
-              <td>{this._renderGrid({
-              type: 'center',
-              width: this.props.width -
-                this.gridWidth(0, this.props.fixedLeftCount) -
-                this.gridWidth(this.props.columns.length - this.props.fixedRightCount, this.props.fixedRightCount),
-              height: this.props.height -
-                this.gridHeight(0, this.props.fixedTopCount) -
-                this.gridHeight(this.props.data.length - this.props.fixedBottomCount, this.props.fixedBottomCount),
-              rowOffset: this.props.__center.rowOffset,
-              rowCount: this.props.__center.rowCount,
-              columnOffset: this.props.__center.columnOffset,
-              columnCount: this.props.__center.columnCount,
-            })}
-              </td>
-              {this.props._right && (
-              <td>{this._renderGrid({
-                // columnWidth: this
-                type: 'right',
-                width: this.gridWidth(this.props.columns.length - this.props.fixedRightCount, this.props.fixedRightCount),
-                height: this.props.height -
-                this.gridHeight(0, this.props.fixedTopCount) -
-                this.gridHeight(this.props.data.length - this.props.fixedBottomCount, this.props.fixedBottomCount),
+    // const fullWidth = this.gridWidth(0, columnCount);
+    // const fullHeight = this.gridHeight(0, (this.props.rows || []).length);
 
-                rowOffset: this.props.__center.rowOffset,
-                rowCount: this.props.__center.rowCount,
-                columnOffset: this.props.__right.columnOffset,
-                columnCount: this.props.__right.columnCount,
-              })}
-              </td>
-            )}
-            </tr>
-            {this.props._bottom && (
-            <tr>
-              {this.props._left && (
-              <td>{this._renderGrid({
-                width: this.gridWidth(0, this.props.fixedLeftCount),
-                height: this.gridHeight(this.props.data.length - this.props.fixedBottomCount, this.props.fixedBottomCount),
-                rowOffset: this.props.__bottom.rowOffset,
-                rowCount: this.props.__bottom.rowCount,
-                columnOffset: this.props.__left.columnOffset,
-                columnCount: this.props.__left.columnCount,
-              })}
-              </td>
-            )}
-              <td>{this._renderGrid({
-              type: 'bottom',
-              width: this.props.width -
-              this.gridWidth(0, this.props.fixedLeftCount) -
-              this.gridWidth(this.props.columns.length - this.props.fixedRightCount, this.props.fixedRightCount),
-              height: this.gridHeight(this.props.data.length - this.props.fixedBottomCount, this.props.fixedBottomCount),
-              // rowOffset: this.props.data.length - this.props.fixedBottomCount,
-              // rowCount: this.props.fixedBottomCount,
-              rowOffset: this.props.__bottom.rowOffset,
-              rowCount: this.props.__bottom.rowCount,
-              columnOffset: this.props.__center.columnOffset,
-              columnCount: this.props.__center.columnCount,
-            })}
-              </td>
-              {this.props._right && (
-              <td>{this._renderGrid({
-                width: this.gridWidth(this.props.columns.length - this.props.fixedRightCount, this.props.fixedRightCount),
-                height: this.gridHeight(this.props.data.length - this.props.fixedBottomCount, this.props.fixedBottomCount),
-                rowOffset: this.props.__bottom.rowOffset,
-                rowCount: this.props.__bottom.rowCount,
-                columnOffset: this.props.__right.columnOffset,
-                columnCount: this.props.__right.columnCount,
-              })}
-              </td>
-            )}
-            </tr>
-          )}
-            <tr>
-              <td colSpan={3}>
-                {/* <ScrollBar
-                  ref={this.scrollbarRef.x}
-                  type="x"
-                  width={this.props.width}
-                  height={this.props.height}
-                  fullWidth={fullWidth}
-                  fullHeight={fullHeight}
-                /> */}
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-      // <table>
-      //   <tbody>
-      //     <tr>
-      //       <td>
-      //       <Grid
-      //   columnCount={1000}
-      //   // columnWidth={100}
-      //   height={300}
-      //   rowCount={100}
-      //   // rowHeight={35}
-      //   width={300}
-      //   // scrollTop={100}
-      //   columnWidth={this.columnWidth}
-      //   rowHeight={this.rowHeight}
-      //   // overscanCount={5}
+    const center = this.center(topCount, rightCount, bottomCount, leftCount, rowCount, columnCount, width, height);
+    const top = this.top(topCount, rightCount, bottomCount, leftCount, width, height);
+    const right = this.right(topCount, rightCount, bottomCount, leftCount, rowCount, columnCount, width, height);
+    const bottom = this.bottom(topCount, rightCount, bottomCount, leftCount, rowCount, columnCount, width, height);
+    const left = this.left(topCount, rightCount, bottomCount, leftCount, rowCount, columnCount, width, height);
 
-    //   onScroll={this.handleScroll}
-    // >
-    //   {({ columnIndex, rowIndex, style }) => (
-    //     <div style={style}>
-    //       {/* row {rowIndex}, column {columnIndex} */}
-    //       {rowIndex}, {columnIndex}
-    //     </div>
-    //   )}
-    // </Grid>
-    //       </td>
+    const rowSpan = [top, center, bottom].filter(e => e).length;
+    const colSpan = [left, center, right].filter(e => e).length;
 
-    //       <td>
+    
 
-    // <Grid
-    //   ref={this.gridRef}
-    //   columnCount={1000}
-    //   // columnWidth={100}
-    //   height={300}
-    //   rowCount={100}
-    //   // rowHeight={35}
-    //   columnWidth={this.columnWidth}
-    //   rowHeight={this.rowHeight}
-    //   // overscanCount={1}
-    //   width={300}
-    // >
-    //   {({ columnIndex, rowIndex, style }) => (
-    //     <div style={style}>
-    //       {rowIndex}, {columnIndex}
-    //     </div>
-    //   )}
-    // </Grid>
-    //       </td>
-    //     </tr>
-    //   </tbody>
-
-    // </table>
-    );
+    return template.call(this, {
+      // variables
+      bottom,
+      center,
+      colSpan,
+      left,
+      right,
+      rowSpan,
+      tableHeight,
+      tableWidth,
+      top,
+    });
   }
 }
 
-const enhance = compose(
-  defaultProps({
-    width: 800,
-    height: 400,
-    fixedTopCount: 1,
-    fixedLeftCount: 1,
-    fixedRightCount: 1,
-    fixedBottomCount: 1,
-    columns: [],
-    // data: [],
-  }),
-  withState('scrollPos', '_updateScrollPos', Map({
-    left: 0,
-    top: 0,
-  })),
-  withHandlers({
-    scrollTo: ({ scrollPos, _updateScrollPos }) => (top, left) => {
-      const next = scrollPos
-        .set('top', top)
-        .set('left', left);
-
-      if (next !== scrollPos) {
-        _updateScrollPos(next);
-      }
-
-      // props.updateValue(event.target.value)
-    },
-  }),
-  // withState('_sTop', 'update_sTop', 0),
-  // withHandlers({})
-  withPropsOnChange(['columns', 'data'], ({
-    columns, data,
-  }) => ({
-    _columnCount: (columns || []).length,
-    _rowCount: (data || []).length,
-  })),
-  withPropsOnChange(['fixedTopCount', 'fixedLeftCount', 'fixedRightCount', 'fixedBottomCount', '_columnCount', '_rowCount'], ({
-    fixedTopCount, fixedLeftCount, fixedRightCount, fixedBottomCount,
-    _columnCount, _rowCount,
-  }) => ({
-    __top: {
-      // height: this.gridHeight(0, this.props.fixedTopCount),
-      rowOffset: 0,
-      rowCount: fixedTopCount,
-    },
-    __bottom: {
-      // height: this.gridHeight(0, this.props.fixedTopCount),
-      // rowOffset: 0,
-      // rowCount: fixedTopCount,
-      rowOffset: _rowCount - fixedBottomCount,
-      rowCount: fixedBottomCount,
-    },
-    __left: {
-      columnOffset: 0,
-      columnCount: fixedLeftCount,
-    },
-    __right: {
-      columnOffset: _columnCount - fixedRightCount,
-      columnCount: fixedRightCount,
-    },
-    __center: {
-      rowOffset: fixedTopCount,
-      rowCount: _rowCount - fixedTopCount - fixedBottomCount,
-      columnOffset: fixedLeftCount,
-      columnCount: _columnCount - fixedLeftCount - fixedRightCount,
-    },
-    _topLeft: fixedTopCount > 0 && fixedLeftCount > 0,
-    _top: fixedTopCount > 0,
-    // _top: fixedTopCount > 0,
-    _topRight: fixedTopCount > 0 && fixedRightCount > 0,
-    _left: fixedLeftCount > 0,
-    _right: fixedRightCount > 0,
-    _bottomLeft: fixedBottomCount > 0 && fixedLeftCount > 0,
-    _bottom: fixedBottomCount > 0,
-    _bottomRight: fixedBottomCount > 0 && fixedRightCount > 0,
-  })),
-);
-
-// const Enhance = enhance(WindowTable);
-
-// Enhance.propTypes = {
-//   name: PropTypes.string,
-// }
-
-// Enhance.defaultProps = {
-//   name: 'aaa',
-// }
+const enhance = compose(defaultProps({
+  width: 800,
+  height: 400,
+  fixedTopCount: 1,
+  fixedLeftCount: 1,
+  fixedRightCount: 1,
+  fixedBottomCount: 1,
+  scrollbarWidth: 20,
+  columns: [],
+  rows: null,
+}));
 
 export default enhance(WindowTable);

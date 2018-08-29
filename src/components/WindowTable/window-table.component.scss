@@ -1,0 +1,35 @@
+.table {
+  padding: 0;
+  margin: 0;
+  border-spacing: 0;
+  td {
+    padding: 0;
+    margin: 0;
+    vertical-align: top;
+    ::-webkit-scrollbar {
+      width: 0;
+      height: 0;
+      /* opacity: 0.5; */
+    }
+  }
+}
+
+.bg_50 {
+  background: #E1F5FE;
+}
+
+.bg_100 {
+  background: #B3E5FC;
+}
+
+.bg_200 {
+  background: #81D4FA;
+}
+
+.bg_300 {
+  background: #4FC3F7;
+}
+
+.bg_400 {
+  background: #29B6F6;
+}

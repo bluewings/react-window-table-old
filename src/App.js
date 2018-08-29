@@ -6,7 +6,7 @@ import WindowTable from './components/WindowTable';
 
 const columns = [...Array(100)].map((e, i) => ({ name: `col-${i}`, width: 120 }));
 
-const data = [...Array(30)].map((e, i) => columns.reduce((prev, f, j) => ({
+const data = [...Array(100)].map((e, i) => columns.reduce((prev, f, j) => ({
   ...prev,
   [f.name]: `${i},${j}`,
 }), {}));
@@ -15,7 +15,20 @@ class App extends Component {
   render() {
     return (
       <div className="App">
-        <WindowTable columns={columns} data={data} />
+        <table border={1}>
+          <tbody>
+            <tr>
+              <td>
+                <WindowTable columns={columns.slice(0,50)} fixedTopCount={0} fixedBottomCount={0} rows={data} width={500} height={300} />
+              </td>
+              <td>
+                <WindowTable columns={columns.slice(0,3)} rows={data} width={500} height={300} />
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        
+        <WindowTable columns={columns} rows={data} height={300} />
         {/* <header className="App-header">
           <img src={logo} className="App-logo" alt="logo" />
           <h1 className="App-title">Welcome to React</h1>

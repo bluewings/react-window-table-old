@@ -1,0 +1,56 @@
+// @import .scss => styles
+div
+  pre {rowSpan + ' x ' + colSpan}
+  pre {tableWidth + ' x ' + tableHeight}
+  pre {this.props.width + ' x ' + this.props.height}
+  table(className='{styles.table}', border='{1}')
+    tbody
+      tr(@if='top')
+        td(@if='left', className='{styles.bg_50}')
+          | {this.renderGrid({ ...top, ...left })}
+        td(className='{styles.bg_100}')
+          | {this.renderGrid({ section: 'top', ...center, ...top })}
+        td(@if='right', className='{styles.bg_200}')
+          | {this.renderGrid({ ...top, ...right })}
+        td(rowSpan='{rowSpan}')
+          | y
+      tr
+        td(@if='left', className='{styles.bg_100}')
+          | {this.renderGrid({ section: 'left', ...center, ...left })}
+        td(className='{styles.bg_200}')
+          | {this.renderGrid({ section: 'center', ...center })}
+        td(@if='right', className='{styles.bg_300}')
+          | {this.renderGrid({ section: 'right', ...center, ...right })}
+        td(@if='!top', rowSpan='{rowSpan}')
+          | y
+      tr(@if='bottom')
+        td(@if='left', className='{styles.bg_200}')
+          | {this.renderGrid({ ...bottom, ...left })}
+        td(className='{styles.bg_300}')
+          | {this.renderGrid({ section: 'bottom', ...center, ...bottom })}
+        td(@if='right', className='{styles.bg_400}')
+          | {this.renderGrid({ ...bottom, ...right })}
+      tr
+        td(colSpan='{colSpan}')
+          | x
+        td
+          | .
+
+            //- <tr>
+            //-   {left && (<td className={styles.bg_100}>{this.renderGrid({ section: 'left', ...center, ...left })} </td>)}
+            //-   <td className={styles.bg_200}>{this.renderGrid({ section: 'center', ...center })} </td>
+            //-   {right && (<td className={styles.bg_300}>{this.renderGrid({ section: 'right', ...center, ...right })} </td>)}
+            //- </tr>
+
+          //- <tbody>
+          //-   {top && (
+          //-   <tr>
+          //-     {left && (<td className={styles.bg_50}>{this.renderGrid({ ...top, ...left })} </td>)}
+          //-     <td className={styles.bg_100}>{this.renderGrid({ section: 'top', ...center, ...top })} </td>
+          //-     {right && (<td className={styles.bg_200}>{this.renderGrid({ ...top, ...right })} </td>)}
+      //- <div>
+
+        
+      //-   <pre>{`${rowSpan} x ${colSpan}`}</pre>
+      //-   <pre>{`${tableWidth} x ${tableHeight}`}</pre>
+      //-   <pre>{`${this.props.width} x ${this.props.height}`}</pre>
