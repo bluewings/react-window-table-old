@@ -52,6 +52,14 @@ const scrollbarHandleStyle = (base) => {
   }
 }
 
+const guidelineStyle = (base) => {
+  return {
+    ...base,
+    background: 'blue',
+    // zIndex: 1,
+  }
+}
+
 class App extends Component {
   render() {
     return (
@@ -71,6 +79,7 @@ class App extends Component {
                 <WindowTable
                   scrollbarTrackStyle={scrollbarTrackStyle}
                   scrollbarHandleStyle={scrollbarHandleStyle}
+                  guidelineStyle={guidelineStyle}
                   columns={columns} rows={data.slice(0, 100)} width={500} height={500} />
               </td>
               <td>

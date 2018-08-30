@@ -2,26 +2,31 @@
 div
   div(className='{styles.root}')
 
-    .guideline-top(@if='top',
-      ref='{this.guideLineRef.top}',
-      className='{styles.guide}',
-      style='{{ top: top.height, width: contentWidth }}'
-      )
-    .guideline-bottom(@if='bottom',
-      ref='{this.guideLineRef.bottom}',
-      className='{styles.guide}',
-      style='{{ bottom: bottom.height + (scrollbarX ? scrollbarWidth : 0), width: contentWidth }}'
-      )  
-    .guideline-left(@if='left',
-      ref='{this.guideLineRef.left}',
-      className='{styles.guide}',
-      style='{{ left: left.width, height: contentHeight }}'
-      )  
-    .guideline-right(@if='right',
-      ref='{this.guideLineRef.right}',
-      className='{styles.guide}',
-      style='{{ right: right.width + (scrollbarY ? scrollbarWidth : 0), height: contentHeight }}'
-      )  
+    Guideline(@if='top',    type='top',    guidelineStyle='{guidelineStyle}', length='{contentWidth}',  distance='{top.height}')
+    Guideline(@if='bottom', type='bottom', guidelineStyle='{guidelineStyle}', length='{contentWidth}',  distance='{bottom.height + (scrollbarX ? scrollbarWidth : 0)}')
+    Guideline(@if='left',   type='left',   guidelineStyle='{guidelineStyle}', length='{contentHeight}', distance='{left.width}')
+    Guideline(@if='right',  type='right',  guidelineStyle='{guidelineStyle}', length='{contentHeight}', distance='{right.width + (scrollbarY ? scrollbarWidth : 0)}')
+
+    //- .guideline-top(@if='top',
+    //-   ref='{this.guideLineRef.top}',
+    //-   className='{styles.guide}',
+    //-   style='{{ top: top.height, width: contentWidth }}'
+    //-   )
+    //- .guideline-bottom(@if='bottom',
+    //-   ref='{this.guideLineRef.bottom}',
+    //-   className='{styles.guide}',
+    //-   style='{{ bottom: bottom.height + (scrollbarX ? scrollbarWidth : 0), width: contentWidth }}'
+    //-   )  
+    //- .guideline-left(@if='left',
+    //-   ref='{this.guideLineRef.left}',
+    //-   className='{styles.guide}',
+    //-   style='{{ left: left.width, height: contentHeight }}'
+    //-   )  
+    //- .guideline-right(@if='right',
+    //-   ref='{this.guideLineRef.right}',
+    //-   className='{styles.guide}',
+    //-   style='{{ right: right.width + (scrollbarY ? scrollbarWidth : 0), height: contentHeight }}'
+    //-   )  
     //- pre {rowSpan + ' x ' + colSpan}
     //- pre {overallWidth + ' x ' + overallHeight}
     //- pre {this.props.width + ' x ' + this.props.height}

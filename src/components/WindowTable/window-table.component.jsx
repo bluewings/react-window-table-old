@@ -4,6 +4,7 @@ import { VariableSizeGrid as Grid } from 'react-window';
 import { compose, defaultProps } from 'recompose';
 import memoize from 'memoize-one';
 import Scrollbar from '../Scrollbar';
+import Guideline from '../Guideline';
 
 // jsx
 import template from './window-table.component.pug';
@@ -255,6 +256,7 @@ class WindowTable extends PureComponent {
       fixedLeftCount: leftCount,
       fixedRightCount: rightCount,
       scrollbarWidth,
+      guidelineStyle,
     } = this.props;
 
     // console.log('render');
@@ -350,6 +352,7 @@ class WindowTable extends PureComponent {
       colSpan,
       contentHeight,
       contentWidth,
+      guidelineStyle,
       left,
       right,
       rowSpan,
@@ -359,6 +362,7 @@ class WindowTable extends PureComponent {
       scrollbarY,
       top,
       // components
+      Guideline,
       Scrollbar,
     });
   }
