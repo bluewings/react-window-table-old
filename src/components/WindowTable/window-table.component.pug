@@ -1,63 +1,41 @@
 // @import .scss => styles
 div
+  strong(ref='{this.titleRef}', style='{{ textAlign: "right" }}')
   //- pre {rowSpan + ' x ' + colSpan}
   //- pre {overallWidth + ' x ' + overallHeight}
   //- pre {this.props.width + ' x ' + this.props.height}
-  table(className='{styles.table}', border='{0}', cellPadding='{0}', cellSpacing='{0}')
+  table(className='{styles.table}', border='{0}', cellPadding='{0}', cellSpacing='{0}',
+    ref='{this.tableRef}')
     tbody
       tr(@if='top')
         td(@if='left', className='{styles.bg_50}')
           | {this.renderGrid({ ...top, ...left })}
         td(className='{styles.bg_100}')
           | {this.renderGrid({ section: 'top', ...center, ...top })}
-        td(@if='right', className='{styles.bg_50}')
+        td(@if='right', className='{styles.bg_200}')
           | {this.renderGrid({ ...top, ...right })}
         td(@if='scrollbarY', rowSpan='{rowSpan}')
-          Scrollbar(axis='y', ref='{this.scrollbarRef.y}', __jsx='{...scrollbar.y}')
+          Scrollbar(__jsx='{...scrollbar.y}')
+
       tr
         td(@if='left', className='{styles.bg_100}')
           | {this.renderGrid({ section: 'left', ...center, ...left })}
-        td(className='{styles.bg_50}')
+        td(className='{styles.bg_200}')
           | {this.renderGrid({ section: 'center', ...center })}
-        td(@if='right', className='{styles.bg_100}')
+        td(@if='right', className='{styles.bg_300}')
           | {this.renderGrid({ section: 'right', ...center, ...right })}
         td(@if='scrollbarY && !top', rowSpan='{rowSpan}')
-          Scrollbar(axis='y', ref='{this.scrollbarRef.y}', __jsx='{...scrollbar.y}')
+          Scrollbar(__jsx='{...scrollbar.y}')
+
       tr(@if='bottom')
-        td(@if='left', className='{styles.bg_50}')
+        td(@if='left', className='{styles.bg_200}')
           | {this.renderGrid({ ...bottom, ...left })}
-        td(className='{styles.bg_100}')
+        td(className='{styles.bg_300}')
           | {this.renderGrid({ section: 'bottom', ...center, ...bottom })}
-        td(@if='right', className='{styles.bg_50}')
+        td(@if='right', className='{styles.bg_400}')
           | {this.renderGrid({ ...bottom, ...right })}
-      tr
-        td(@if='scrollbarX', colSpan='{colSpan}')
-          Scrollbar(axis='x', ref='{this.scrollbarRef.x}', __jsx='{...scrollbar.x}')
-                //- {/* <ScrollBar
-                //-   ref={this.scrollbarRef.x}
-                //-   axis="x"
-                //-   width={this.props.width}
-                //-   height={this.props.height}
-                //-   overallWidth={overallWidth}
-                //-   overallHeight={overallHeight}
-                //- /> */}
+
+      tr(@if='scrollbarX')
+        td(colSpan='{colSpan}')
+          Scrollbar(__jsx='{...scrollbar.x}')
         td
-
-            //- <tr>
-            //-   {left && (<td className={styles.bg_100}>{this.renderGrid({ section: 'left', ...center, ...left })} </td>)}
-            //-   <td className={styles.bg_200}>{this.renderGrid({ section: 'center', ...center })} </td>
-            //-   {right && (<td className={styles.bg_300}>{this.renderGrid({ section: 'right', ...center, ...right })} </td>)}
-            //- </tr>
-
-          //- <tbody>
-          //-   {top && (
-          //-   <tr>
-          //-     {left && (<td className={styles.bg_50}>{this.renderGrid({ ...top, ...left })} </td>)}
-          //-     <td className={styles.bg_100}>{this.renderGrid({ section: 'top', ...center, ...top })} </td>
-          //-     {right && (<td className={styles.bg_200}>{this.renderGrid({ ...top, ...right })} </td>)}
-      //- <div>
-
-        
-      //-   <pre>{`${rowSpan} x ${colSpan}`}</pre>
-      //-   <pre>{`${overallWidth} x ${overallHeight}`}</pre>
-      //-   <pre>{`${this.props.width} x ${this.props.height}`}</pre>

@@ -7,23 +7,29 @@ import Draggable from 'react-draggable';
 
 import template from './scrollbar.component.pug';
 
+const getClientRect = (elem) => {
+  const rect = elem.getBoundingClientRect();
+  return {
+    top: rect.top,
+    left: rect.left,
+    right: rect.right,
+    bottom: rect.bottom,
+    width: rect.width,
+    height: rect.height,
+  };
+};
+
 class Scrollbar extends PureComponent {
   constructor(props) {
     super(props);
     this.state = { scrollTop: 0, scrollLeft: 0 };
     this.trackRef = React.createRef();
     this.handleRef = React.createRef();
-    this.cache = {
-      left: {}, top: {},
-    };
+    this.cache = {};
   }
   
   scrollTo = ({ scrollTop, scrollLeft }) => {
-    this.setState(prevState => ({
-      ...prevState,
-      scrollTop,
-      scrollLeft,
-    }));
+    this.setState(prevState => ({ ...prevState, scrollTop, scrollLeft }));
   }
 
   trackStyle = memoize((axis, trackLength, trackWidth) => {
@@ -63,287 +69,119 @@ class Scrollbar extends PureComponent {
     return this._scale(scrollLength, scrollbarLength, this.handleLength());
   }
 
-  handleClick = (event) => {
-    if (this.trackRef.current === event.target) {
-      const {
-        scaleX,
-        handleX,
-        axis,
-        width,
-        height,
-        overallWidth,
-        overallHeight,
-        minHandleLength,
-      } = this.props;
+  _scrollTo = (point, eventType) => {
+    let data = { eventType }
+    if (point !== null) {
+      const { axis, scrollbarLength } = this.props;
       const handleSize = this.handleLength();
       const scale = this.scale();
-      console.log(handleSize, scale);
-
-      // let scale = this.scale();
-      
-      // console.log(handleSize, scale);
-      const tRect = event.target.getBoundingClientRect();
-      if (this.props.axis === 'x') {
-        let point = event.clientX - tRect.left - (handleSize / 2);
-        if (point < 0) {
-          point = 0;
-        } else if (point > width - handleSize) {
-          point = width - handleSize;
-        }
-        this.props.onScroll({
-          scrollLeft: point / scale,
-        });
+      if (point < 0) {
+        point = 0;
+      } else if (point > scrollbarLength - handleSize) {
+        point = scrollbarLength - handleSize;
+      }
+      point = Math.round(point / scale);
+      if (axis === 'x') {
+        data = { ...data, scrollLeft: point };
       } else {
-        let point = event.clientY - tRect.top - (handleSize / 2);
-        if (point < 0) {
-          point = 0;
-        } else if (point > height - handleSize) {
-          point = height - handleSize;
-        }
-        this.props.onScroll({
-          scrollTop: point / scale,
-        });
+        data = { ...data, scrollTop: point };        
       }
     }
+    this.props.onScroll(data);
   }
 
-  left = (scrollLeft, scale) => {
-    const key = `${scrollLeft}_${scale}`;
-    if (!this.cache.left[key]) {
-      this.cache.left[key] = scrollLeft * scale;
-    }
-    return this.cache.left[key];
-  }
-
-  top = (scrollTop, scale) => {
-    const key = `${scrollTop}_${scale}`;
-    if (!this.cache.top[key]) {
-      this.cache.top[key] = scrollTop * scale;
-    }
-    return this.cache.top[key];
-  }
-
-  handleStart = (event, data) => {
-    if (this.trackRef.current && this.handleRef.current) {
-      const tRect = this.trackRef.current.getBoundingClientRect();
-      const hRect = this.handleRef.current.getBoundingClientRect();
-      this._start = {
-        x: hRect.left - tRect.left - data.lastX,
-        y: hRect.top - tRect.top - data.lastY,
-      };
+  handleClick = (event) => {
+    if (this.trackRef.current === event.target) {
+      const { axis } = this.props;
+      const { top, left } = getClientRect(this.trackRef.current);
+      const point = (axis === 'x' ? event.clientX - left : event.clientY - top) - (this.handleLength() / 2);
+      this._scrollTo(point);
     }
   }
 
-  handleDrag = (event, data) => {
-
-    const {
-      scaleX,
-      handleX,
-      axis,
-      width,
-      height,
-      overallWidth,
-      overallHeight,
-      minHandleLength,
-    } = this.props;
-    // const handleSize = this.handleLength();
+  scaled = (point) => {
     const scale = this.scale();
-
-    // console.log(data.lastX - this._start.x);
-    // console.log(hRect.left - tRect.left);
-    if (this.props.axis === 'x') {
-      const point = data.lastX - this._start.x;
-      this.props.onScroll({
-        scrollLeft: point / scale,
-      });
-    } else {
-      const point = data.lastY - this._start.y;
-      this.props.onScroll({
-        scrollTop: point / scale,
-      });
+    const key = `${scale}_${point}`;
+    if (!this.cache[key]) {
+      this.cache[key] = point * scale;
     }
-
-    //   console.log(hRect.left - tRect.left);
-    //   // console.log(tRect, hRect);
-    // }
+    return this.cache[key];
   }
 
-  handleStop = (event) => {
-    // console.log(event);
-    delete this._start;
+  handleDragStart = (event, { lastX, lastY }) => {
+    console.log('%c handleDragStart ', 'color:red');
+    if (!this.trackRef.current || !this.handleRef.current) {
+      return;
+    }
+    const track = getClientRect(this.trackRef.current);
+    const handle = getClientRect(this.handleRef.current);
+    this._ondrag = {
+      x: handle.left - track.left - lastX,
+      y: handle.top - track.top - lastY,
+    };
+    this._scrollTo(null, 'dragstart');
   }
 
+  handleDrag = (event, { lastX, lastY }) => {
+    if (!this.trackRef.current || !this.handleRef.current || !this._ondrag) {
+      return;
+    }
+    const { axis } = this.props;
+    const point = axis === 'x' ? lastX - this._ondrag.x : lastY - this._ondrag.y;
+    this._scrollTo(point, 'drag');
+  }
+
+  handleDragStop = (event, { lastX, lastY }) => {
+    if (!this.trackRef.current || !this.handleRef.current || !this._ondrag) {
+      delete this._ondrag;
+      return;
+    }
+    const { axis } = this.props;
+    const point = axis === 'x' ? lastX - this._ondrag.x : lastY - this._ondrag.y;
+    this._scrollTo(point, 'dragend');
+    delete this._ondrag;
+  }
 
   render() {
-    const {
-      // scaleX,
-      // handleX,
-      // axis,
-      width,
-      height,
-      // overallWidth,
-      // overallHeight,
-      // minHandleLength,
-    } = this.props;
+    const { axis, scrollbarLength, scrollbarWidth } = this.props;
 
-    
-    // 
-    const handleSize = this.handleLength();
-    const scale = this.scale();
-
-    // console.log(overallWidth, handleSize.bias, overallWidth);
-    // const wRate = Math.min(this.props.width / this.props.overallWidth, 1);
-    // const hRate = Math.min(this.props.height / this.props.overallHeight, 1);
-    // const barWidth = this.props.width * scaleX;
-    
-    
-    // const left = this.state.scrollLeft * scale;
-
-    // scale = (width - handleSize.size) / (overallWidth - width) ;
-    //     console.log(axis, width , height, overallWidth, overallHeight, handleSize);
-    // console.log(axis, handleSize, scale);
-    // console.log(axis, width, height, overallWidth, overallHeight, minHandleLength);
-    const left = this.left(this.state.scrollLeft, scale);
-    // console.log(this.state.scrollLeft, handleSize.size);
-
-    // const barHeight = this.props.height * scale;
-    const top = this.left(this.state.scrollTop, scale);
+    const { scrollTop, scrollLeft } = this.state;
 
     const dragProps = {
-      axis: this.props.axis,
+      axis,
       bounds: 'parent',
-      // position: {x: left, y: 0},
-      onStart: this.handleStart,
+      onStart: this.handleDragStart,
       onDrag: this.handleDrag,
-      onStop: this.handleStop,
+      onStop: this.handleDragStop,
     };
-    if (!this._start) {
-      if (this.props.axis === 'x') {
-        dragProps.position = { x: left, y: 0 };
+    if (!this._ondrag) {
+      if (axis === 'x') {
+        dragProps.position = { x: this.scaled(scrollLeft), y: 0 };
       } else {
-        dragProps.position = { x: 0, y: top };
+        dragProps.position = { x: 0, y: this.scaled(scrollTop) };
       }
-      // delete dragProps.position
     }
-
-    const trackStyle = this.trackStyle(this.props.axis, this.props.scrollbarLength, this.props.scrollbarWidth);
-
-    const handleStyle = this.handleStyle(this.props.axis, handleSize, this.props.scrollbarWidth);
 
     return template.call(this, {
       // variables
       dragProps,
-      handleStyle,
-      trackStyle,
+      handleStyle: this.handleStyle(axis, this.handleLength(), scrollbarWidth),
+      trackStyle: this.trackStyle(axis, scrollbarLength, scrollbarWidth),
       // components
       Draggable,
       Fragment,
     });
-
-
-    return (
-      <div>
-        {this.props.axis === 'x' && (
-          <div
-            ref={this.trackRef}
-            onClick={this.handleClick}
-            style={{
-            position: 'relative',
-            height: this.props.scrollbarWidth,
-            width,
-            background: 'lightgray',
-          }}
-          >
-            <Draggable 
-              {...dragProps}
-            >
-              <div
-                ref={this.handleRef}
-                style={{
-            position: 'absolute',
- width: handleSize,
-height: this.props.scrollbarWidth,
-background: 'green',
-}}
-              />
-            </Draggable>
-          </div>
-        )}
-        {this.props.axis === 'y' && (
-          <div
-            ref={this.trackRef}
-            onClick={this.handleClick}
-            style={{
-            position: 'relative',
-            // paddingTop: top,
-            // boxSizing: 'content-box',
-            width: this.props.scrollbarWidth,
-            height,
-            background: 'yellow',
-          }}
-          >
-            <Draggable 
-              {...dragProps}
-            >
-              <div
-                ref={this.handleRef}
-                style={{
-            position: 'absolute',
-            // top: top,
- height: handleSize,
-width: this.props.scrollbarWidth,
-background: 'green',
-}}
-              />
-            </Draggable>
-          </div>
-        )}
-
-
-        {/* <pre>
-        {JSON.stringify(this.props)}
-        {JSON.stringify(this.state)}
-        </pre> */}
-      </div>
-    );
   }
 }
-
-// const enhance = compose(
-//   forwardRef('outer'),
-//   defaultProps({
-//     scrollbarWidth: 20
-//   }),
-//   withPropsOnChange(['width', 'overallWidth'], ({ width, overallWidth }) => {
-//     const scaleX = Math.min(width / overallWidth, 1);
-//     console.log(width, overallWidth, scaleX);
-//     const handleX = parseInt(width * scaleX, 10);
-
-//     return {
-//       scaleX,
-//       handleX
-//     };
-//   }),
-//   forwardRef('inner'),
-// )
 
 Scrollbar.propTypes = {
   scrollbarWidth: PropTypes.number,
   minHandleLength: PropTypes.number,
-  // fieldValue: ImmutablePropTypes.list,
-  // readOnly: PropTypes.bool.isRequired,
-  // onChange: PropTypes.func,
-  // onFocus: PropTypes.func,
-  // onBlur: PropTypes.func,
-  // renderer: ImmutablePropTypes.map.isRequired,
 };
 
 Scrollbar.defaultProps = {
   scrollbarWidth: 40,
   minHandleLength: 40,
-  // onFocus: () => {},
-  // onBlur: () => {},
-  // fieldValue: List(['']),
 };
 
 export default Scrollbar;

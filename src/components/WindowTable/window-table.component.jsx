@@ -29,81 +29,90 @@ class WindowTable extends PureComponent {
       scrollTop: props.scrollTop,
       scrollLeft: props.scrollLeft,
     };
+
+    this.tableRef = React.createRef();
+    this.titleRef = React.createRef();
+  }
+
+  componentDidMount() {
+    this.timer = setInterval(() => {
+      if (this.tableRef.current) {
+        const tRect = this.tableRef.current.getBoundingClientRect();
+        this.titleRef.current.innerText = `${tRect.width} x ${tRect.height}`;
+      }
+    }, 500);
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.timer);
   }
 
   columnWidth = index => this.props.columns[index].width || 80
 
   rowHeight = index => 40
 
-  scrollTo = ({ scrollTop, scrollLeft }) => {
-    if (typeof scrollTop !== 'undefined') {
-      this.metric.scrollTop = scrollTop;
-    }
-    if (typeof scrollLeft !== 'undefined') {
-      this.metric.scrollLeft = scrollLeft;
-    }
-    Object.keys(this.gridRef)
-      .filter(key => this.gridRef[key].current)
-      .forEach(key => this.gridRef[key].current.scrollTo(this.metric));
-    if (this.scrollbarRef.x.current) {
-      this.scrollbarRef.x.current.scrollTo(this.metric);
-    }
-    if (this.scrollbarRef.y.current) {
-      this.scrollbarRef.y.current.scrollTo(this.metric);
-    }
-  }
-
-  handleScroll = (event, section) => {
-    if (event.scrollUpdateWasRequested === false) {
-      const { scrollTop, scrollLeft } = event;
-      switch (section) {
-        case 'left':
-        case 'right':
-          this.metric.scrollTop = scrollTop;
-          break;
-        case 'top':
-        case 'bottom':
-          this.metric.scrollLeft = scrollLeft;
-          break;
-        default:
-          this.metric.scrollTop = scrollTop;
-          this.metric.scrollLeft = scrollLeft;
-          break;
+  scrollTo = ({ scrollTop, scrollLeft }, section) => {
+    // clearTimeout(this._timer);
+    if (typeof scrollTop !== 'undefined' || typeof scrollLeft !== 'undefined') {
+      if (typeof scrollTop !== 'undefined') {
+        this.metric.scrollTop = scrollTop;
       }
-      // if (section === 'left' || section === 'right') {
-
-      // } else if (section === 'top' || section === 'bottom') {
-
-      // } else {
-
-      // }
-
-      // console.log(section, this.metric);
-
-
+      if (typeof scrollLeft !== 'undefined') {
+        this.metric.scrollLeft = scrollLeft;
+      }
       Object.keys(this.gridRef)
         .filter(key => key !== section && this.gridRef[key].current)
-        .forEach((key) => {
-          this.gridRef[key].current.scrollTo(this.metric);
-          // if (key === 'left' || key === 'right') {
-          //   // this.gridRef[key].current.scrollTo({ scrollTop, scrollLeft: 0 });
-          //   this.gridRef[key].current.scrollTo(this.metric);
-          // } else if (key === 'top' || key === 'bottom') {
-          //   // this.gridRef[key].current.scrollTo({ scrollTop: 0, scrollLeft });
-          //   this.gridRef[key].current.scrollTo(this.metric);
-          // } else {
-          //   this.gridRef[key].current.scrollTo(this.metric);
-          // }
-        });
-
-
+        .forEach(key => this.gridRef[key].current.scrollTo(this.metric));
       if (this.scrollbarRef.x.current) {
         this.scrollbarRef.x.current.scrollTo(this.metric);
       }
       if (this.scrollbarRef.y.current) {
         this.scrollbarRef.y.current.scrollTo(this.metric);
       }
+      const scrollTo = { ...this.metric };
+      
+
+      // this._timer = setTimeout(() => {
+      //   console.log(scrollTo, section);
+      // }, 500);
     }
+  }
+
+  handleScrollbarDrag = ({ eventType, scrollTop, scrollLeft }) => {
+    this.onScrollbarDrag = eventType === 'drag';
+    this.scrollTo({ scrollTop, scrollLeft });
+  }
+
+  handleGridScroll = (event, section) => {
+    if (this.onScrollbarDrag || event.scrollUpdateWasRequested !== false) {
+      // console.log('>', section);
+      return;
+    }
+    if (this._section !== section) {
+      // console.log(this._section, section);
+      return 
+    }
+    // console.log(section);
+    
+    // if (this.onScrollbarDragevent.scrollUpdateWasRequested === false) {
+    const { scrollTop, scrollLeft } = event;
+    let scrollTo = {};
+    switch (section) {
+      case 'left':
+      case 'right':
+        scrollTo = { scrollTop };
+        break;
+      case 'top':
+      case 'bottom':
+        scrollTo = { scrollLeft };
+        break;
+      default:
+        scrollTo = { scrollTop, scrollLeft };
+        break;
+    }
+
+    this.scrollTo(scrollTo, section);
+    // }
   }
 
   gridWidth = (from, limit) => this.props.columns.slice(from, from + limit).reduce((prev, e) => prev + e.width, 0)
@@ -164,6 +173,12 @@ class WindowTable extends PureComponent {
       columnCount: rightCount,
     }))
 
+    handleMouseOver = (event, section) => {
+      // console.log(event, section);
+      this._section = section;
+      console.log(this._section);
+    }
+
   overallWidth = memoize(columns =>
     (columns || []).reduce((prev, column, index) => prev + this.columnWidth(index, column), 0))
 
@@ -185,10 +200,15 @@ class WindowTable extends PureComponent {
       gridProps = {
         ...gridProps,
         ref: this.gridRef[section],
-        onScroll: event => this.handleScroll(event, section),
+        onScroll: event => this.handleGridScroll(event, section),
       };
     }
+    const handleMouseOver = (event) => {
+      console.log(section);
+      this.handleMouseOver(event, section);
+    }
     return (
+      <div onMouseOver={handleMouseOver}>
       <Grid {...gridProps} >
         {({ columnIndex, rowIndex, style }) => (
           <div style={style}>
@@ -196,6 +216,7 @@ class WindowTable extends PureComponent {
           </div>
           )}
       </Grid>
+      </div>
     );
   }
 
@@ -241,26 +262,22 @@ class WindowTable extends PureComponent {
 
     const scrollbar = {
       x: {
+        axis: 'x',
+        ref: this.scrollbarRef.x,
         scrollbarLength: width,
         scrollLength: overallWidth,
-        width,
-        height,
-        overallWidth,
-        overallHeight,
         scrollbarWidth,
-        onScroll: this.scrollTo,
+        onScroll: this.handleScrollbarDrag,
       },
       y: {
+        axis: 'y',
+        ref: this.scrollbarRef.y,
         scrollbarLength: height,
         scrollLength: overallHeight,
-        width,
-        height,
-        overallWidth,
-        overallHeight,
         scrollbarWidth,
-        onScroll: this.scrollTo,
+        onScroll: this.handleScrollbarDrag,
       },
-    }
+    };
 
     return template.call(this, {
       // variables
@@ -268,20 +285,9 @@ class WindowTable extends PureComponent {
       center,
       colSpan,
       left,
-      unused_overallHeight: overallHeight,
-      unused_overallWidth: overallWidth,
       right,
       rowSpan,
       scrollbar,
-      unused_scrollbarProps: {
-        scrollbarLength: width,
-        scrollLength: overallWidth,
-        height,
-        overallWidth,
-        overallHeight,
-        scrollbarWidth,
-        onScroll: this.scrollTo,
-      },
       scrollbarX,
       scrollbarY,
       top,
