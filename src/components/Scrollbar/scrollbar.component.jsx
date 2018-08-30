@@ -22,7 +22,7 @@ const getClientRect = (elem) => {
 class Scrollbar extends PureComponent {
   constructor(props) {
     super(props);
-    this.state = { scrollTop: 0, scrollLeft: 0 };
+    this.state = { scrollTop: 0, scrollLeft: 0, status: null };
     this.trackRef = React.createRef();
     this.handleRef = React.createRef();
     this.cache = {};
@@ -32,24 +32,43 @@ class Scrollbar extends PureComponent {
     this.setState(prevState => ({ ...prevState, scrollTop, scrollLeft }));
   }
 
-  trackStyle = memoize((axis, trackLength, trackWidth) => {
-    const styles = {
+  trackStyle = memoize((axis, trackLength, trackWidth, customStyle) => {
+    const width = axis === 'x' ? trackLength : trackWidth;
+    const height = axis === 'x' ? trackWidth : trackLength;
+    let styles = {
       position: 'relative',
-      width: axis === 'x' ? trackLength : trackWidth,
-      height: axis === 'x' ? trackWidth : trackLength,
+      width,
+      height,
       background: 'lightgray',
       overflow: 'hidden',
     };
-    return css(styles);
+    if (typeof customStyle === 'function') {
+      styles = customStyle(styles, { axis, trackLength, trackWidth });
+    }
+    return css({
+      ...styles,
+      position: 'relative',
+      width,
+      height,
+    });
   })
 
-  handleStyle = memoize((axis, handleLength, trackWidth) => {
-    const styles = {
-      width: axis === 'x' ? handleLength : trackWidth,
-      height: axis === 'x' ? trackWidth : handleLength,
+  handleStyle = memoize((axis, handleLength, trackWidth, customStyle) => {
+    const width = axis === 'x' ? handleLength : trackWidth;
+    const height = axis === 'x' ? trackWidth : handleLength;
+    let styles = {
+      width,
+      height,
       background: 'green',
     };
-    return css(styles);
+    if (typeof customStyle === 'function') {
+      styles = customStyle(styles, { axis, handleLength, trackWidth });
+    }
+    return css({
+      ...styles,
+      width,
+      height,
+    });
   })
 
   _handleLength = memoize((scrollLength, scrollbarLength, minHandleLength) => {
@@ -121,6 +140,19 @@ class Scrollbar extends PureComponent {
       y: handle.top - track.top - lastY,
     };
     this._scrollTo(null, 'dragstart');
+    // this.updateStatus('dragst')
+
+  }
+
+  updateStatus = (status) => {
+    if (this.state.status !== status) {
+      this.setState(prevState => {
+        return {
+          ...prevState,
+          status,
+        }
+      })
+    }
   }
 
   handleDrag = (event, { lastX, lastY }) => {
@@ -130,6 +162,15 @@ class Scrollbar extends PureComponent {
     const { axis } = this.props;
     const point = axis === 'x' ? lastX - this._ondrag.x : lastY - this._ondrag.y;
     this._scrollTo(point, 'drag');
+    this.updateStatus('dragging')
+    // if (this.state.status !== 'dragging') {
+    //   this.setState(prevState => {
+    //     return {
+    //       ...prevState,
+    //       status: 'dragging',
+    //     }
+    //   })
+    // }
   }
 
   handleDragStop = (event, { lastX, lastY }) => {
@@ -141,12 +182,20 @@ class Scrollbar extends PureComponent {
     const point = axis === 'x' ? lastX - this._ondrag.x : lastY - this._ondrag.y;
     this._scrollTo(point, 'dragend');
     delete this._ondrag;
+    this.updateStatus('dragend')
   }
 
   render() {
-    const { axis, scrollbarLength, scrollbarWidth } = this.props;
+    const {
+      axis,
+      scrollbarLength,
+      scrollbarWidth,
+      trackStyle,
+      handleStyle,
 
-    const { scrollTop, scrollLeft } = this.state;
+    } = this.props;
+
+    const { scrollTop, scrollLeft, status } = this.state;
 
     const dragProps = {
       axis,
@@ -154,6 +203,7 @@ class Scrollbar extends PureComponent {
       onStart: this.handleDragStart,
       onDrag: this.handleDrag,
       onStop: this.handleDragStop,
+      className: 'drr',
     };
     if (!this._ondrag) {
       if (axis === 'x') {
@@ -166,8 +216,9 @@ class Scrollbar extends PureComponent {
     return template.call(this, {
       // variables
       dragProps,
-      handleStyle: this.handleStyle(axis, this.handleLength(), scrollbarWidth),
-      trackStyle: this.trackStyle(axis, scrollbarLength, scrollbarWidth),
+      handleStyle: this.handleStyle(axis, this.handleLength(), scrollbarWidth, handleStyle),
+      status,
+      trackStyle: this.trackStyle(axis, scrollbarLength, scrollbarWidth, trackStyle),
       // components
       Draggable,
       Fragment,

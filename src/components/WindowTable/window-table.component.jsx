@@ -321,6 +321,8 @@ class WindowTable extends PureComponent {
         scrollLength: overallWidth,
         scrollbarWidth,
         onScroll: this.handleScrollbarDrag,
+        trackStyle: this.props.scrollbarTrackStyle,
+        handleStyle: this.props.scrollbarHandleStyle,
       },
       y: {
         axis: 'y',
@@ -329,6 +331,8 @@ class WindowTable extends PureComponent {
         scrollLength: overallHeight,
         scrollbarWidth,
         onScroll: this.handleScrollbarDrag,
+        trackStyle: this.props.scrollbarTrackStyle,
+        handleStyle: this.props.scrollbarHandleStyle,
       },
     };
 
@@ -337,6 +341,8 @@ class WindowTable extends PureComponent {
       bottom,
       center,
       colSpan,
+      contentHeight,
+      contentWidth,
       left,
       right,
       rowSpan,

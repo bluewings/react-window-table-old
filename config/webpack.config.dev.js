@@ -152,7 +152,7 @@ module.exports = {
                   // },
                   resolveVariables: {
                     // intl: 'useIntl/intl',
-                    classNames: 'cx',
+                    cx: 'classnames',
                   },
                   transpiledFile: true,
                   autoUpdateJsFile: true,

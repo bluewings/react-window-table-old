@@ -1,11 +1,12 @@
 Fragment
   div(ref='{this.trackRef}',
     onClick='{this.handleClick}',
-    className='{trackStyle}')
+    className='{cx(trackStyle, status)}')
     Draggable(__jsx='{...dragProps}')
 
       div(ref='{this.handleRef}',
-        className='{handleStyle}')
+        className='{cx(handleStyle, status)}')
+        div
         //- h5 i am scrollbar
 
 

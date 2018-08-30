@@ -11,6 +11,47 @@ const data = [...Array(100)].map((e, i) => columns.reduce((prev, f, j) => ({
   [f.name]: `${i},${j}`,
 }), {}));
 
+const scrollbarTrackStyle = (base) => {
+  return {
+    ...base,
+    background: '#fff',
+  }
+}
+
+const scrollbarHandleStyle = (base) => {
+  return {
+    ...base,
+    background: 'transparent',
+
+    '> div': {
+      display: 'block',
+      content: '111',
+      width: base.width - 4,
+      height: base.height - 4,
+      margin: 2,
+      borderRadius: ((base.height - 4) / 2) + 'px',
+      // background: 'red',
+      transition: 'background 0.1s',
+      // background: 'rgba(204,204,204,0.4)',
+      // background: 'rgba(204,204,204,0.4)',
+      background: 'rgba(0,0,0,0.25)',
+
+      '&:hover': {
+        // background: 'blue',
+        // background: 'rgba(204,204,204,0.8)',
+        background: 'rgba(0,0,0,0.5)',
+        // boxShadow: 'inset 0 0 6px rgba(0,0,0,0.5)', 
+      }
+    },
+    '&.dragging > div': {
+      // background: 'blue',
+      // background: 'rgba(204,204,204,0.8)',
+      background: 'rgba(0,0,0,0.5)',
+      // boxShadow: 'inset 0 0 6px rgba(0,0,0,0.5)',
+    },
+  }
+}
+
 class App extends Component {
   render() {
     return (
@@ -27,7 +68,10 @@ class App extends Component {
             </tr>
             <tr>
               <td>
-                <WindowTable columns={columns} rows={data} width={500} height={300} />
+                <WindowTable
+                  scrollbarTrackStyle={scrollbarTrackStyle}
+                  scrollbarHandleStyle={scrollbarHandleStyle}
+                  columns={columns} rows={data.slice(0, 100)} width={500} height={500} />
               </td>
               <td>
                 <WindowTable columns={columns} fixedLeftCount={2} fixedBottomCount={0} fixedRightCount={0} rows={data} width={500} height={300} />

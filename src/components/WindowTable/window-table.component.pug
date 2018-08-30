@@ -1,9 +1,22 @@
 // @import .scss => styles
-div
-  strong(ref='{this.titleRef}', style='{{ textAlign: "right" }}')
+div(className='{styles.root}')
+
+  div(@if='top', className='{styles.guide}',
+    style='{{ top: top.height, width: contentWidth }}'
+    )
+  div(@if='bottom', className='{styles.guide}',
+    style='{{ top: contentHeight - top.height, width: contentWidth }}'
+    )  
+  div(@if='left', className='{styles.guide}',
+    style='{{ left: left.width, height: contentHeight }}'
+    )  
+  div(@if='right', className='{styles.guide}',
+    style='{{ left: contentWidth - left.width, height: contentHeight }}'
+    )  
   //- pre {rowSpan + ' x ' + colSpan}
   //- pre {overallWidth + ' x ' + overallHeight}
   //- pre {this.props.width + ' x ' + this.props.height}
+
   table(className='{styles.table}', border='{0}', cellPadding='{0}', cellSpacing='{0}',
     ref='{this.tableRef}')
     tbody
@@ -39,3 +52,4 @@ div
         td(colSpan='{colSpan}')
           Scrollbar(__jsx='{...scrollbar.x}')
         td
+    strong(ref='{this.titleRef}', style='{{ textAlign: "right" }}')

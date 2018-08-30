@@ -1,3 +1,13 @@
+.root {
+  position: relative;
+  border: orange 5px solid;
+}
+.guide {
+  position: absolute;
+  width: 5px;
+  height: 5px;
+  background: black;
+}
 .table {
   padding: 0;
   margin: 0;
@@ -9,11 +19,23 @@
     ::-webkit-scrollbar {
       width: 0;
       height: 0;
+
+      display: none !important;
+      width: 0 !important;
+      height: 0 !important;
+      background-color: transparent;
       /* opacity: 0.5; */
     }
+    ::-webkit-scrollbar-thumb {
+      display: none !important;
+    }
+    // -webkit-overflow-scrolling: touch!important; 
+    // -ms-overflow-style: -ms-autohiding-scrollbar!important;
   }
 }
-
+:global(.drr) {
+  border: 5px green solid;
+}
 .bg_50 {
   background: #E1F5FE;
 }
