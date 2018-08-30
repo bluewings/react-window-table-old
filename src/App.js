@@ -15,11 +15,11 @@ class App extends Component {
   render() {
     return (
       <div className="App" style={{ padding: 100 }}>
-        <table border={1}>
+        <table border={1} cellPadding={10}>
           <tbody>
             <tr>
               <td>
-                <WindowTable columns={columns.slice(0,50)} fixedTopCount={0} fixedBottomCount={0} rows={data} width={500} height={300} />
+                <WindowTable columns={columns.slice(0,50)} fixedTopCount={0} fixedBottomCount={0} fixedLeftCount={0} fixedRightCount={0} rows={data.slice(0, 1000)} width={500} height={300} />
               </td>
               <td>
                 <WindowTable columns={columns.slice(0,3)} rows={data} width={500} height={300} />

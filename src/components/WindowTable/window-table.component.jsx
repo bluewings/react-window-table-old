@@ -36,7 +36,6 @@ class WindowTable extends PureComponent {
   rowHeight = index => 40
 
   scrollTo = ({ scrollTop, scrollLeft }) => {
-    // console.log(scrollTop, scrollLeft);
     if (typeof scrollTop !== 'undefined') {
       this.metric.scrollTop = scrollTop;
     }
@@ -44,10 +43,8 @@ class WindowTable extends PureComponent {
       this.metric.scrollLeft = scrollLeft;
     }
     Object.keys(this.gridRef)
-    .filter(key => this.gridRef[key].current)
-    .forEach((key) => {
-      this.gridRef[key].current.scrollTo(this.metric);
-    });
+      .filter(key => this.gridRef[key].current)
+      .forEach(key => this.gridRef[key].current.scrollTo(this.metric));
     if (this.scrollbarRef.x.current) {
       this.scrollbarRef.x.current.scrollTo(this.metric);
     }
@@ -74,9 +71,9 @@ class WindowTable extends PureComponent {
           break;
       }
       // if (section === 'left' || section === 'right') {
-        
+
       // } else if (section === 'top' || section === 'bottom') {
-        
+
       // } else {
 
       // }
@@ -98,7 +95,7 @@ class WindowTable extends PureComponent {
           //   this.gridRef[key].current.scrollTo(this.metric);
           // }
         });
-    
+
 
       if (this.scrollbarRef.x.current) {
         this.scrollbarRef.x.current.scrollTo(this.metric);
@@ -126,19 +123,17 @@ class WindowTable extends PureComponent {
 
   columnCount = memoize(columns => (columns || []).length)
 
-  center = memoize((topCount, rightCount, bottomCount, leftCount, rowCount, columnCount, width, height) => {
+  center = memoize((topCount, rightCount, bottomCount, leftCount, rowCount, columnCount, width, height) =>
 
     // console.log(width, this.gridWidth(0, leftCount), this.gridWidth(columnCount - rightCount, rightCount))
-    return {
+    ({
       width: width - this.gridWidth(0, leftCount) - this.gridWidth(columnCount - rightCount, rightCount),
       height: height - this.gridHeight(0, topCount) - this.gridHeight(rowCount - bottomCount, bottomCount),
       rowOffset: topCount,
       rowCount: rowCount - topCount - bottomCount,
       columnOffset: leftCount,
       columnCount: columnCount - leftCount - rightCount,
-    }
-
-  })
+    }))
 
 
   top = memoize((topCount, rightCount, bottomCount, leftCount, rowCount, columnCount, width, height) =>
@@ -175,7 +170,9 @@ class WindowTable extends PureComponent {
   overallHeight = memoize(rows =>
     (rows || []).reduce((prev, row, index) => prev + this.rowHeight(index, row), 0))
 
-  renderGrid = ({ section, width, height, columnCount, columnOffset, rowCount, rowOffset }) => {
+  renderGrid = ({
+    section, width, height, columnCount, columnOffset, rowCount, rowOffset,
+  }) => {
     let gridProps = {
       width,
       height,
@@ -239,6 +236,32 @@ class WindowTable extends PureComponent {
     const colSpan = [left, center, right].filter(e => e).length;
 
 
+    const scrollbarX = width < overallWidth;
+    const scrollbarY = height < overallHeight;
+
+    const scrollbar = {
+      x: {
+        scrollbarLength: width,
+        scrollLength: overallWidth,
+        width,
+        height,
+        overallWidth,
+        overallHeight,
+        scrollbarWidth,
+        onScroll: this.scrollTo,
+      },
+      y: {
+        scrollbarLength: height,
+        scrollLength: overallHeight,
+        width,
+        height,
+        overallWidth,
+        overallHeight,
+        scrollbarWidth,
+        onScroll: this.scrollTo,
+      },
+    }
+
     return template.call(this, {
       // variables
       bottom,
@@ -249,14 +272,18 @@ class WindowTable extends PureComponent {
       unused_overallWidth: overallWidth,
       right,
       rowSpan,
-      scrollbarProps: {
-        width,
+      scrollbar,
+      unused_scrollbarProps: {
+        scrollbarLength: width,
+        scrollLength: overallWidth,
         height,
         overallWidth,
         overallHeight,
         scrollbarWidth,
-        onScroll: this.scrollTo
+        onScroll: this.scrollTo,
       },
+      scrollbarX,
+      scrollbarY,
       top,
       // components
       Scrollbar,

@@ -9,7 +9,9 @@ export default function (params = {}) {
     left,
     right,
     rowSpan,
-    scrollbarProps,
+    scrollbar,
+    scrollbarX,
+    scrollbarY,
     top,
     Scrollbar,
   } = params;
@@ -28,13 +30,15 @@ export default function (params = {}) {
               {this.renderGrid({ section: 'top', ...center, ...top })}
             </td>
             {(right) && (
-            <td className={styles.bg_200}>
+            <td className={styles.bg_50}>
               {this.renderGrid({ ...top, ...right })}
             </td>
             )}
+            {(scrollbarY) && (
             <td rowSpan={rowSpan}>
-              <Scrollbar {...scrollbarProps} ref={this.scrollbarRef.y} type="y" />
+              <Scrollbar axis="y" {...scrollbar.y} ref={this.scrollbarRef.y} />
             </td>
+            )}
           </tr>
           )}
           <tr>
@@ -43,41 +47,43 @@ export default function (params = {}) {
               {this.renderGrid({ section: 'left', ...center, ...left })}
             </td>
             )}
-            <td className={styles.bg_200}>
+            <td className={styles.bg_50}>
               {this.renderGrid({ section: 'center', ...center })}
             </td>
             {(right) && (
-            <td className={styles.bg_300}>
+            <td className={styles.bg_100}>
               {this.renderGrid({ section: 'right', ...center, ...right })}
             </td>
             )}
-            {(!top) && (
+            {(scrollbarY && !top) && (
             <td rowSpan={rowSpan}>
-              <Scrollbar {...scrollbarProps} ref={this.scrollbarRef.y} type="y" />
+              <Scrollbar axis="y" {...scrollbar.y} ref={this.scrollbarRef.y} />
             </td>
             )}
           </tr>
           {(bottom) && (
           <tr>
             {(left) && (
-            <td className={styles.bg_200}>
+            <td className={styles.bg_50}>
               {this.renderGrid({ ...bottom, ...left })}
             </td>
             )}
-            <td className={styles.bg_300}>
+            <td className={styles.bg_100}>
               {this.renderGrid({ section: 'bottom', ...center, ...bottom })}
             </td>
             {(right) && (
-            <td className={styles.bg_400}>
+            <td className={styles.bg_50}>
               {this.renderGrid({ ...bottom, ...right })}
             </td>
             )}
           </tr>
           )}
           <tr>
+            {(scrollbarX) && (
             <td colSpan={colSpan}>
-              <Scrollbar {...scrollbarProps} ref={this.scrollbarRef.x} type="x" />
+              <Scrollbar axis="x" {...scrollbar.x} ref={this.scrollbarRef.x} />
             </td>
+            )}
             <td />
           </tr>
         </tbody>
@@ -103,7 +109,9 @@ export default function (params = {}) {
 //        left,
 //        right,
 //        rowSpan,
-//        scrollbarProps,
+//        scrollbar,
+//        scrollbarX,
+//        scrollbarY,
 //        top,
 //      } = this;
 //
@@ -115,7 +123,9 @@ export default function (params = {}) {
 //        left,
 //        right,
 //        rowSpan,
-//        scrollbarProps,
+//        scrollbar,
+//        scrollbarX,
+//        scrollbarY,
 //        top,
 //        // components
 //        Scrollbar,

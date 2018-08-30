@@ -10,32 +10,32 @@ div
           | {this.renderGrid({ ...top, ...left })}
         td(className='{styles.bg_100}')
           | {this.renderGrid({ section: 'top', ...center, ...top })}
-        td(@if='right', className='{styles.bg_200}')
+        td(@if='right', className='{styles.bg_50}')
           | {this.renderGrid({ ...top, ...right })}
-        td(rowSpan='{rowSpan}')
-          Scrollbar(type='y', ref='{this.scrollbarRef.y}', __jsx='{...scrollbarProps}')
+        td(@if='scrollbarY', rowSpan='{rowSpan}')
+          Scrollbar(axis='y', ref='{this.scrollbarRef.y}', __jsx='{...scrollbar.y}')
       tr
         td(@if='left', className='{styles.bg_100}')
           | {this.renderGrid({ section: 'left', ...center, ...left })}
-        td(className='{styles.bg_200}')
+        td(className='{styles.bg_50}')
           | {this.renderGrid({ section: 'center', ...center })}
-        td(@if='right', className='{styles.bg_300}')
+        td(@if='right', className='{styles.bg_100}')
           | {this.renderGrid({ section: 'right', ...center, ...right })}
-        td(@if='!top', rowSpan='{rowSpan}')
-          Scrollbar(type='y', ref='{this.scrollbarRef.y}', __jsx='{...scrollbarProps}')
+        td(@if='scrollbarY && !top', rowSpan='{rowSpan}')
+          Scrollbar(axis='y', ref='{this.scrollbarRef.y}', __jsx='{...scrollbar.y}')
       tr(@if='bottom')
-        td(@if='left', className='{styles.bg_200}')
+        td(@if='left', className='{styles.bg_50}')
           | {this.renderGrid({ ...bottom, ...left })}
-        td(className='{styles.bg_300}')
+        td(className='{styles.bg_100}')
           | {this.renderGrid({ section: 'bottom', ...center, ...bottom })}
-        td(@if='right', className='{styles.bg_400}')
+        td(@if='right', className='{styles.bg_50}')
           | {this.renderGrid({ ...bottom, ...right })}
       tr
-        td(colSpan='{colSpan}')
-          Scrollbar(type='x', ref='{this.scrollbarRef.x}', __jsx='{...scrollbarProps}')
+        td(@if='scrollbarX', colSpan='{colSpan}')
+          Scrollbar(axis='x', ref='{this.scrollbarRef.x}', __jsx='{...scrollbar.x}')
                 //- {/* <ScrollBar
                 //-   ref={this.scrollbarRef.x}
-                //-   type="x"
+                //-   axis="x"
                 //-   width={this.props.width}
                 //-   height={this.props.height}
                 //-   overallWidth={overallWidth}

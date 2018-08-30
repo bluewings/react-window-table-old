@@ -1,0 +1,29 @@
+Fragment
+  div(ref='{this.trackRef}',
+    onClick='{this.handleClick}',
+    className='{trackStyle}')
+    Draggable(__jsx='{...dragProps}')
+
+      div(ref='{this.handleRef}',
+        className='{handleStyle}')
+        //- h5 i am scrollbar
+
+
+//-           <div  ref={this.trackRef} onClick={this.handleClick} style={{
+//-             position: 'relative',
+//-             height: this.props.scrollbarWidth,
+//-             width,
+//-             background: 'lightgray'
+//-           }}>
+//-           <Draggable 
+//-           {...dragProps}
+//-           >
+//-           <div
+//-             ref={this.handleRef}
+//-             style={{
+//-             position: 'absolute',
+//-  width: handleSize, height: this.props.scrollbarWidth, background: 'green',
+//- }}
+//-           />
+//-           </Draggable>
+//-           </div>
