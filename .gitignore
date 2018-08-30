@@ -20,4 +20,8 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
+# transpiled pug-jsx file
+*.transpiled.jsx
+
+# docz tmp files
 .docz

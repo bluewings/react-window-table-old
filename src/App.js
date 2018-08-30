@@ -19,7 +19,7 @@ class App extends Component {
           <tbody>
             <tr>
               <td>
-                <WindowTable columns={columns.slice(0,50)} fixedTopCount={0} fixedBottomCount={0} fixedLeftCount={0} fixedRightCount={0} rows={data.slice(0, 1000)} width={500} height={300} />
+                <WindowTable columns={columns.slice(0, 3)} rows={data.slice(0, 8)} fixedTopCount={0} fixedBottomCount={0} fixedLeftCount={0} fixedRightCount={0} width={500} height={300} />
               </td>
               <td>
                 <WindowTable columns={columns.slice(0,3)} rows={data} width={500} height={300} />

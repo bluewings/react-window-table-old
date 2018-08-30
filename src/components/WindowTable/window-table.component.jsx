@@ -26,8 +26,8 @@ class WindowTable extends PureComponent {
     };
 
     this.metric = {
-      scrollTop: props.scrollTop,
-      scrollLeft: props.scrollLeft,
+      scrollTop: props.scrollTop || 0,
+      scrollLeft: props.scrollLeft || 0,
     };
 
     this.tableRef = React.createRef();
@@ -60,16 +60,29 @@ class WindowTable extends PureComponent {
       if (typeof scrollLeft !== 'undefined') {
         this.metric.scrollLeft = scrollLeft;
       }
-      Object.keys(this.gridRef)
+
+      const metric = {
+        scrollTop: this.metric.scrollTop || 0,
+        scrollLeft: this.metric.scrollLeft || 0,
+      }
+      // console.log(metric);
+      // requestAnimationFrame(() => {
+        Object.keys(this.gridRef)
         .filter(key => key !== section && this.gridRef[key].current)
-        .forEach(key => this.gridRef[key].current.scrollTo(this.metric));
+        .forEach(key => this.gridRef[key].current.scrollTo(metric));
       if (this.scrollbarRef.x.current) {
-        this.scrollbarRef.x.current.scrollTo(this.metric);
+        this.scrollbarRef.x.current.scrollTo(metric);
+      } else {
+        console.log('>>> not x found');
       }
       if (this.scrollbarRef.y.current) {
-        this.scrollbarRef.y.current.scrollTo(this.metric);
+        this.scrollbarRef.y.current.scrollTo(metric);
+      } else {
+        console.log('>>> not y found');
       }
-      const scrollTo = { ...this.metric };
+      // const scrollTo = { ...this.metric };
+      // });
+
       
 
       // this._timer = setTimeout(() => {
@@ -80,7 +93,11 @@ class WindowTable extends PureComponent {
 
   handleScrollbarDrag = ({ eventType, scrollTop, scrollLeft }) => {
     this.onScrollbarDrag = eventType === 'drag';
+    console.log('>> handleScrollbarDrag', eventType)
     this.scrollTo({ scrollTop, scrollLeft });
+    console.log('fin.');
+
+
   }
 
   handleGridScroll = (event, section) => {
@@ -176,7 +193,7 @@ class WindowTable extends PureComponent {
     handleMouseOver = (event, section) => {
       // console.log(event, section);
       this._section = section;
-      console.log(this._section);
+      // console.log(this._section);
     }
 
   overallWidth = memoize(columns =>
@@ -204,7 +221,7 @@ class WindowTable extends PureComponent {
       };
     }
     const handleMouseOver = (event) => {
-      console.log(section);
+      // console.log(section);/
       this.handleMouseOver(event, section);
     }
     return (
@@ -247,24 +264,60 @@ class WindowTable extends PureComponent {
       rightCount = 0;
     }
 
-    const center = this.center(topCount, rightCount, bottomCount, leftCount, rowCount, columnCount, width, height);
-    const top = this.top(topCount, rightCount, bottomCount, leftCount, width, height);
-    const right = this.right(topCount, rightCount, bottomCount, leftCount, rowCount, columnCount, width, height);
-    const bottom = this.bottom(topCount, rightCount, bottomCount, leftCount, rowCount, columnCount, width, height);
-    const left = this.left(topCount, rightCount, bottomCount, leftCount, rowCount, columnCount, width, height);
+    let contentWidth = width;
+    let contentHeight = height;
+
+    let scrollbarX;
+    let scrollbarY;
+
+
+    scrollbarX = contentWidth < overallWidth;
+    scrollbarY = contentHeight < overallHeight;
+
+    contentWidth = contentWidth - (scrollbarY ? scrollbarWidth : 0);
+    contentHeight = contentHeight - (scrollbarX ? scrollbarWidth : 0);
+
+    if (overallHeight < contentHeight) {
+      console.log('case1');
+      contentHeight = overallHeight;
+    }
+
+    if (scrollbarX && !scrollbarY && contentHeight < overallHeight) {
+      console.log('>>>>');
+      scrollbarY = true;
+      contentWidth = contentWidth - scrollbarWidth;
+    }
+
+    // scrollbarX = false;
+    // scrollbarY = false;
+
+    // if (overallHeight < contentHeight) {
+    //   contentHeight = overallHeight;
+    //   // scrollbarX = contentHeight < overallWidth;
+      
+    //   scrollbarY = contentHeight < overallHeight;
+  
+    //   contentWidth = contentWidth - (scrollbarY ? scrollbarWidth : 0);
+    //   scrollbarX = contentWidth < overallWidth;
+    // }
+
+
+    const center = this.center(topCount, rightCount, bottomCount, leftCount, rowCount, columnCount, contentWidth, contentHeight);
+    const top = this.top(topCount, rightCount, bottomCount, leftCount, contentWidth, contentHeight);
+    const right = this.right(topCount, rightCount, bottomCount, leftCount, rowCount, columnCount, contentWidth, contentHeight);
+    const bottom = this.bottom(topCount, rightCount, bottomCount, leftCount, rowCount, columnCount, contentWidth, contentHeight);
+    const left = this.left(topCount, rightCount, bottomCount, leftCount, rowCount, columnCount, contentWidth, contentHeight);
 
     const rowSpan = [top, center, bottom].filter(e => e).length;
     const colSpan = [left, center, right].filter(e => e).length;
 
 
-    const scrollbarX = width < overallWidth;
-    const scrollbarY = height < overallHeight;
 
     const scrollbar = {
       x: {
         axis: 'x',
         ref: this.scrollbarRef.x,
-        scrollbarLength: width,
+        scrollbarLength: contentWidth,
         scrollLength: overallWidth,
         scrollbarWidth,
         onScroll: this.handleScrollbarDrag,
@@ -272,7 +325,7 @@ class WindowTable extends PureComponent {
       y: {
         axis: 'y',
         ref: this.scrollbarRef.y,
-        scrollbarLength: height,
+        scrollbarLength: contentHeight,
         scrollLength: overallHeight,
         scrollbarWidth,
         onScroll: this.handleScrollbarDrag,

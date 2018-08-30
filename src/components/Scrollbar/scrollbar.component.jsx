@@ -38,6 +38,7 @@ class Scrollbar extends PureComponent {
       width: axis === 'x' ? trackLength : trackWidth,
       height: axis === 'x' ? trackWidth : trackLength,
       background: 'lightgray',
+      overflow: 'hidden',
     };
     return css(styles);
   })
