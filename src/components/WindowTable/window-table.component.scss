@@ -4,9 +4,23 @@
 }
 .guide {
   position: absolute;
-  width: 5px;
-  height: 5px;
-  background: black;
+  width: 6px;
+  height: 6px;
+  // background: black;
+  
+  // &:.blob
+  &:global(.guideline-left) {
+    background: linear-gradient(to right, rgba(0, 0, 0, 0.1) 0%, rgba(0, 0, 0, 0) 100%);
+  }
+  &:global(.guideline-right) {
+    background: linear-gradient(to left, rgba(0, 0, 0, 0.1) 0%, rgba(0, 0, 0, 0) 100%);
+  }
+  &:global(.guideline-top) {
+    background: linear-gradient(to bottom, rgba(0, 0, 0, 0.1) 0%, rgba(0, 0, 0, 0) 100%);
+  }
+  &:global(.guideline-bottom) {
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.1) 0%, rgba(0, 0, 0, 0) 100%);
+  }
 }
 .table {
   padding: 0;

@@ -25,6 +25,13 @@ class WindowTable extends PureComponent {
       y: React.createRef(),
     };
 
+    this.guideLineRef = {
+      top: React.createRef(),
+      right: React.createRef(),
+      bottom: React.createRef(),
+      left: React.createRef(),
+    };
+
     this.metric = {
       scrollTop: props.scrollTop || 0,
       scrollLeft: props.scrollLeft || 0,
@@ -347,6 +354,7 @@ class WindowTable extends PureComponent {
       right,
       rowSpan,
       scrollbar,
+      scrollbarWidth,
       scrollbarX,
       scrollbarY,
       top,

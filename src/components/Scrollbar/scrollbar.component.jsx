@@ -39,7 +39,7 @@ class Scrollbar extends PureComponent {
       position: 'relative',
       width,
       height,
-      background: 'lightgray',
+      background: 'rgba(0, 0, 0, .1)',
       overflow: 'hidden',
     };
     if (typeof customStyle === 'function') {
