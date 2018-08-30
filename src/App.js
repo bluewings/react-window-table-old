@@ -63,12 +63,12 @@ const guidelineStyle = (base) => {
 class App extends Component {
   render() {
     return (
-      <div className="App" style={{ padding: 100 }}>
+      <div className="App" style={{ padding: 20 }}>
         <table border={1} cellPadding={10}>
           <tbody>
             <tr>
               <td>
-                <WindowTable columns={columns.slice(0, 3)} rows={data.slice(0, 8)} fixedTopCount={0} fixedBottomCount={0} fixedLeftCount={0} fixedRightCount={0} width={500} height={300} />
+                <WindowTable columns={columns.slice(0, 3)} rows={data.slice(0, 4)} fixedTopCount={0} fixedBottomCount={0} fixedLeftCount={0} fixedRightCount={0} width={500} height={300} />
               </td>
               <td>
                 <WindowTable columns={columns.slice(0,3)} rows={data} width={500} height={300} />
@@ -77,9 +77,9 @@ class App extends Component {
             <tr>
               <td>
                 <WindowTable
-                  scrollbarTrackStyle={scrollbarTrackStyle}
-                  scrollbarHandleStyle={scrollbarHandleStyle}
-                  guidelineStyle={guidelineStyle}
+                  // scrollbarTrackStyle={scrollbarTrackStyle}
+                  // scrollbarHandleStyle={scrollbarHandleStyle}
+                  // guidelineStyle={guidelineStyle}
                   columns={columns} rows={data.slice(0, 100)} width={500} height={500} />
               </td>
               <td>

@@ -19,13 +19,15 @@ const getClientRect = (elem) => {
   };
 };
 
+const SHADOW_GRADIENT = 'rgba(0, 0, 0, 0.2) 0%, rgba(0, 0, 0, 0) 100%';
+
 const defaults = {
-  width: 12,
+  width: 6,
   background: {
-    top: 'linear-gradient(to bottom, rgba(0, 0, 0, 0.1) 0%, rgba(0, 0, 0, 0) 100%)',
-    bottom: 'linear-gradient(to top, rgba(0, 0, 0, 0.1) 0%, rgba(0, 0, 0, 0) 100%)',
-    left: 'linear-gradient(to right, rgba(0, 0, 0, 0.1) 0%, rgba(0, 0, 0, 0) 100%)',
-    right: 'linear-gradient(to left, rgba(0, 0, 0, 0.1) 0%, rgba(0, 0, 0, 0) 100%)',
+    top: 'linear-gradient(to bottom, ' + SHADOW_GRADIENT + ')',
+    bottom: 'linear-gradient(to top, ' + SHADOW_GRADIENT + ')',
+    left: 'linear-gradient(to right, ' + SHADOW_GRADIENT + ')',
+    right: 'linear-gradient(to left, ' + SHADOW_GRADIENT + ')',
   
   }
 }
@@ -54,6 +56,10 @@ class Guideline extends PureComponent {
       height: defaults.width,
       background: defaults.background[type],
       [type]: distance,
+      transition: 'opacity 0.2s',
+      '&.scroll-0': {
+        opacity: 0
+      }
     }
     styles[(type === 'top' || type === 'bottom') ? 'width' : 'height'] = length;
     if (typeof customStyle === 'function') {
@@ -89,12 +95,16 @@ class Guideline extends PureComponent {
           ccc = 1 - this.scrollX
           break;
       }
-      this.aaaRef.current.innerText = parseInt(ccc * 100, 10) / 100;
-      this.bbbRef.current.classList.remove('no-scroll', 'full-scroll');
+      // this.aaaRef.current.innerText = parseInt(ccc * 100, 10) / 100;
+      // this.aaaRef.current.innerText = parseInt(ccc * 100, 10) / 100 || 0;
+      this.bbbRef.current.classList.remove('scroll-0', 'scroll-100');
+      if (isNaN(ccc)) {
+        ccc = 0
+      }
       if (ccc === 0) {
-        this.bbbRef.current.classList.add('no-scroll');
+        this.bbbRef.current.classList.add('scroll-0');
       } else if (ccc === 1) {
-        this.bbbRef.current.classList.add('full-scroll');
+        this.bbbRef.current.classList.add('scroll-100');
       }
     }
   }

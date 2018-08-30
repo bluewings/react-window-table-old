@@ -170,7 +170,9 @@ class WindowTable extends PureComponent {
 
   // _top = (memoize)
 
-  rowCount = memoize(rows => (rows || []).length)
+  rowCount = memoize(rows => {
+    return (rows || []).length + 1
+  })
 
   columnCount = memoize(columns => (columns || []).length)
 
@@ -225,8 +227,16 @@ class WindowTable extends PureComponent {
   overallWidth = memoize(columns =>
     (columns || []).reduce((prev, column, index) => prev + this.columnWidth(index, column), 0))
 
-  overallHeight = memoize(rows =>
-    (rows || []).reduce((prev, row, index) => prev + this.rowHeight(index, row), 0))
+  // overallHeight = memoize(rows =>
+  //   (rows || []).reduce((prev, row, index) => prev + this.rowHeight(index, row), 0))
+
+  overallHeight = memoize(rows => {
+  
+    // new Array(rows)
+    return [{}, ...rows].reduce((prev, row, index) => prev + this.rowHeight(index - 1, row), 0)
+
+
+  })
 
   renderGrid = ({
     section, width, height, columnCount, columnOffset, rowCount, rowOffset,
@@ -253,11 +263,23 @@ class WindowTable extends PureComponent {
     return (
       <div onMouseOver={handleMouseOver}>
       <Grid {...gridProps} >
-        {({ columnIndex, rowIndex, style }) => (
-          <div style={style}>
-            {rowOffset + rowIndex}, {columnOffset + columnIndex}
+        {({ columnIndex, rowIndex, style }) => {
+          const _colIndex = columnOffset + columnIndex;
+          const _rowIndex = rowOffset + rowIndex - 1;
+
+          return (
+
+          
+          <div className={(_colIndex + _rowIndex) % 2 ? "odd" : "even"} style={style}>
+            {_rowIndex === -1 && this.props.columns[_colIndex].name}
+            
+            {_rowIndex >= 0 && (
+              <span>{_rowIndex}, {_colIndex}</span>
+            )}
+            
           </div>
-          )}
+          );
+        }}
       </Grid>
       </div>
     );
@@ -279,7 +301,7 @@ class WindowTable extends PureComponent {
 
     // console.log('render');
 
-    const columnCount = this.rowCount(columns);
+    const columnCount = this.columnCount(columns);
     const rowCount = this.rowCount(rows);
 
     const overallWidth = this.overallWidth(columns);

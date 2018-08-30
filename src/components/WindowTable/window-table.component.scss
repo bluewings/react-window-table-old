@@ -36,12 +36,24 @@
 :global(.drr) {
   border: 5px green solid;
 }
-.bg_50 {
-  background: #E1F5FE;
+.bg_50, :global(.odd) {
+  // background: #E1F5FE;
+
+  background: #fff;
+  display: flex;
+  align-items: center;
+  
+  justify-content: center;
 }
 
-.bg_100 {
-  background: #B3E5FC;
+.bg_100, :global(.even) {
+  // background: #B3E5FC;
+  background: #E1F5FE;
+  background: #f8f8f0;
+  display: flex;
+  align-items: center;
+  
+  justify-content: center;
 }
 
 .bg_200 {
