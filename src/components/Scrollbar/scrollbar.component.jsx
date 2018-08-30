@@ -203,7 +203,7 @@ class Scrollbar extends PureComponent {
       onStart: this.handleDragStart,
       onDrag: this.handleDrag,
       onStop: this.handleDragStop,
-      className: 'drr',
+      // className: 'drr',
     };
     if (!this._ondrag) {
       if (axis === 'x') {

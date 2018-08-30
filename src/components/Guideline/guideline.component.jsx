@@ -33,7 +33,18 @@ const defaults = {
 
 
 class Guideline extends PureComponent {
+  
+  constructor(props) {
+    super(props)
+    this.scrollX = 0;
+    this.scrollY = 0;
+    this.aaaRef = React.createRef();
+    this.bbbRef = React.createRef();
+  }
 
+  componentDidMount() {
+    this.aaa();
+  }
 
   guidelineStyle = memoize((type, distance, length, customStyle) => {
     let styles = {
@@ -51,11 +62,48 @@ class Guideline extends PureComponent {
     return css(styles);
   })
 
+  update = (abc)=> {
+    const { scrollX, scrollY } = abc;
+    // console.log(abc);
+    // console.log(aaa);
+    this.scrollX = scrollX;
+    this.scrollY = scrollY;
+    this.aaa();
+    
+  }
+
+  aaa = () => {
+    if (this.aaaRef.current) {
+      let ccc;
+      switch (this.props.type) {
+        case 'top':
+        ccc = this.scrollY
+          break;
+          case 'bottom':
+          ccc = 1 - this.scrollY
+          break;
+          case 'left':
+          ccc = this.scrollX
+          break;
+          case 'right':
+          ccc = 1 - this.scrollX
+          break;
+      }
+      this.aaaRef.current.innerText = parseInt(ccc * 100, 10) / 100;
+      this.bbbRef.current.classList.remove('no-scroll', 'full-scroll');
+      if (ccc === 0) {
+        this.bbbRef.current.classList.add('no-scroll');
+      } else if (ccc === 1) {
+        this.bbbRef.current.classList.add('full-scroll');
+      }
+    }
+  }
+
   render() {
     const { type, distance, length, guidelineStyle } = this.props;
     return (
-    <div className={this.guidelineStyle(type, distance, length, guidelineStyle)}>
-      <div />
+    <div ref={this.bbbRef} className={this.guidelineStyle(type, distance, length, guidelineStyle)}>
+      <div ref={this.aaaRef }/>
     </div>
     )
   }

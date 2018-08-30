@@ -26,7 +26,7 @@ class WindowTable extends PureComponent {
       y: React.createRef(),
     };
 
-    this.guideLineRef = {
+    this.guidelineRef = {
       top: React.createRef(),
       right: React.createRef(),
       bottom: React.createRef(),
@@ -44,11 +44,17 @@ class WindowTable extends PureComponent {
 
   componentDidMount() {
     this.timer = setInterval(() => {
-      if (this.tableRef.current) {
+      if (this.tableRef.current && this.center) {
         const tRect = this.tableRef.current.getBoundingClientRect();
-        this.titleRef.current.innerText = `${tRect.width} x ${tRect.height}`;
+        // this.titleRef.current.innerText = `${tRect.width} x ${tRect.height}`;
+        this.titleRef.current.innerText = this.metric.scrollLeft
+        + ' , ' + this.metric.maxScrollX
+        + ' , ' + this.metric.scrollTop
+        // + ' , ' + (this.contentWidth + this.center.width_)
+        // + ' , ' + (this.center.width_ - this.center.width)
+        + ' , ' + this.metric.maxScrollY
       }
-    }, 500);
+    }, 10);
   }
 
   componentWillUnmount() {
@@ -69,7 +75,7 @@ class WindowTable extends PureComponent {
         this.metric.scrollLeft = scrollLeft;
       }
 
-      const metric = {
+      let metric = {
         scrollTop: this.metric.scrollTop || 0,
         scrollLeft: this.metric.scrollLeft || 0,
       }
@@ -78,6 +84,13 @@ class WindowTable extends PureComponent {
         Object.keys(this.gridRef)
         .filter(key => key !== section && this.gridRef[key].current)
         .forEach(key => this.gridRef[key].current.scrollTo(metric));
+      metric = {
+        ...metric,
+        scrollX: this.metric.scrollLeft / this.metric.maxScrollX,
+        scrollY: this.metric.scrollTop / this.metric.maxScrollY,
+        // scrollTop: this.metric.scrollTop || 0,
+        // scrollLeft: this.metric.scrollLeft || 0,
+      }
       if (this.scrollbarRef.x.current) {
         this.scrollbarRef.x.current.scrollTo(metric);
       } else {
@@ -88,6 +101,10 @@ class WindowTable extends PureComponent {
       } else {
         console.log('>>> not y found');
       }
+
+      Object.keys(this.guidelineRef)
+      .filter(key => this.guidelineRef[key].current)
+      .forEach(key => this.guidelineRef[key].current.update(metric));
       // const scrollTo = { ...this.metric };
       // });
 
@@ -161,6 +178,7 @@ class WindowTable extends PureComponent {
 
     // console.log(width, this.gridWidth(0, leftCount), this.gridWidth(columnCount - rightCount, rightCount))
     ({
+      width_: this.gridWidth(leftCount, columnCount - leftCount - rightCount), 
       width: width - this.gridWidth(0, leftCount) - this.gridWidth(columnCount - rightCount, rightCount),
       height: height - this.gridHeight(0, topCount) - this.gridHeight(rowCount - bottomCount, bottomCount),
       rowOffset: topCount,
@@ -297,6 +315,8 @@ class WindowTable extends PureComponent {
       contentWidth = contentWidth - scrollbarWidth;
     }
 
+    this.contentWidth = contentWidth;
+
     // scrollbarX = false;
     // scrollbarY = false;
 
@@ -319,6 +339,11 @@ class WindowTable extends PureComponent {
 
     const rowSpan = [top, center, bottom].filter(e => e).length;
     const colSpan = [left, center, right].filter(e => e).length;
+
+    this.center = center;
+
+    this.metric.maxScrollX = Math.max(0, this.gridWidth(leftCount, columnCount - leftCount - rightCount) - center.width);
+    this.metric.maxScrollY = Math.max(0, this.gridHeight(topCount, rowCount - topCount - bottomCount) - center.height);
 
 
 

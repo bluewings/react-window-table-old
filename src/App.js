@@ -25,7 +25,7 @@ const scrollbarHandleStyle = (base) => {
 
     '> div': {
       display: 'block',
-      content: '111',
+      // content: '111',
       width: base.width - 4,
       height: base.height - 4,
       margin: 2,
@@ -55,7 +55,7 @@ const scrollbarHandleStyle = (base) => {
 const guidelineStyle = (base) => {
   return {
     ...base,
-    background: 'blue',
+    background: '#f8f8f8',
     // zIndex: 1,
   }
 }
@@ -83,7 +83,7 @@ class App extends Component {
                   columns={columns} rows={data.slice(0, 100)} width={500} height={500} />
               </td>
               <td>
-                <WindowTable columns={columns} fixedLeftCount={2} fixedBottomCount={0} fixedRightCount={0} rows={data} width={500} height={300} />
+                <WindowTable columns={columns} rows={data.slice(0, 5)} fixedLeftCount={2} fixedBottomCount={0} fixedRightCount={0} width={500} height={300} />
               </td>
             </tr>
           </tbody>

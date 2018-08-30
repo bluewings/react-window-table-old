@@ -2,10 +2,10 @@
 div
   div(className='{styles.root}')
 
-    Guideline(@if='top',    type='top',    guidelineStyle='{guidelineStyle}', length='{contentWidth}',  distance='{top.height}')
-    Guideline(@if='bottom', type='bottom', guidelineStyle='{guidelineStyle}', length='{contentWidth}',  distance='{bottom.height + (scrollbarX ? scrollbarWidth : 0)}')
-    Guideline(@if='left',   type='left',   guidelineStyle='{guidelineStyle}', length='{contentHeight}', distance='{left.width}')
-    Guideline(@if='right',  type='right',  guidelineStyle='{guidelineStyle}', length='{contentHeight}', distance='{right.width + (scrollbarY ? scrollbarWidth : 0)}')
+    Guideline(@if='top',    ref='{this.guidelineRef.top}',    type='top',    guidelineStyle='{guidelineStyle}', length='{contentWidth}',  distance='{top.height}')
+    Guideline(@if='bottom', ref='{this.guidelineRef.bottom}', type='bottom', guidelineStyle='{guidelineStyle}', length='{contentWidth}',  distance='{bottom.height + (scrollbarX ? scrollbarWidth : 0)}')
+    Guideline(@if='left',   ref='{this.guidelineRef.left}',   type='left',   guidelineStyle='{guidelineStyle}', length='{contentHeight}', distance='{left.width}')
+    Guideline(@if='right',  ref='{this.guidelineRef.right}',  type='right',  guidelineStyle='{guidelineStyle}', length='{contentHeight}', distance='{right.width + (scrollbarY ? scrollbarWidth : 0)}')
 
     //- .guideline-top(@if='top',
     //-   ref='{this.guideLineRef.top}',

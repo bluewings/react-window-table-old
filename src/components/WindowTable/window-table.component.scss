@@ -27,6 +27,12 @@
     // -ms-overflow-style: -ms-autohiding-scrollbar!important;
   }
 }
+:global(.no-scroll) {
+  background: blue !important;
+}
+:global(.full-scroll) {
+  background: red !important;
+}
 :global(.drr) {
   border: 5px green solid;
 }
