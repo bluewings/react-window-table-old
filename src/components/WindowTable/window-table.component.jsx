@@ -1,8 +1,9 @@
 /* eslint-disable */
 import React, { PureComponent } from 'react';
 import { VariableSizeGrid as Grid } from 'react-window';
-import { compose, defaultProps } from 'recompose';
+import { compose, defaultProps, withPropsOnChange } from 'recompose';
 import memoize from 'memoize-one';
+import { css } from 'emotion';
 import Scrollbar from '../Scrollbar';
 import Guideline from '../Guideline';
 
@@ -46,13 +47,11 @@ class WindowTable extends PureComponent {
     this.timer = setInterval(() => {
       if (this.tableRef.current && this.center) {
         const tRect = this.tableRef.current.getBoundingClientRect();
-        // this.titleRef.current.innerText = `${tRect.width} x ${tRect.height}`;
-        this.titleRef.current.innerText = this.metric.scrollLeft
-        + ' , ' + this.metric.maxScrollX
-        + ' , ' + this.metric.scrollTop
-        // + ' , ' + (this.contentWidth + this.center.width_)
-        // + ' , ' + (this.center.width_ - this.center.width)
-        + ' , ' + this.metric.maxScrollY
+        this.titleRef.current.innerText = `${tRect.width} x ${tRect.height}`;
+        // this.titleRef.current.innerText = this.metric.scrollLeft
+          // + ' , ' + this.metric.maxScrollX
+          // + ' , ' + this.metric.scrollTop
+          // + ' , ' + this.metric.maxScrollY
       }
     }, 10);
   }
@@ -63,7 +62,14 @@ class WindowTable extends PureComponent {
 
   columnWidth = index => this.props.columns[index].width || 80
 
-  rowHeight = index => 40
+  rowHeight = index => {
+    if (typeof this.props.rowHeight === 'function') {
+      return this.props.rowHeight(index - 1);
+    } else if (typeof this.props.rowHeight === 'number') {
+      return this.props.rowHeight;
+    }
+    return 100;
+  }
 
   scrollTo = ({ scrollTop, scrollLeft }, section) => {
     // clearTimeout(this._timer);
@@ -79,7 +85,7 @@ class WindowTable extends PureComponent {
         scrollTop: this.metric.scrollTop || 0,
         scrollLeft: this.metric.scrollLeft || 0,
       }
-      // console.log(metric);
+      // // console.log(metric);
       // requestAnimationFrame(() => {
         Object.keys(this.gridRef)
         .filter(key => key !== section && this.gridRef[key].current)
@@ -94,12 +100,12 @@ class WindowTable extends PureComponent {
       if (this.scrollbarRef.x.current) {
         this.scrollbarRef.x.current.scrollTo(metric);
       } else {
-        console.log('>>> not x found');
+        // console.log('>>> not x found');
       }
       if (this.scrollbarRef.y.current) {
         this.scrollbarRef.y.current.scrollTo(metric);
       } else {
-        console.log('>>> not y found');
+        // console.log('>>> not y found');
       }
 
       Object.keys(this.guidelineRef)
@@ -111,30 +117,30 @@ class WindowTable extends PureComponent {
       
 
       // this._timer = setTimeout(() => {
-      //   console.log(scrollTo, section);
+      //   // console.log(scrollTo, section);
       // }, 500);
     }
   }
 
   handleScrollbarDrag = ({ eventType, scrollTop, scrollLeft }) => {
     this.onScrollbarDrag = eventType === 'drag';
-    console.log('>> handleScrollbarDrag', eventType)
+    // console.log('>> handleScrollbarDrag', eventType)
     this.scrollTo({ scrollTop, scrollLeft });
-    console.log('fin.');
+    // console.log('fin.');
 
 
   }
 
   handleGridScroll = (event, section) => {
     if (this.onScrollbarDrag || event.scrollUpdateWasRequested !== false) {
-      // console.log('>', section);
+      // // console.log('>', section);
       return;
     }
     if (this._section !== section) {
-      // console.log(this._section, section);
+      // // console.log(this._section, section);
       return 
     }
-    // console.log(section);
+    // // console.log(section);
     
     // if (this.onScrollbarDragevent.scrollUpdateWasRequested === false) {
     const { scrollTop, scrollLeft } = event;
@@ -159,10 +165,24 @@ class WindowTable extends PureComponent {
 
   gridWidth = (from, limit) => this.props.columns.slice(from, from + limit).reduce((prev, e) => prev + e.width, 0)
 
-  gridHeight = (from, limit) =>
+  gridHeight = (from, limit) => {
 
-    new Array(limit)
-      .fill(true).reduce((prev, i) => prev + this.rowHeight(from + i), 0)
+    // console.log('%c grid height ' + from + ' ~ ' + limit, 'background:yellow');
+    // // console.log(from, limit);
+
+
+    return new Array(limit)
+    .fill(true)
+    .map((e, i) => {
+      return from + i;
+    })
+    .reduce((prev, i) => {
+      // console.log(i);
+      return prev + this.rowHeight(i)
+    }, 0)
+
+  }
+
   // return
   // return this.props.columns.slice(from, from + limit).reduce((prev, e) => {
   //   return prev + e.width;
@@ -171,25 +191,28 @@ class WindowTable extends PureComponent {
   // _top = (memoize)
 
   rowCount = memoize(rows => {
-    return (rows || []).length + 1
+    return (rows || []).length
   })
 
   columnCount = memoize(columns => (columns || []).length)
 
-  center = memoize((topCount, rightCount, bottomCount, leftCount, rowCount, columnCount, width, height) =>
+  center = memoize((topCount, rightCount, bottomCount, leftCount, rowCount, columnCount, width, height) => {
 
-    // console.log(width, this.gridWidth(0, leftCount), this.gridWidth(columnCount - rightCount, rightCount))
-    ({
+    // console.log('center', [0, topCount], this.gridHeight(0, topCount));
+      // console.log('center', this.gridHeight(0, topCount), this.gridHeight(rowCount - bottomCount, bottomCount) );
+    return {
       width_: this.gridWidth(leftCount, columnCount - leftCount - rightCount), 
       width: width - this.gridWidth(0, leftCount) - this.gridWidth(columnCount - rightCount, rightCount),
+      // height: height - this.gridHeight(-1, topCount) - this.gridHeight(rowCount -1 - bottomCount, bottomCount),
       height: height - this.gridHeight(0, topCount) - this.gridHeight(rowCount - bottomCount, bottomCount),
       rowOffset: topCount,
       rowCount: rowCount - topCount - bottomCount,
       columnOffset: leftCount,
       columnCount: columnCount - leftCount - rightCount,
-    }))
+    }
+  })
 
-
+    
   top = memoize((topCount, rightCount, bottomCount, leftCount, rowCount, columnCount, width, height) =>
     (topCount <= 0 ? null : {
       height: this.gridHeight(0, topCount),
@@ -219,23 +242,53 @@ class WindowTable extends PureComponent {
     }))
 
     handleMouseOver = (event, section) => {
-      // console.log(event, section);
+      // // console.log(event, section);
       this._section = section;
-      // console.log(this._section);
+      // // console.log(this._section);
     }
 
   overallWidth = memoize(columns =>
     (columns || []).reduce((prev, column, index) => prev + this.columnWidth(index, column), 0))
 
-  // overallHeight = memoize(rows =>
-  //   (rows || []).reduce((prev, row, index) => prev + this.rowHeight(index, row), 0))
+  overallHeight = memoize(rows =>
+    (rows || []).reduce((prev, row, index) => prev + this.rowHeight(index, row), 0))
 
-  overallHeight = memoize(rows => {
-  
-    // new Array(rows)
-    return [{}, ...rows].reduce((prev, row, index) => prev + this.rowHeight(index - 1, row), 0)
+  // overallHeight = memoize(rows => {
+
+  //   // new Array(rows)
+  //   return [...rows].reduce((prev, row, index) => prev + this.rowHeight(index, row), 0)
 
 
+  // })
+
+  headerStyle = memoize((customStyle) => {
+    let styles = {
+      boxSizing: 'border-box'
+    };
+    if (typeof customStyle === 'function') {
+      styles = customStyle(styles, {  });
+    }
+    return css({
+      ...styles,
+      // position: 'relative',
+      // width,
+      // height,
+    });
+  })
+
+  cellStyle = memoize((customStyle) => {
+    let styles = {
+      boxSizing: 'border-box'
+    };
+    if (typeof customStyle === 'function') {
+      styles = customStyle(styles, {  });
+    }
+    return css({
+      ...styles,
+      // position: 'relative',
+      // width,
+      // height,
+    });
   })
 
   renderGrid = ({
@@ -247,7 +300,10 @@ class WindowTable extends PureComponent {
       columnCount,
       columnWidth: this.columnWidth,
       rowCount,
-      rowHeight: this.rowHeight,
+      rowHeight: (index) => {
+        // console.log('>>> row height', index + rowOffset);
+        return this.rowHeight(index + rowOffset)
+      }
     };
     if (section) {
       gridProps = {
@@ -257,7 +313,7 @@ class WindowTable extends PureComponent {
       };
     }
     const handleMouseOver = (event) => {
-      // console.log(section);/
+      // // console.log(section);/
       this.handleMouseOver(event, section);
     }
     return (
@@ -265,16 +321,30 @@ class WindowTable extends PureComponent {
       <Grid {...gridProps} >
         {({ columnIndex, rowIndex, style }) => {
           const _colIndex = columnOffset + columnIndex;
-          const _rowIndex = rowOffset + rowIndex - 1;
+          const _rowIndex = rowOffset + rowIndex;
+          const cellStyle = this.cellStyle(this.props.cellStyle);
+          const headerStyle = this.headerStyle(this.props.headerStyle);
+
+          // const applyStyle = _rowIndex === -1 ? headerStyle : cellStyle;
+          const applyStyle = _rowIndex === 0 ? headerStyle : cellStyle;
+          // // console.log('>', _rowIndex, _colIndex);
+
+          // consol
+
+
 
           return (
 
           
-          <div className={(_colIndex + _rowIndex) % 2 ? "odd" : "even"} style={style}>
+          // <div className={(_colIndex + _rowIndex) % 2 ? "odd" : "even"} style={style}>
+          <div className={applyStyle} style={style}>
             {_rowIndex === -1 && this.props.columns[_colIndex].name}
             
             {_rowIndex >= 0 && (
-              <span>{_rowIndex}, {_colIndex}</span>
+
+              <span>{this.props.rows[_rowIndex].arr[_colIndex]}
+              {/* <br/>{_rowIndex}, {_colIndex} */}
+              </span>
             )}
             
           </div>
@@ -299,7 +369,7 @@ class WindowTable extends PureComponent {
       guidelineStyle,
     } = this.props;
 
-    // console.log('render');
+    // // console.log('render');
 
     const columnCount = this.columnCount(columns);
     const rowCount = this.rowCount(rows);
@@ -327,12 +397,12 @@ class WindowTable extends PureComponent {
     contentHeight = contentHeight - (scrollbarX ? scrollbarWidth : 0);
 
     if (overallHeight < contentHeight) {
-      console.log('case1');
+      // console.log('case1');
       contentHeight = overallHeight;
     }
 
     if (scrollbarX && !scrollbarY && contentHeight < overallHeight) {
-      console.log('>>>>');
+      // console.log('>>>>');
       scrollbarY = true;
       contentWidth = contentWidth - scrollbarWidth;
     }
@@ -415,16 +485,82 @@ class WindowTable extends PureComponent {
   }
 }
 
-const enhance = compose(defaultProps({
+const enhance = compose(
+  defaultProps({
   width: 800,
   height: 400,
   fixedTopCount: 1,
   fixedLeftCount: 1,
   fixedRightCount: 1,
   fixedBottomCount: 1,
-  scrollbarWidth: 15,
+  scrollbarWidth: 24,
   columns: [],
   rows: null,
-}));
+}),
+withPropsOnChange(['columns', 'rows'], ({ columns, rows }) => {
+  // // console.log(columns);
+  // // console.log(rows);
+
+  // if (rows === null || typeof rows !== 'object') {
+  //   return;
+  // }
+  if (!Array.isArray(rows)) {
+    return;
+  }
+
+  let ts = new Date();
+
+
+
+  rows = rows.map(row => {
+    let _row;
+    if (Array.isArray(row)) {
+      _row = columns.reduce((prev, e, i) => {
+        return {
+          ...prev,
+          [e.name]: row[i]
+        }
+      }, {});
+    } else {
+      _row = { ...row };
+    }
+
+    // const 
+
+    let data = {
+      org: { ..._row },
+      arr: columns.map(e => {
+        let value = _row[e.name];
+        if (typeof e.getValue === 'function') {
+          value = e.getValue(value);
+        }
+        return value
+      })
+    };
+
+    return data;
+  })
+
+  rows = [
+    {
+      org: {},
+      arr: columns.map(e => e.name),
+    },
+    ...rows,
+  ]
+
+  // // console.log(rows);
+  let te = new Date();
+  console.info('data count', rows.length * columns.length, 'elapsed', te - ts);
+  // // console.log(rows);
+
+  return {rows}
+  // return {
+  
+  // }
+  // // console.log(rows)
+
+})
+);
 
 export default enhance(WindowTable);

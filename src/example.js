@@ -6,7 +6,7 @@ const data = [...Array(30)].map((e, i) => {
   return columns.reduce((prev, f, j) => {
     return {
       ...prev,
-      [f.name]: i + ',' + j
+      [f.name]: i + '_' + j
     }
   }, {})
 })

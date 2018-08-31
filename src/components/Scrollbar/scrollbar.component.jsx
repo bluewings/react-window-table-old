@@ -129,7 +129,7 @@ class Scrollbar extends PureComponent {
   }
 
   handleDragStart = (event, { lastX, lastY }) => {
-    console.log('%c handleDragStart ', 'color:red');
+    // console.log('%c handleDragStart ', 'color:red');
     if (!this.trackRef.current || !this.handleRef.current) {
       return;
     }

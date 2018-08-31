@@ -19,7 +19,7 @@ const getClientRect = (elem) => {
   };
 };
 
-const SHADOW_GRADIENT = 'rgba(0, 0, 0, 0.2) 0%, rgba(0, 0, 0, 0) 100%';
+const SHADOW_GRADIENT = 'rgba(0, 0, 0, 0.1) 0%, rgba(0, 0, 0, 0) 100%';
 
 const defaults = {
   width: 6,
@@ -65,7 +65,10 @@ class Guideline extends PureComponent {
     if (typeof customStyle === 'function') {
       styles = customStyle(styles, { type, distance, length });
     }
-    return css(styles);
+    return css({
+      ...styles,
+      [(type === 'top' || type === 'bottom') ? 'width' : 'height']: length,
+    });
   })
 
   update = (abc)=> {

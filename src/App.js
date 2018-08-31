@@ -6,15 +6,28 @@ import WindowTable from './components/WindowTable';
 
 const columns = [...Array(10)].map((e, i) => ({ name: `col-${i}`, width: 120 }));
 
-const data = [...Array(100)].map((e, i) => columns.reduce((prev, f, j) => ({
-  ...prev,
-  [f.name]: `${i},${j}`,
-}), {}));
+// const data = [...Array(100)].map((e, i) => columns.reduce((prev, f, j) => ({
+//   ...prev,
+//   [f.name]: `data ${i}_${j}`,
+// }), {}));
+
+columns[2].getValue = (e) => {
+  return '___' + e;
+}
+
+const data = [...Array(1000)].map((e, i) => {
+
+  return columns.map((f, j) => {
+    if (j === 0) return i
+    return parseInt(Math.random() * 1000, 10);
+  })
+
+});
 
 const scrollbarTrackStyle = (base) => {
   return {
     ...base,
-    background: '#fff',
+    background: 'yellow',
   }
 }
 
@@ -26,10 +39,10 @@ const scrollbarHandleStyle = (base) => {
     '> div': {
       display: 'block',
       // content: '111',
-      width: base.width - 4,
-      height: base.height - 4,
-      margin: 2,
-      borderRadius: ((base.height - 4) / 2) + 'px',
+      width: base.width - 6,
+      height: base.height - 6,
+      margin: 3,
+      borderRadius: ((base.height - 6) / 2) + 'px',
       // background: 'red',
       transition: 'background 0.1s',
       // background: 'rgba(204,204,204,0.4)',
@@ -55,9 +68,32 @@ const scrollbarHandleStyle = (base) => {
 const guidelineStyle = (base) => {
   return {
     ...base,
-    background: '#f8f8f8',
+    width: 1,
+    height: 1,
+    background: 'black',
+    opacity: '1 !important',
     // zIndex: 1,
   }
+}
+
+const cellStyle = (base) => {
+  return {
+    ...base,
+    borderBottom: '1px solid silver'
+  }
+}
+
+const headerStyle = (base) => {
+  return {
+    ...base,
+    background: '#e8e8e8',
+    // borderBottom: '1px solid silver'
+  }
+}
+
+const rowHeight = (index) => {
+  // console.log(index, index % 3, 40 + (index % 3) * 10)
+  return 40 + (index % 3) * 10;
 }
 
 class App extends Component {
@@ -79,11 +115,16 @@ class App extends Component {
                 <WindowTable
                   // scrollbarTrackStyle={scrollbarTrackStyle}
                   // scrollbarHandleStyle={scrollbarHandleStyle}
-                  // guidelineStyle={guidelineStyle}
-                  columns={columns} rows={data.slice(0, 100)} width={500} height={500} />
+                  guidelineStyle={guidelineStyle}
+                  headerStyle={headerStyle}
+                  cellStyle={cellStyle}
+                  rowHeight={rowHeight}
+                  columns={columns} rows={data.slice(0, 1000)} width={500} height={300} />
               </td>
               <td>
-                <WindowTable columns={columns} rows={data.slice(0, 5)} fixedLeftCount={2} fixedBottomCount={0} fixedRightCount={0} width={500} height={300} />
+                <WindowTable columns={columns} rows={data.slice(0, 1000)}
+                  rowHeight={30}
+                  fixedLeftCount={2} fixedBottomCount={2} fixedRightCount={0} width={500} height={300} />
               </td>
             </tr>
           </tbody>
