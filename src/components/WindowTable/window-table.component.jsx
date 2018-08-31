@@ -63,12 +63,13 @@ class WindowTable extends PureComponent {
   columnWidth = index => this.props.columns[index].width || 80
 
   rowHeight = index => {
-    if (typeof this.props.rowHeight === 'function') {
-      return this.props.rowHeight(index - 1);
-    } else if (typeof this.props.rowHeight === 'number') {
-      return this.props.rowHeight;
-    }
-    return 100;
+    return this.props.rows[index]._height;
+    // if (typeof this.props.rowHeight === 'function') {
+    //   return this.props.rowHeight(index - 1);
+    // } else if (typeof this.props.rowHeight === 'number') {
+    //   return this.props.rowHeight;
+    // }
+    // return 40;
   }
 
   scrollTo = ({ scrollTop, scrollLeft }, section) => {
@@ -497,7 +498,7 @@ const enhance = compose(
   columns: [],
   rows: null,
 }),
-withPropsOnChange(['columns', 'rows'], ({ columns, rows }) => {
+withPropsOnChange(['columns', 'rows', 'rowHeight'], ({ columns, rows, rowHeight }) => {
   // // console.log(columns);
   // // console.log(rows);
 
@@ -509,6 +510,33 @@ withPropsOnChange(['columns', 'rows'], ({ columns, rows }) => {
   }
 
   let ts = new Date();
+
+  let getRowHeight;
+
+  if (typeof rowHeight === 'function') {
+    getRowHeight = (index) => {
+      return rowHeight(index - 1);
+    }
+  } else if (typeof rowHeight === 'number') {
+    getRowHeight = (index) => {
+      return rowHeight;
+    }
+  } else {
+    getRowHeight = (index) => {
+      return 40;
+    }
+  }
+
+
+
+  // rowHeight = index => {
+  //   if (typeof this.props.rowHeight === 'function') {
+  //     return this.props.rowHeight(index - 1);
+  //   } else if (typeof this.props.rowHeight === 'number') {
+  //     return this.props.rowHeight;
+  //   }
+  //   return 40;
+  // }
 
 
 
@@ -547,7 +575,14 @@ withPropsOnChange(['columns', 'rows'], ({ columns, rows }) => {
       arr: columns.map(e => e.name),
     },
     ...rows,
-  ]
+  ].map((e, i) => {
+
+    return {
+      ...e,
+      _height: getRowHeight(i, e)
+    }
+
+  })
 
   // // console.log(rows);
   let te = new Date();
