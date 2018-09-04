@@ -44,10 +44,10 @@ const scrollbarHandleStyle = ({
       // background: 'rgba(204,204,204,0.4)',
       // background: 'rgba(0,0,0,0.25)',
       // background: '#c2c2c2',
-      background: 'black',
+      background: '#c0c0c0',
 
       '&:hover': {
-        background: '#7d7d7d',
+        background: '#7b7b7b',
         // boxShadow: 'inset 0 0 6px rgba(0,0,0,0.5)', 
       }
     },
@@ -55,7 +55,7 @@ const scrollbarHandleStyle = ({
       // background: 'blue',
       // background: 'rgba(204,204,204,0.8)',
       // background: 'rgba(0,0,0,0.5)',
-      background: '#7d7d7d',
+      background: '#7b7b7b',
       // boxShadow: 'inset 0 0 6px rgba(0,0,0,0.5)',
     },
   }
@@ -81,7 +81,8 @@ class Scrollbar extends PureComponent {
       position: 'relative',
       width,
       height,
-      background: 'rgba(0, 0, 0, .1)',
+      // background: 'rgba(0, 0, 0, .1)',
+      background: '#f9f9f9',
       overflow: 'hidden',
     };
     if (typeof customStyle === 'function') {

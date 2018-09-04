@@ -100,7 +100,15 @@ class App extends Component {
   render() {
     return (
       <div className="App" style={{ padding: 20 }}>
-        <table border={1} cellPadding={10}>
+                <WindowTable
+                  // scrollbarTrackStyle={scrollbarTrackStyle}
+                  // scrollbarHandleStyle={scrollbarHandleStyle}
+                  guidelineStyle={guidelineStyle}
+                  headerStyle={headerStyle}
+                  cellStyle={cellStyle}
+                  rowHeight={rowHeight}
+                  columns={columns} rows={data.slice(0, 50)} width={500} height={300} />
+        {/* <table border={1} cellPadding={10}>
           <tbody>
             <tr>
               <td>
@@ -119,7 +127,7 @@ class App extends Component {
                   headerStyle={headerStyle}
                   cellStyle={cellStyle}
                   rowHeight={rowHeight}
-                  columns={columns} rows={data.slice(0, 1000)} width={500} height={300} />
+                  columns={columns} rows={data.slice(0, 50)} width={500} height={300} />
               </td>
               <td>
                 <WindowTable columns={columns} rows={data.slice(0, 1000)}
@@ -128,7 +136,7 @@ class App extends Component {
               </td>
             </tr>
           </tbody>
-        </table>
+        </table> */}
         
         
         {/* <header className="App-header">

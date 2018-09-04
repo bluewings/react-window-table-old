@@ -1,6 +1,7 @@
 // @import .scss => styles
 div
-  div(className='{styles.root}')
+  div(className='{cx(styles.root, containerStyle)}',
+    ref='{this.containerRef}')
 
     Guideline(@if='top',    ref='{this.guidelineRef.top}',    type='top',    guidelineStyle='{guidelineStyle}', length='{contentWidth}',  distance='{top.height}')
     Guideline(@if='bottom', ref='{this.guidelineRef.bottom}', type='bottom', guidelineStyle='{guidelineStyle}', length='{contentWidth}',  distance='{bottom.height + (scrollbarX ? scrollbarWidth : 0)}')

@@ -14,6 +14,8 @@ class WindowTable extends PureComponent {
   constructor(props) {
     super(props);
 
+    this.containerRef = React.createRef();
+
     this.gridRef = {
       center: React.createRef(),
       top: React.createRef(),
@@ -46,8 +48,8 @@ class WindowTable extends PureComponent {
   componentDidMount() {
     this.timer = setInterval(() => {
       if (this.tableRef.current && this.center) {
-        const tRect = this.tableRef.current.getBoundingClientRect();
-        // this.titleRef.current.innerText = `${tRect.width} x ${tRect.height}`;
+        const tRect = this.containerRef.current.getBoundingClientRect();
+        this.titleRef.current.innerText = `${tRect.width} x ${tRect.height}`;
         // this.titleRef.current.innerText = this.metric.scrollLeft
           // + ' , ' + this.metric.maxScrollX
           // + ' , ' + this.metric.scrollTop
@@ -59,6 +61,41 @@ class WindowTable extends PureComponent {
   componentWillUnmount() {
     clearInterval(this.timer);
   }
+
+
+  containerStyle = memoize((width, height) => {
+    return css({
+      border: '1px solid #c4c4c4',
+      boxSizing: 'border-box',
+      width,
+      height,
+      // width: 500,
+    })
+  })
+
+  rect = memoize((containerStyle, width, height) => {
+    const div = document.createElement('div');
+    div.classList.add(containerStyle);
+    document.body.appendChild(div);
+    const styles = window.getComputedStyle(div);
+    // document.body.removeChild(div);
+    const borderTop = parseInt(styles.borderTopWidth, 10);
+    const borderBottom = parseInt(styles.borderBottomWidth, 10);
+    const borderLeft = parseInt(styles.borderLeftWidth, 10);
+    const borderRight = parseInt(styles.borderRightWidth, 10);
+    document.body.removeChild(div);
+    return {
+      width: width - borderLeft - borderRight,
+      height: height - borderTop - borderBottom,
+    }
+    // conso
+    
+    // console.log(styles.width);
+    // console.log(borderLeft, borderRight);
+
+    // console.log(styles.borderRightWidth);
+    // console.log(styles.borderRightWidth);
+  })
 
   columnWidth = index => {
     // console.log(this.props.columns[index].width);
@@ -395,8 +432,8 @@ class WindowTable extends PureComponent {
     let {
       columns,
       rows,
-      width,
-      height,
+      width: _width,
+      height: _height,
       fixedTopCount: topCount,
       fixedBottomCount: bottomCount,
       fixedLeftCount: leftCount,
@@ -406,6 +443,8 @@ class WindowTable extends PureComponent {
     } = this.props;
 
     // // console.log('render');
+    const containerStyle = this.containerStyle(_width, _height);
+    const { width, height } = this.rect(containerStyle, _width, _height);
 
     const columnCount = this.columnCount(columns);
     const rowCount = this.rowCount(rows);
@@ -503,6 +542,7 @@ class WindowTable extends PureComponent {
       bottom,
       center,
       colSpan,
+      containerStyle,
       contentHeight,
       contentWidth,
       guidelineStyle,
