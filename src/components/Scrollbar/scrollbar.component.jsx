@@ -19,6 +19,48 @@ const getClientRect = (elem) => {
   };
 };
 
+const scrollbarHandleStyle = ({ 
+  axis, handleLength, trackWidth,
+  width, height,
+}) => {
+  return {
+    // ...base,
+    background: 'transparent',
+    // background: 'red',
+
+    '> div': {
+      position: 'absolute',
+      display: 'block',
+      top: 3,
+      left: 3,
+      right: 3,
+      bottom: 3,
+      pointerEvent: 'none',
+      // margin: 3,
+      borderRadius: ((height - 6) / 2) + 'px',
+      // background: 'red',
+      transition: 'background 0.2s',
+      // background: 'rgba(204,204,204,0.4)',
+      // background: 'rgba(204,204,204,0.4)',
+      // background: 'rgba(0,0,0,0.25)',
+      // background: '#c2c2c2',
+      background: 'black',
+
+      '&:hover': {
+        background: '#7d7d7d',
+        // boxShadow: 'inset 0 0 6px rgba(0,0,0,0.5)', 
+      }
+    },
+    '&.dragging > div': {
+      // background: 'blue',
+      // background: 'rgba(204,204,204,0.8)',
+      // background: 'rgba(0,0,0,0.5)',
+      background: '#7d7d7d',
+      // boxShadow: 'inset 0 0 6px rgba(0,0,0,0.5)',
+    },
+  }
+}
+
 class Scrollbar extends PureComponent {
   constructor(props) {
     super(props);
@@ -51,16 +93,22 @@ class Scrollbar extends PureComponent {
       width,
       height,
     });
-  })
+  })  
 
   handleStyle = memoize((axis, handleLength, trackWidth, customStyle) => {
     const width = axis === 'x' ? handleLength : trackWidth;
     const height = axis === 'x' ? trackWidth : handleLength;
-    let styles = {
-      width,
-      height,
-      background: 'green',
-    };
+    let styles = scrollbarHandleStyle({
+      axis, handleLength, trackWidth,
+      width, height,
+    })
+    // const width = axis === 'x' ? handleLength : trackWidth;
+    // const height = axis === 'x' ? trackWidth : handleLength;
+    // let styles = {
+    //   width,
+    //   height,
+    //   background: 'green',
+    // };
     if (typeof customStyle === 'function') {
       styles = customStyle(styles, { axis, handleLength, trackWidth });
     }

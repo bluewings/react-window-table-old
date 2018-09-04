@@ -47,7 +47,7 @@ class WindowTable extends PureComponent {
     this.timer = setInterval(() => {
       if (this.tableRef.current && this.center) {
         const tRect = this.tableRef.current.getBoundingClientRect();
-        this.titleRef.current.innerText = `${tRect.width} x ${tRect.height}`;
+        // this.titleRef.current.innerText = `${tRect.width} x ${tRect.height}`;
         // this.titleRef.current.innerText = this.metric.scrollLeft
           // + ' , ' + this.metric.maxScrollX
           // + ' , ' + this.metric.scrollTop
@@ -60,9 +60,16 @@ class WindowTable extends PureComponent {
     clearInterval(this.timer);
   }
 
-  columnWidth = index => this.props.columns[index].width || 80
+  columnWidth = index => {
+    // console.log(this.props.columns[index].width);
+    let width = this.props.columns[index].width;
+    width = isNaN(width) ? 80 : width
+    console.log(width);
+    return width;
+  }
 
   rowHeight = index => {
+    // console.log('rowHeight', index, this.props.rows);
     return this.props.rows[index]._height;
     // if (typeof this.props.rowHeight === 'function') {
     //   return this.props.rowHeight(index - 1);
@@ -164,14 +171,38 @@ class WindowTable extends PureComponent {
     // }
   }
 
-  gridWidth = (from, limit) => this.props.columns.slice(from, from + limit).reduce((prev, e) => prev + e.width, 0)
+  // gridWidth = (from, limit) => this.props.columns.slice(from, from + limit).reduce((prev, e) => prev + e.width, 0)
+
+  gridWidth = (from, limit) => {
+
+    // console.log('%c grid height ' + from + ' ~ ' + limit, 'background:yellow');
+    // // console.log(from, limit);
+    // console.log(limit, this.props.rows);
+    limit = limit > 0 ? limit : 0;
+    
+
+    // console.log(from, limit || 0);
+    return new Array(limit)
+    .fill(true)
+    .map((e, i) => {
+      return from + i;
+    })
+    .reduce((prev, i) => {
+      // console.log(i);
+      return prev + this.columnWidth(i)
+    }, 0)
+
+  }
 
   gridHeight = (from, limit) => {
 
     // console.log('%c grid height ' + from + ' ~ ' + limit, 'background:yellow');
     // // console.log(from, limit);
+    console.log(limit, this.props.rows);
+    limit = limit > 0 ? limit : 0;
+    
 
-
+    // console.log(from, limit || 0);
     return new Array(limit)
     .fill(true)
     .map((e, i) => {
@@ -197,7 +228,7 @@ class WindowTable extends PureComponent {
 
   columnCount = memoize(columns => (columns || []).length)
 
-  center = memoize((topCount, rightCount, bottomCount, leftCount, rowCount, columnCount, width, height) => {
+  _center = memoize((topCount, rightCount, bottomCount, leftCount, rowCount, columnCount, width, height) => {
 
     // console.log('center', [0, topCount], this.gridHeight(0, topCount));
       // console.log('center', this.gridHeight(0, topCount), this.gridHeight(rowCount - bottomCount, bottomCount) );
@@ -279,7 +310,9 @@ class WindowTable extends PureComponent {
 
   cellStyle = memoize((customStyle) => {
     let styles = {
-      boxSizing: 'border-box'
+      boxSizing: 'border-box',
+      // border: '1px solid black',
+      overflow: 'hidden',
     };
     if (typeof customStyle === 'function') {
       styles = customStyle(styles, {  });
@@ -299,7 +332,9 @@ class WindowTable extends PureComponent {
       width,
       height,
       columnCount,
-      columnWidth: this.columnWidth,
+      columnWidth: (index) => {
+        return this.columnWidth(index + columnOffset)
+      },
       rowCount,
       rowHeight: (index) => {
         // console.log('>>> row height', index + rowOffset);
@@ -424,7 +459,7 @@ class WindowTable extends PureComponent {
     // }
 
 
-    const center = this.center(topCount, rightCount, bottomCount, leftCount, rowCount, columnCount, contentWidth, contentHeight);
+    const center = this._center(topCount, rightCount, bottomCount, leftCount, rowCount, columnCount, contentWidth, contentHeight);
     const top = this.top(topCount, rightCount, bottomCount, leftCount, contentWidth, contentHeight);
     const right = this.right(topCount, rightCount, bottomCount, leftCount, rowCount, columnCount, contentWidth, contentHeight);
     const bottom = this.bottom(topCount, rightCount, bottomCount, leftCount, rowCount, columnCount, contentWidth, contentHeight);
@@ -494,7 +529,7 @@ const enhance = compose(
   fixedLeftCount: 1,
   fixedRightCount: 1,
   fixedBottomCount: 1,
-  scrollbarWidth: 24,
+  scrollbarWidth: 15,
   columns: [],
   rows: null,
 }),
@@ -562,7 +597,10 @@ withPropsOnChange(['columns', 'rows', 'rowHeight'], ({ columns, rows, rowHeight 
         if (typeof e.getValue === 'function') {
           value = e.getValue(value);
         }
-        return value
+        if (typeof value === 'string') {
+          return value;
+        }
+        return '-'
       })
     };
 
