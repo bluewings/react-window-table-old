@@ -103,11 +103,16 @@ class App extends Component {
                 <WindowTable
                   // scrollbarTrackStyle={scrollbarTrackStyle}
                   // scrollbarHandleStyle={scrollbarHandleStyle}
-                  guidelineStyle={guidelineStyle}
-                  headerStyle={headerStyle}
-                  cellStyle={cellStyle}
-                  rowHeight={rowHeight}
-                  columns={columns} rows={data.slice(0, 50)} width={500} height={300} />
+                  // guidelineStyle={guidelineStyle}
+                  // headerStyle={headerStyle}
+                  // cellStyle={cellStyle}
+                  // rowHeight={rowHeight}
+                  columns={columns} rows={data.slice(0, 5000)} width={800} height={500}
+                  fixedLeftCount={2} 
+                  fixedRightCount={0} 
+                  fixedTopCount={2} 
+                  fixedBottomCount={0} 
+                  />
         {/* <table border={1} cellPadding={10}>
           <tbody>
             <tr>

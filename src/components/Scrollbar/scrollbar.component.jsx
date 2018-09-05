@@ -19,6 +19,30 @@ const getClientRect = (elem) => {
   };
 };
 
+
+const scrollbarTrackStyle = ({ 
+  axis, handleLength, trackWidth,
+  width, height,
+}) => {
+  let styles = {
+    position: 'relative',
+    width,
+    height,
+    // background: 'rgba(0, 0, 0, .1)',
+    // background: '#f9f9f9',
+    overflow: 'hidden',
+    boxSizing: 'border-box',
+  };
+  if (axis === 'x') {
+    styles.borderTop = '1px solid #e5e5e5';
+    styles.borderTop = '1px solid #cacaca';
+  } else {
+    styles.borderLeft = '1px solid #cacaca';
+  }
+
+  return styles;
+};
+
 const scrollbarHandleStyle = ({ 
   axis, handleLength, trackWidth,
   width, height,
@@ -33,8 +57,8 @@ const scrollbarHandleStyle = ({
       display: 'block',
       top: 3,
       left: 3,
-      right: 3,
-      bottom: 3,
+      right: 4,
+      bottom: 4,
       pointerEvent: 'none',
       // margin: 3,
       borderRadius: ((height - 6) / 2) + 'px',
@@ -77,14 +101,10 @@ class Scrollbar extends PureComponent {
   trackStyle = memoize((axis, trackLength, trackWidth, customStyle) => {
     const width = axis === 'x' ? trackLength : trackWidth;
     const height = axis === 'x' ? trackWidth : trackLength;
-    let styles = {
-      position: 'relative',
-      width,
-      height,
-      // background: 'rgba(0, 0, 0, .1)',
-      background: '#f9f9f9',
-      overflow: 'hidden',
-    };
+    let styles = scrollbarTrackStyle({
+      axis, trackLength, trackWidth,
+      width, height,
+    })
     if (typeof customStyle === 'function') {
       styles = customStyle(styles, { axis, trackLength, trackWidth });
     }

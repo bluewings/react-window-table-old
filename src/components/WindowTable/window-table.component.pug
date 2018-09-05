@@ -38,39 +38,39 @@ div
         tr(@if='top')
           //- td(@if='left', className='{styles.bg_50}')
           td(@if='left')
-            | {this.renderGrid({ ...top, ...left })}
+            | {this.renderGrid({ section: ['top', 'left'], ...top, ...left })}
           //- td(className='{styles.bg_100}')
           td
-            | {this.renderGrid({ section: 'top', ...center, ...top })}
+            | {this.renderGrid({ section: ['top', 'center'], ...center, ...top })}
           //- td(@if='right', className='{styles.bg_200}')
           td(@if='right')
-            | {this.renderGrid({ ...top, ...right })}
+            | {this.renderGrid({ section: ['top', 'right'], ...top, ...right })}
           td(@if='scrollbarY', rowSpan='{rowSpan}')
             Scrollbar(__jsx='{...scrollbar.y}')
 
         tr
           //- td(@if='left', className='{styles.bg_100}')
           td(@if='left')
-            | {this.renderGrid({ section: 'left', ...center, ...left })}
+            | {this.renderGrid({ section: ['middle', 'left'], ...center, ...left })}
           //- td(className='{styles.bg_200}')
           td
-            | {this.renderGrid({ section: 'center', ...center })}
+            | {this.renderGrid({ section: ['middle', 'center'], ...center })}
           //- td(@if='right', className='{styles.bg_300}')
           td(@if='right')
-            | {this.renderGrid({ section: 'right', ...center, ...right })}
+            | {this.renderGrid({ section: ['middle', 'right'], ...center, ...right })}
           td(@if='scrollbarY && !top', rowSpan='{rowSpan}')
             Scrollbar(__jsx='{...scrollbar.y}')
 
         tr(@if='bottom')
           //- td(@if='left', className='{styles.bg_200}')
           td(@if='left')
-            | {this.renderGrid({ ...bottom, ...left })}
+            | {this.renderGrid({ section: ['bottom', 'left'], ...bottom, ...left })}
           //- td(className='{styles.bg_300}')
           td
-            | {this.renderGrid({ section: 'bottom', ...center, ...bottom })}
+            | {this.renderGrid({ section: ['bottom', 'center'], ...center, ...bottom })}
           //- td(@if='right', className='{styles.bg_400}')
           td(@if='right')
-            | {this.renderGrid({ ...bottom, ...right })}
+            | {this.renderGrid({ section: ['bottom', 'right'], ...bottom, ...right })}
 
         tr(@if='scrollbarX')
           td(colSpan='{colSpan}')
