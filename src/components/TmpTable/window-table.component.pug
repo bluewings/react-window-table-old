@@ -59,9 +59,7 @@ div
               handleStyle='{scrollbarHandleStyle}')
 
         tr(@if='scrollbarX')
-          //- td(colSpan='{colSpan}')
           td
-            //- Scrollbar(__jsx='{...scrollbar.x}')
             Scrollbar(
               axis='x',
               ref='{this.scrollbarRef.x}',
@@ -76,5 +74,5 @@ div
 
 
 
-    br
-    strong(ref='{this.titleRef}', style='{{ textAlign: "right" }}')
+  br
+  strong(ref='{this.titleRef}', style='{{ textAlign: "right" }}')

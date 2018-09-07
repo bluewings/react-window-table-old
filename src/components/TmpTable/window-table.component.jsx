@@ -475,7 +475,7 @@ const enhance = compose(
     'overallWidth', 'overallHeight', 'scrollbarWidth'], ({
     width: _width, height: _height, overallWidth, overallHeight, scrollbarWidth,
   }) => {
-    const containerStyle = css({
+    let containerStyle = css({
       border: '1px solid #c4c4c4',
       boxSizing: 'border-box',
       width: _width,
@@ -483,6 +483,13 @@ const enhance = compose(
     });
 
     const { width, height } = measure(containerStyle, _width, _height);
+
+   containerStyle = css({
+      border: '1px solid #c4c4c4',
+      boxSizing: 'border-box',
+      width: _width,
+      // height: _height,
+    });
 
     let contentWidth = width;
     let contentHeight = height;

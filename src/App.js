@@ -115,7 +115,7 @@ class App extends Component {
                   // headerStyle={headerStyle}
                   // cellStyle={cellStyle}
                   // rowHeight={rowHeight}
-                  columns={columns} rows={data.slice(0, 3)} width={800} height={300}
+                  columns={columns} rows={data.slice(0, 200)} width={800} height={300}
                   fixedLeftCount={1} 
                   fixedRightCount={1} 
                   fixedTopCount={1} 
