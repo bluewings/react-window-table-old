@@ -124,6 +124,9 @@ class WindowTable extends PureComponent {
       overflow: 'hidden',
       borderRight: '1px solid #cacaca',
       borderBottom: '1px solid #cacaca',
+      display: 'flex',
+      justifyContent: 'center',
+      alignItems: 'center',
 
       '&.cell-right': {
         borderLeft: '1px solid #cacaca',
