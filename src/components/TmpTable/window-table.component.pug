@@ -1,0 +1,64 @@
+// @import .scss => styles
+//- div
+
+div
+  pre {JSON.stringify(this.metric, null, 2)}
+  div(className='{cx(styles.root, containerStyle)}',
+    ref='{this.containerRef}')
+    table(className='{styles.table}', border='{0}', cellPadding='{0}', cellSpacing='{0}', ref='{this.tableRef}')
+      tbody
+        tr
+          td
+            Scrollarea(width='{contentWidth}', height='{contentHeight}',
+            
+              contentWidth='{overallWidth}',
+              contentHeight='{overallHeight}',
+              onScroll='{this._handleScroll}')
+
+
+              div
+                Guideline(@if='top',    ref='{this.guidelineRef.top}',    type='top',    guidelineStyle='{guidelineStyle}', length='{contentWidth}',  distance='{top.height}')
+                //- Guideline(@if='bottom', ref='{this.guidelineRef.bottom}', type='bottom', guidelineStyle='{guidelineStyle}', length='{contentWidth}',  distance='{bottom.height + (scrollbarX ? scrollbarWidth : 0)}')
+                Guideline(@if='bottom', ref='{this.guidelineRef.bottom}', type='bottom', guidelineStyle='{guidelineStyle}', length='{contentWidth}',  distance='{bottom.height}')
+                Guideline(@if='left',   ref='{this.guidelineRef.left}',   type='left',   guidelineStyle='{guidelineStyle}', length='{contentHeight}', distance='{left.width}')
+                //- Guideline(@if='right',  ref='{this.guidelineRef.right}',  type='right',  guidelineStyle='{guidelineStyle}', length='{contentHeight}', distance='{right.width + (scrollbarY ? scrollbarWidth : 0)}')
+                Guideline(@if='right',  ref='{this.guidelineRef.right}',  type='right',  guidelineStyle='{guidelineStyle}', length='{contentHeight}', distance='{right.width}')
+                table(className='{styles.table}', border='{0}', cellPadding='{0}', cellSpacing='{0}',
+                  )
+                  tbody
+                    tr(@if='top')
+                      td(@if='left')
+                        | {this.renderGrid({ section: ['top', 'left'], ...top, ...left })}
+                      td
+                        | {this.renderGrid({ section: ['top', 'center'], ...center, ...top })}
+                      td(@if='right')
+                        | {this.renderGrid({ section: ['top', 'right'], ...top, ...right })}
+                    tr
+                      td(@if='left')
+                        | {this.renderGrid({ section: ['middle', 'left'], ...center, ...left })}
+                      td
+                        | {this.renderGrid({ section: ['middle', 'center'], ...center })}
+                      td(@if='right')
+                        | {this.renderGrid({ section: ['middle', 'right'], ...center, ...right })}
+                    tr(@if='bottom')
+                      td(@if='left')
+                        | {this.renderGrid({ section: ['bottom', 'left'], ...bottom, ...left })}
+                      td
+                        | {this.renderGrid({ section: ['bottom', 'center'], ...center, ...bottom })}
+                      td(@if='right')
+                        | {this.renderGrid({ section: ['bottom', 'right'], ...bottom, ...right })}
+
+          td(@if='scrollbarY')
+            Scrollbar(__jsx='{...scrollbar.y}')
+
+        tr(@if='scrollbarX')
+          //- td(colSpan='{colSpan}')
+          td
+            Scrollbar(__jsx='{...scrollbar.x}')
+          td
+
+
+
+
+    br
+    strong(ref='{this.titleRef}', style='{{ textAlign: "right" }}')

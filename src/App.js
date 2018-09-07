@@ -3,19 +3,24 @@ import React, { Component } from 'react';
 // import logo from './logo.svg';
 import './App.css';
 import WindowTable from './components/WindowTable';
+import TmpTable from './components/TmpTable';
+import Scrollarea from './components/Scrollarea';
+import sampleImg from './sample.png';
 
-const columns = [...Array(10)].map((e, i) => ({ name: `col-${i}`, width: 120 }));
+const columns = [...Array(25)].map((e, i) => ({ name: `col-${i}`, width: 100 }));
 
 // const data = [...Array(100)].map((e, i) => columns.reduce((prev, f, j) => ({
 //   ...prev,
 //   [f.name]: `data ${i}_${j}`,
 // }), {}));
-
+columns[0].getValue = (e) => {
+  return '' + e;
+}
 columns[2].getValue = (e) => {
-  return '___' + e;
+  return '_' + e;
 }
 
-const data = [...Array(1000)].map((e, i) => {
+const data = [...Array(200)].map((e, i) => {
 
   return columns.map((f, j) => {
     if (j === 0) return i
@@ -100,18 +105,21 @@ class App extends Component {
   render() {
     return (
       <div className="App" style={{ padding: 20 }}>
-                <WindowTable
+        {/* <Scrollarea contentHeight={1000}>
+          <img src={sampleImg} />
+        </Scrollarea> */}
+                <TmpTable
                   // scrollbarTrackStyle={scrollbarTrackStyle}
                   // scrollbarHandleStyle={scrollbarHandleStyle}
                   // guidelineStyle={guidelineStyle}
                   // headerStyle={headerStyle}
                   // cellStyle={cellStyle}
                   // rowHeight={rowHeight}
-                  columns={columns} rows={data.slice(0, 5000)} width={800} height={500}
-                  fixedLeftCount={2} 
-                  fixedRightCount={0} 
-                  fixedTopCount={2} 
-                  fixedBottomCount={0} 
+                  columns={columns} rows={data.slice(0, 5000)} width={1200} height={800}
+                  fixedLeftCount={1} 
+                  fixedRightCount={1} 
+                  fixedTopCount={1} 
+                  fixedBottomCount={1} 
                   />
         {/* <table border={1} cellPadding={10}>
           <tbody>

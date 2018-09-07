@@ -1,0 +1,22 @@
+// @import .scss => styles
+div(className='{styles.root}')
+  //- main(role='main')
+    //- Main jumbotron for a primary marketing message or call to action
+    //- .jumbotron
+      .container-fluid
+        //- h1.display-3 about...
+  //- .container-fluid
+    br
+    .row
+      .col-sm-12
+        h1 {y}
+        //- .card(ref='{this.bumperRef}', style='{{ overflowX: "yes" }}')
+          //- .shim(ref='{this.shimRef}')
+  //- h1 {x} , {y}, {this.props.contentWidth}, {this.props.contentHeight}
+  div(className='{styles.wrap}',
+    ref='{this.scrollWrapRef}',
+    onWheel='{this.handleMousewheel}', style='{scrollWrapStyle}')
+    //- div(ref='{this.scrollContentRef}', style='{{ width: "max-content", transform: "translate3d(" + x + "px, " + y + "px, 0)" }}')
+    div(ref='{this.scrollContentRef}', style='{{ width: "max-content" }}')
+      | {this.props.children}
+      //- img(src='{sampleImg}')
