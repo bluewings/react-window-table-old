@@ -54,6 +54,23 @@ class WindowTable extends PureComponent {
     this.titleRef = React.createRef();
   }
 
+  componentDidMount() {
+    this.timer = setInterval(() => {
+      if (this.containerRef.current) {
+        const tRect = this.containerRef.current.getBoundingClientRect();
+        this.titleRef.current.innerText = `${tRect.width} x ${tRect.height}`;
+        // this.titleRef.current.innerText = this.metric.scrollLeft
+        // + ' , ' + this.metric.maxScrollX
+        // + ' , ' + this.metric.scrollTop
+        // + ' , ' + this.metric.maxScrollY
+      }
+    }, 10);
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.timer);
+  }
+
   componentDidUpdate(prevProps, prevState) {
     const { scrollTop, scrollLeft } = this.state;
 
@@ -484,7 +501,7 @@ const enhance = compose(
 
     const { width, height } = measure(containerStyle, _width, _height);
 
-   containerStyle = css({
+    containerStyle = css({
       border: '1px solid #c4c4c4',
       boxSizing: 'border-box',
       width: _width,
@@ -523,107 +540,82 @@ const enhance = compose(
     };
   }),
 
-  withPropsOnChange(['width', 'overallWidth',
-    'height',
-    'fixedLeftCount',
-    'fixedRightCount',
-    'fixedTopCount',
-    'fixedBottomCount',
-    'columnWidth',
-    'rowHeight',
-    'columnCount',
-    'rowCount',
-    'contentWidth',
-    'contentHeight',
+  withPropsOnChange([
+    'width', 'overallWidth',
+    'contentWidth', 'contentHeight',
+    'columnCount', 'columnWidth', 'rowCount', 'rowHeight',
+    'fixedTopCount', 'fixedBottomCount', 'fixedLeftCount', 'fixedRightCount',
   ], ({
     width, overallWidth,
-    fixedLeftCount,
-    fixedRightCount,
-    fixedTopCount,
-    fixedBottomCount,
-    columnWidth,
-    rowHeight,
-    columnCount,
-    rowCount,
-    contentWidth,
-    contentHeight,
+    contentWidth, contentHeight,
+    columnCount, columnWidth, rowCount, rowHeight,
+    fixedTopCount, fixedBottomCount, fixedLeftCount: leftCount, fixedRightCount: rightCount,
   }) => {
-    let leftCount = fixedLeftCount;
-    let rightCount = fixedRightCount;
-    const topCount = fixedTopCount;
-    const bottomCount = fixedBottomCount;
+    let fixedLeftCount = leftCount;
+    let fixedRightCount = rightCount;
+
     if (overallWidth <= width) {
-      leftCount = 0;
-      rightCount = 0;
+      fixedLeftCount = 0;
+      fixedRightCount = 0;
     }
 
     const center = {
       width: contentWidth -
-        columnWidth(0, leftCount) -
-        columnWidth(columnCount - rightCount, rightCount),
+        columnWidth(0, fixedLeftCount) -
+        columnWidth(columnCount - fixedRightCount, fixedRightCount),
       height: contentHeight -
-        rowHeight(0, topCount) -
-        rowHeight(rowCount - bottomCount, bottomCount),
-      rowOffset: topCount,
-      rowCount: rowCount - topCount - bottomCount,
-      columnOffset: leftCount,
-      columnCount: columnCount - leftCount - rightCount,
+        rowHeight(0, fixedTopCount) -
+        rowHeight(rowCount - fixedBottomCount, fixedBottomCount),
+      rowOffset: fixedTopCount,
+      rowCount: rowCount - fixedTopCount - fixedBottomCount,
+      columnOffset: fixedLeftCount,
+      columnCount: columnCount - fixedLeftCount - fixedRightCount,
     };
 
-    const top = topCount <= 0 ? null : {
-      height: rowHeight(0, topCount),
+    const top = fixedTopCount <= 0 ? null : {
+      height: rowHeight(0, fixedTopCount),
       rowOffset: 0,
-      rowCount: topCount,
+      rowCount: fixedTopCount,
     };
 
-    const bottom = bottomCount <= 0 ? null : {
-      height: rowHeight(rowCount - bottomCount, bottomCount),
-      rowOffset: rowCount - bottomCount,
-      rowCount: bottomCount,
+    const bottom = fixedBottomCount <= 0 ? null : {
+      height: rowHeight(rowCount - fixedBottomCount, fixedBottomCount),
+      rowOffset: rowCount - fixedBottomCount,
+      rowCount: fixedBottomCount,
     };
 
-    const left = leftCount <= 0 ? null : {
-      width: columnWidth(0, leftCount),
+    const left = fixedLeftCount <= 0 ? null : {
+      width: columnWidth(0, fixedLeftCount),
       columnOffset: 0,
-      columnCount: leftCount,
+      columnCount: fixedLeftCount,
     };
 
-    const right = rightCount <= 0 ? null : {
-      width: columnWidth(columnCount - rightCount, rightCount),
-      columnOffset: columnCount - rightCount,
-      columnCount: rightCount,
+    const right = fixedRightCount <= 0 ? null : {
+      width: columnWidth(columnCount - fixedRightCount, fixedRightCount),
+      columnOffset: columnCount - fixedRightCount,
+      columnCount: fixedRightCount,
     };
-
-    // const maxScrollX = Math.max(
-    //   0,
-    //   columnWidth(leftCount, columnCount - leftCount - rightCount) - center.width,
-    // );
-    // const maxScrollY = Math.max(
-    //   0,
-    //   rowHeight(topCount, rowCount - topCount - bottomCount) - center.height,
-    // );
 
     return {
-      fixedLeftCount: leftCount,
-      fixedRightCount: rightCount,
-      fixedTopCount: topCount,
-      fixedBottomCount: bottomCount,
+      fixedTopCount,
+      fixedBottomCount,
+      fixedLeftCount,
+      fixedRightCount,
       center,
+      top,
+      bottom,
+      left,
+      right,
       maxScrollX: Math.max(
         0,
-        columnWidth(leftCount, columnCount - leftCount - rightCount) - center.width,
+        columnWidth(fixedLeftCount, columnCount - fixedLeftCount - fixedRightCount) - center.width,
       ),
       maxScrollY: Math.max(
         0,
-        rowHeight(topCount, rowCount - topCount - bottomCount) - center.height,
+        rowHeight(fixedTopCount, rowCount - fixedTopCount - fixedBottomCount) - center.height,
       ),
-      top,
-      left,
-      bottom,
-      right,
     };
   }),
 );
-
 
 export default enhance(WindowTable);
