@@ -1,8 +1,6 @@
 // @import .scss => styles
-//- div
-
 div
-  pre {JSON.stringify(this.metric, null, 2)}
+  //- pre {JSON.stringify(this.state)}
   div(className='{cx(styles.root, containerStyle)}',
     ref='{this.containerRef}')
     table(className='{styles.table}', border='{0}', cellPadding='{0}', cellSpacing='{0}', ref='{this.tableRef}')
@@ -10,10 +8,11 @@ div
         tr
           td
             Scrollarea(width='{contentWidth}', height='{contentHeight}',
-            
+              scrollTop='{this.state.scrollTop}'
+              scrollLeft='{this.state.scrollLeft}'
               contentWidth='{overallWidth}',
               contentHeight='{overallHeight}',
-              onScroll='{this._handleScroll}')
+              onScroll='{this.scrollTo}')
 
 
               div
@@ -49,12 +48,29 @@ div
                         | {this.renderGrid({ section: ['bottom', 'right'], ...bottom, ...right })}
 
           td(@if='scrollbarY')
-            Scrollbar(__jsx='{...scrollbar.y}')
+            Scrollbar(
+              axis='y',
+              ref='{this.scrollbarRef.y}',
+              scrollbarLength='{contentHeight}',
+              scrollLength='{overallHeight}',
+              scrollbarWidth='{scrollbarWidth}',
+              onScroll='{this.scrollTo}',
+              trackStyle='{scrollbarTrackStyle}',
+              handleStyle='{scrollbarHandleStyle}')
 
         tr(@if='scrollbarX')
           //- td(colSpan='{colSpan}')
           td
-            Scrollbar(__jsx='{...scrollbar.x}')
+            //- Scrollbar(__jsx='{...scrollbar.x}')
+            Scrollbar(
+              axis='x',
+              ref='{this.scrollbarRef.x}',
+              scrollbarLength='{contentWidth}',
+              scrollLength='{overallWidth}',
+              scrollbarWidth='{scrollbarWidth}',
+              onScroll='{this.scrollTo}',
+              trackStyle='{scrollbarTrackStyle}',
+              handleStyle='{scrollbarHandleStyle}')
           td
 
 

@@ -1,5 +1,11 @@
+/* eslint-disable
+  react/no-unused-state,
+  no-underscore-dangle,
+  react/forbid-prop-types,
+*/
 /* eslint-disable */
 import React, { PureComponent } from 'react';
+import PropTypes from 'prop-types';
 import { VariableSizeGrid as Grid } from 'react-window';
 import { compose, defaultProps, withPropsOnChange } from 'recompose';
 import memoize from 'memoize-one';
@@ -8,7 +14,6 @@ import Scrollarea from '../Scrollarea';
 import Scrollbar from '../Scrollbar';
 import Guideline from '../Guideline';
 
-// jsx
 import template from './window-table.component.pug';
 import styles from './window-table.component.scss';
 
@@ -21,9 +26,9 @@ class WindowTable extends PureComponent {
     this.gridRef = {
       center: React.createRef(),
       top: React.createRef(),
-      right: React.createRef(),
       bottom: React.createRef(),
       left: React.createRef(),
+      right: React.createRef(),
     };
 
     this.scrollbarRef = {
@@ -33,325 +38,71 @@ class WindowTable extends PureComponent {
 
     this.guidelineRef = {
       top: React.createRef(),
-      right: React.createRef(),
       bottom: React.createRef(),
       left: React.createRef(),
+      right: React.createRef(),
     };
 
-    this.metric = {
+    this.state = {
       scrollTop: props.scrollTop || 0,
       scrollLeft: props.scrollLeft || 0,
+      scrollX: props.scrollLeft / props.maxScrollX,
+      scrollY: props.scrollTop / props.maxScrollY,
     };
 
     this.tableRef = React.createRef();
     this.titleRef = React.createRef();
   }
 
-  componentDidMount() {
-    // this.timer = setInterval(() => {
-    //   if (this.tableRef.current && this.center) {
-    //     const tRect = this.containerRef.current.getBoundingClientRect();
-    //     this.titleRef.current.innerText = `${tRect.width} x ${tRect.height}`;
-    //     // this.titleRef.current.innerText = this.metric.scrollLeft
-    //     // + ' , ' + this.metric.maxScrollX
-    //     // + ' , ' + this.metric.scrollTop
-    //     // + ' , ' + this.metric.maxScrollY
-    //   }
-    // }, 10);
-  }
+  componentDidUpdate(prevProps, prevState) {
+    const { scrollTop, scrollLeft } = this.state;
 
-  componentWillUnmount() {
-    clearInterval(this.timer);
-  }
-
-
-  containerStyle = memoize((width, height) => css({
-    border: '1px solid #c4c4c4',
-    boxSizing: 'border-box',
-    width,
-    height,
-    // width: 500,
-  }))
-
-  rect = memoize((containerStyle, width, height) => {
-    const div = document.createElement('div');
-    div.classList.add(containerStyle);
-    document.body.appendChild(div);
-    const styles = window.getComputedStyle(div);
-    // document.body.removeChild(div);
-    const borderTop = parseInt(styles.borderTopWidth, 10);
-    const borderBottom = parseInt(styles.borderBottomWidth, 10);
-    const borderLeft = parseInt(styles.borderLeftWidth, 10);
-    const borderRight = parseInt(styles.borderRightWidth, 10);
-    document.body.removeChild(div);
-    return {
-      width: width - borderLeft - borderRight,
-      height: height - borderTop - borderBottom,
-    };
-    // conso
-
-    // // console.log(styles.width);
-    // // console.log(borderLeft, borderRight);
-
-    // // console.log(styles.borderRightWidth);
-    // // console.log(styles.borderRightWidth);
-  })
-
-  columnWidth = (index) => {
-    // // console.log(this.props.columns[index].width);
-    let width = this.props.columns[index].width;
-    width = isNaN(width) ? 80 : width;
-    // console.log(width);
-    return width;
-  }
-
-  rowHeight = index =>
-    // // console.log('rowHeight', index, this.props.rows);
-    this.props.rows[index]._height
-    // if (typeof this.props.rowHeight === 'function') {
-    //   return this.props.rowHeight(index - 1);
-    // } else if (typeof this.props.rowHeight === 'number') {
-    //   return this.props.rowHeight;
-    // }
-    // return 40;
-  scrollTo = ({ scrollTop, scrollLeft }, section) => {
-    // cancelAnimationFrame(this._timer);
-    // this._timer = requestAnimationFrame(() => {
-    this._scrollTo({ scrollTop, scrollLeft }, section);
-    // })
-  }
-
-
-  _scrollTo = ({ scrollTop, scrollLeft }, section) => {
-    // clearTimeout(this._timer);
-    if (typeof scrollTop !== 'undefined' || typeof scrollLeft !== 'undefined') {
-      if (typeof scrollTop !== 'undefined') {
-        this.metric.scrollTop = scrollTop;
-      }
-      if (typeof scrollLeft !== 'undefined') {
-        this.metric.scrollLeft = scrollLeft;
-      }
-
-      let metric = {
-        scrollTop: this.metric.scrollTop || 0,
-        scrollLeft: this.metric.scrollLeft || 0,
-      };
-      // // // console.log(metric);
-      // requestAnimationFrame(() => {
-      Object.keys(this.gridRef)
-        .filter(key => key !== section && this.gridRef[key].current)
-        .forEach(key => this.gridRef[key].current.scrollTo(metric));
-      metric = {
-        ...metric,
-        scrollX: this.metric.scrollLeft / this.metric.maxScrollX,
-        scrollY: this.metric.scrollTop / this.metric.maxScrollY,
-        // scrollTop: this.metric.scrollTop || 0,
-        // scrollLeft: this.metric.scrollLeft || 0,
-      };
-      if (this.scrollbarRef.x.current) {
-        this.scrollbarRef.x.current.scrollTo(metric);
-      } else {
-        // // console.log('>>> not x found');
-      }
-      if (this.scrollbarRef.y.current) {
-        this.scrollbarRef.y.current.scrollTo(metric);
-      } else {
-        // // console.log('>>> not y found');
-      }
-
-      Object.keys(this.guidelineRef)
-        .filter(key => this.guidelineRef[key].current)
-        .forEach(key => this.guidelineRef[key].current.update(metric));
-
+    if (prevState.scrollTop !== scrollTop || prevState.scrollLeft !== scrollLeft) {
+      cancelAnimationFrame(this.animFrame);
+      this.animFrame = requestAnimationFrame(() => {
+        Object.keys(this.gridRef)
+          .filter(key => this.gridRef[key].current)
+          .forEach(key => this.gridRef[key].current.scrollTo(this.state));
+        if (this.scrollbarRef.x.current) {
+          this.scrollbarRef.x.current.scrollTo(this.state);
+        }
+        if (this.scrollbarRef.y.current) {
+          this.scrollbarRef.y.current.scrollTo(this.state);
+        }
+        Object.keys(this.guidelineRef)
+          .filter(key => this.guidelineRef[key].current)
+          .forEach(key => this.guidelineRef[key].current.update(this.state));
+      });
     }
   }
 
-  handleScrollbarDrag = ({ eventType, scrollTop, scrollLeft }) => {
-    this.onScrollbarDrag = eventType === 'drag';
-    // // console.log('>> handleScrollbarDrag', eventType)
-    this.scrollTo({ scrollTop, scrollLeft });
-    // // console.log('fin.');
-  }
-
-  // handleGridScroll = (event, section) => {
-  //   if (this.onScrollbarDrag || event.scrollUpdateWasRequested !== false) {
-  //     // // // console.log('>', section);
-  //     return;
-  //   }
-  //   if (this._section !== section) {
-  //     // // // console.log(this._section, section);
-  //     return;
-  //   }
-  //   // // // console.log(section);
-
-  //   // if (this.onScrollbarDragevent.scrollUpdateWasRequested === false) {
-  //   const { scrollTop, scrollLeft } = event;
-  //   let scrollTo = {};
-  //   switch (section) {
-  //     case 'left':
-  //     case 'right':
-  //       scrollTo = { scrollTop };
-  //       break;
-  //     case 'top':
-  //     case 'bottom':
-  //       scrollTo = { scrollLeft };
-  //       break;
-  //     default:
-  //       scrollTo = { scrollTop, scrollLeft };
-  //       break;
-  //   }
-
-  //   this.scrollTo(scrollTo, section);
-  //   // }
-  // }
-
-  // gridWidth = (from, limit) => this.props.columns.slice(from, from + limit).reduce((prev, e) => prev + e.width, 0)
-
-  gridWidth = (from, limit) => {
-    // // console.log('%c grid height ' + from + ' ~ ' + limit, 'background:yellow');
-    // // // console.log(from, limit);
-    // // console.log(limit, this.props.rows);
-    limit = limit > 0 ? limit : 0;
-
-
-    // // console.log(from, limit || 0);
-    return new Array(limit)
-      .fill(true)
-      .map((e, i) => from + i)
-      .reduce(
-        (prev, i) =>
-        // // console.log(i);
-          prev + this.columnWidth(i)
-        , 0,
-      );
-  }
-
-  gridHeight = (from, limit) => {
-    // // console.log('%c grid height ' + from + ' ~ ' + limit, 'background:yellow');
-    // // // console.log(from, limit);
-    // console.log(limit, this.props.rows);
-    limit = limit > 0 ? limit : 0;
-
-
-    // // console.log(from, limit || 0);
-    return new Array(limit)
-      .fill(true)
-      .map((e, i) => from + i)
-      .reduce(
-        (prev, i) =>
-        // // console.log(i);
-          prev + this.rowHeight(i)
-        , 0,
-      );
-  }
-
-  // return
-  // return this.props.columns.slice(from, from + limit).reduce((prev, e) => {
-  //   return prev + e.width;
-  // }, 0 )
-
-  // _top = (memoize)
-
-  rowCount = memoize(rows => (rows || []).length)
-
-  columnCount = memoize(columns => (columns || []).length)
-
-  _center = memoize((topCount, rightCount, bottomCount, leftCount, rowCount, columnCount, width, height) =>
-
-    // // console.log('center', [0, topCount], this.gridHeight(0, topCount));
-    // // console.log('center', this.gridHeight(0, topCount), this.gridHeight(rowCount - bottomCount, bottomCount) );
-    ({
-      width_: this.gridWidth(leftCount, columnCount - leftCount - rightCount),
-      width: width - this.gridWidth(0, leftCount) - this.gridWidth(columnCount - rightCount, rightCount),
-      // height: height - this.gridHeight(-1, topCount) - this.gridHeight(rowCount -1 - bottomCount, bottomCount),
-      height: height - this.gridHeight(0, topCount) - this.gridHeight(rowCount - bottomCount, bottomCount),
-      rowOffset: topCount,
-      rowCount: rowCount - topCount - bottomCount,
-      columnOffset: leftCount,
-      columnCount: columnCount - leftCount - rightCount,
-    }))
-
-
-  top = memoize((topCount, rightCount, bottomCount, leftCount, rowCount, columnCount, width, height) =>
-    (topCount <= 0 ? null : {
-      height: this.gridHeight(0, topCount),
-      rowOffset: 0,
-      rowCount: topCount,
-    }))
-
-  bottom = memoize((topCount, rightCount, bottomCount, leftCount, rowCount, columnCount, width, height) =>
-    (bottomCount <= 0 ? null : {
-      height: this.gridHeight(rowCount - bottomCount, bottomCount),
-      rowOffset: rowCount - bottomCount,
-      rowCount: bottomCount,
-    }))
-
-  left = memoize((topCount, rightCount, bottomCount, leftCount, rowCount, columnCount, width, height) =>
-    (leftCount <= 0 ? null : {
-      width: this.gridWidth(0, leftCount),
-      columnOffset: 0,
-      columnCount: leftCount,
-    }))
-
-  right = memoize((topCount, rightCount, bottomCount, leftCount, rowCount, columnCount, width, height) =>
-    (rightCount <= 0 ? null : {
-      width: this.gridWidth(columnCount - rightCount, rightCount),
-      columnOffset: columnCount - rightCount,
-      columnCount: rightCount,
-    }))
-
-    handleMouseOver = (event, section) => {
-      // // // console.log(event, section);
-      this._section = section;
-      // // // console.log(this._section);
+  scrollTo = ({ scrollTop, scrollLeft }) => {
+    const _scrollTop = typeof scrollTop === 'number' ? scrollTop : this.state.scrollTop;
+    const _scrollLeft = typeof scrollLeft === 'number' ? scrollLeft : this.state.scrollLeft;
+    if (this.state.scrollTop !== scrollTop || this.state.scrollLeft !== scrollLeft) {
+      this.setState(prevState => ({
+        ...prevState,
+        scrollTop: _scrollTop,
+        scrollLeft: _scrollLeft,
+        scrollY: _scrollTop / this.props.maxScrollY,
+        scrollX: _scrollLeft / this.props.maxScrollX,
+      }));
     }
-
-  overallWidth = memoize(columns =>
-    (columns || []).reduce((prev, column, index) => prev + this.columnWidth(index, column), 0))
-
-  overallHeight = memoize(rows =>
-    (rows || []).reduce((prev, row, index) => prev + this.rowHeight(index, row), 0))
-
-  // overallHeight = memoize(rows => {
-
-  //   // new Array(rows)
-  //   return [...rows].reduce((prev, row, index) => prev + this.rowHeight(index, row), 0)
-
-
-  // })
+  }
 
   headerStyle = memoize((cellStyles, customStyle) => {
-    let styles = {
-      // boxSizing: 'border-box',
-      // border: '1px solid black',
-      // '&.cell-top': {
-
-      // },
+    let styleObj = {
       ...cellStyles,
       background: 'silver',
     };
     if (typeof customStyle === 'function') {
-      styles = customStyle(styles, { });
+      styleObj = customStyle(styleObj, { });
     }
-    return css({
-      ...styles,
-      // position: 'relative',
-      // width,
-      // height,
-    });
+    return css({ ...styleObj });
   })
 
-  _handleScroll = (args) => {
-    // console.log('_handleScroll', args);
-    this.scrollTo({
-      scrollTop: args.y * -1,
-      scrollLeft: args.x * -1,
-    })
-  }
-
   cellStyle = memoize((customStyle) => {
-    // odd / even
-    let styles = {
+    let styleObj = {
       boxSizing: 'border-box',
       overflow: 'hidden',
       borderRight: '1px solid #cacaca',
@@ -366,7 +117,6 @@ class WindowTable extends PureComponent {
         borderBottom: 'none',
       },
 
-
       '&.cell-center': {
         '&.cell-h-last': {
           borderRight: 'none',
@@ -380,19 +130,17 @@ class WindowTable extends PureComponent {
 
       },
       '&.row-even': {
-        // background: '#f8f8f8',
+
         background: 'lightyellow',
       },
     };
     if (typeof customStyle === 'function') {
-      styles = customStyle(styles, { });
+      styleObj = customStyle(styleObj, { });
     }
 
     return css({
-      ...styles,
-      // position: 'relative',
-      // width,
-      // height,
+      ...styleObj,
+
     });
   })
 
@@ -403,18 +151,16 @@ class WindowTable extends PureComponent {
       width,
       height,
       columnCount,
-      columnWidth: index => this.columnWidth(index + columnOffset),
+      columnWidth: index => this.props.columnWidth(index + columnOffset),
       rowCount,
-      // overscanCount: 3,
+
       rowHeight: index =>
-        // // console.log('>>> row height', index + rowOffset);
-        this.rowHeight(index + rowOffset)
+
+        this.props.rowHeight(index + rowOffset)
       ,
     };
     let aaa;
     if (section) {
-      const priority = ['top', 'bottom', 'left', 'right', 'center'];
-
       switch (section.join(' ')) {
         case 'top center':
           aaa = 'top';
@@ -434,32 +180,20 @@ class WindowTable extends PureComponent {
         default:
           break;
       }
-      // console.log(aaa);
-      // const aaa = section.sort((a, b) => {
-      //   const c = priority.indexOf(a);
-      //   const d = priority.indexOf(b);
-      //   if (c === d) {
-      //     return 0;
-      //   }
-      //   return c < d ? -1 : 1;
-      // })[0];
-      // // console.log(aaa);
+
       gridProps = {
         ...gridProps,
         ref: this.gridRef[aaa],
-        // onScroll: event => this.handleGridScroll(event, aaa),
+
       };
     }
-    const handleMouseOver = (event) => {
-      // // // console.log(section);/
-      this.handleMouseOver(event, aaa);
-    };
 
     const cellStyle = this.cellStyle(this.props.cellStyle);
     const sectionClass = (Array.isArray(section) ? section : [section]).map(e => `cell-${e}`).join(' ');
 
     return (
-      <div className={styles.gridWrap} onMouseOver={handleMouseOver} style={{ width, height }}>
+
+      <div className={styles.gridWrap} style={{ width, height }}>
         <Grid {...gridProps} >
           {({ columnIndex, rowIndex, style }) => {
           const _colIndex = columnOffset + columnIndex;
@@ -476,15 +210,9 @@ class WindowTable extends PureComponent {
 
           ].join(' ');
 
-          // // // console.log('>', _rowIndex, _colIndex);
-
-          // consol
-          // const newStyle = { ...style, border: '1px solid black' }
-
-
           return (
             <div className={applyStyle} style={style}>
-            {/* <div style={newStyle}> */}
+              {/* <div style={newStyle}> */}
               {_rowIndex === -1 && this.props.columns[_colIndex].name}
 
               {_rowIndex >= 0 && (
@@ -502,137 +230,9 @@ class WindowTable extends PureComponent {
   }
 
   render() {
-    let {
-      columns,
-      rows,
-      width: _width,
-      height: _height,
-      fixedTopCount: topCount,
-      fixedBottomCount: bottomCount,
-      fixedLeftCount: leftCount,
-      fixedRightCount: rightCount,
-      scrollbarWidth,
-      guidelineStyle,
-    } = this.props;
-
-    // // // console.log('render');
-    const containerStyle = this.containerStyle(_width, _height);
-    const { width, height } = this.rect(containerStyle, _width, _height);
-
-    const columnCount = this.columnCount(columns);
-    const rowCount = this.rowCount(rows);
-
-    const overallWidth = this.overallWidth(columns);
-    const overallHeight = this.overallHeight(rows);
-
-
-    if (overallWidth <= width) {
-      leftCount = 0;
-      rightCount = 0;
-    }
-
-    let contentWidth = width;
-    let contentHeight = height;
-
-    let scrollbarX;
-    let scrollbarY;
-
-
-    scrollbarX = contentWidth < overallWidth;
-    scrollbarY = contentHeight < overallHeight;
-
-    contentWidth -= (scrollbarY ? scrollbarWidth : 0);
-    contentHeight -= (scrollbarX ? scrollbarWidth : 0);
-
-    // console.log(contentWidth, contentHeight);
-
-    if (overallHeight < contentHeight) {
-      // console.log('case1');
-      contentHeight = overallHeight;
-    }
-
-    if (scrollbarX && !scrollbarY && contentHeight < overallHeight) {
-      // console.log('>>>>');
-      scrollbarY = true;
-      contentWidth -= scrollbarWidth;
-    }
-
-    this.contentWidth = contentWidth;
-
-    // scrollbarX = false;
-    // scrollbarY = false;
-
-    // if (overallHeight < contentHeight) {
-    //   contentHeight = overallHeight;
-    //   // scrollbarX = contentHeight < overallWidth;
-
-    //   scrollbarY = contentHeight < overallHeight;
-
-    //   contentWidth = contentWidth - (scrollbarY ? scrollbarWidth : 0);
-    //   scrollbarX = contentWidth < overallWidth;
-    // }
-
-
-    const center = this._center(topCount, rightCount, bottomCount, leftCount, rowCount, columnCount, contentWidth, contentHeight);
-    const top = this.top(topCount, rightCount, bottomCount, leftCount, contentWidth, contentHeight);
-    const right = this.right(topCount, rightCount, bottomCount, leftCount, rowCount, columnCount, contentWidth, contentHeight);
-    const bottom = this.bottom(topCount, rightCount, bottomCount, leftCount, rowCount, columnCount, contentWidth, contentHeight);
-    const left = this.left(topCount, rightCount, bottomCount, leftCount, rowCount, columnCount, contentWidth, contentHeight);
-
-    const rowSpan = [top, center, bottom].filter(e => e).length;
-    const colSpan = [left, center, right].filter(e => e).length;
-
-    this.center = center;
-
-    this.metric.maxScrollX = Math.max(0, this.gridWidth(leftCount, columnCount - leftCount - rightCount) - center.width);
-    this.metric.maxScrollY = Math.max(0, this.gridHeight(topCount, rowCount - topCount - bottomCount) - center.height);
-
-
-    const scrollbar = {
-      x: {
-        axis: 'x',
-        ref: this.scrollbarRef.x,
-        scrollbarLength: contentWidth,
-        scrollLength: overallWidth,
-        scrollbarWidth,
-        onScroll: this.handleScrollbarDrag,
-        trackStyle: this.props.scrollbarTrackStyle,
-        handleStyle: this.props.scrollbarHandleStyle,
-      },
-      y: {
-        axis: 'y',
-        ref: this.scrollbarRef.y,
-        scrollbarLength: contentHeight,
-        scrollLength: overallHeight,
-        scrollbarWidth,
-        onScroll: this.handleScrollbarDrag,
-        trackStyle: this.props.scrollbarTrackStyle,
-        handleStyle: this.props.scrollbarHandleStyle,
-      },
-    };
-
-    // // console.log(center);
-
-    const _cWidth = this.gridWidth(center.columnOffset, center.columnCount);
-    const _cHeight = this.gridHeight(center.rowOffset, center.rowCount);
-
-    // renderGrid = ({
-    //   section, width, height, columnCount, columnOffset, rowCount, rowOffset,
-    // }) => {
-    //   let gridProps = {
-    //     width,
-    //     height,
-    //     columnCount,
-    //     columnWidth: index => this.columnWidth(index + columnOffset),
-    //     rowCount,
-
-    return template.call(this, {
-      // variables
-      unused__cHeight: _cHeight,
-      unused__cWidth: _cWidth,
+    const {
       bottom,
       center,
-      unused_colSpan: colSpan,
       containerStyle,
       contentHeight,
       contentWidth,
@@ -641,10 +241,29 @@ class WindowTable extends PureComponent {
       overallHeight,
       overallWidth,
       right,
-      unused_rowSpan: rowSpan,
-      // unused_scrollTop: scrollTop,
-      scrollbar,
-      unused_scrollbarWidth: scrollbarWidth,
+      scrollbarHandleStyle,
+      scrollbarTrackStyle,
+      scrollbarWidth,
+      scrollbarX,
+      scrollbarY,
+      top,
+    } = this.props;
+
+    return template.call(this, {
+      // variables
+      bottom,
+      center,
+      containerStyle,
+      contentHeight,
+      contentWidth,
+      guidelineStyle,
+      left,
+      overallHeight,
+      overallWidth,
+      right,
+      scrollbarHandleStyle,
+      scrollbarTrackStyle,
+      scrollbarWidth,
       scrollbarX,
       scrollbarY,
       top,
@@ -656,6 +275,72 @@ class WindowTable extends PureComponent {
   }
 }
 
+const measure = (containerStyle, width, height) => {
+  const divEl = document.createElement('div');
+  divEl.classList.add(containerStyle);
+  document.body.appendChild(divEl);
+  const computed = window.getComputedStyle(divEl);
+  const borderTop = parseInt(computed.borderTopWidth, 10);
+  const borderBottom = parseInt(computed.borderBottomWidth, 10);
+  const borderLeft = parseInt(computed.borderLeftWidth, 10);
+  const borderRight = parseInt(computed.borderRightWidth, 10);
+  document.body.removeChild(divEl);
+  return {
+    width: width - borderLeft - borderRight,
+    height: height - borderTop - borderBottom,
+  };
+};
+
+
+WindowTable.propTypes = {
+  scrollTop: PropTypes.number,
+  scrollLeft: PropTypes.number,
+  maxScrollY: PropTypes.number,
+  maxScrollX: PropTypes.number,
+
+  cellStyle: PropTypes.func,
+
+  columns: PropTypes.array.isRequired,
+  columnWidth: PropTypes.func.isRequired,
+  containerStyle: PropTypes.func,
+  contentHeight: PropTypes.number.isRequired,
+  contentWidth: PropTypes.number.isRequired,
+  guidelineStyle: PropTypes.func,
+
+  overallHeight: PropTypes.number.isRequired,
+  overallWidth: PropTypes.number.isRequired,
+  // priority: PropTypes.number.isRequired,
+
+  left: PropTypes.object.isRequired,
+  right: PropTypes.object.isRequired,
+  center: PropTypes.object.isRequired,
+  top: PropTypes.object.isRequired,
+  bottom: PropTypes.object.isRequired,
+
+
+  rowHeight: PropTypes.func.isRequired,
+  rows: PropTypes.array.isRequired,
+  scrollbarHandleStyle: PropTypes.func,
+  scrollbarTrackStyle: PropTypes.func,
+  scrollbarWidth: PropTypes.number.isRequired,
+  scrollbarX: PropTypes.bool.isRequired,
+  scrollbarY: PropTypes.bool.isRequired,
+
+};
+
+WindowTable.defaultProps = {
+  scrollTop: 0,
+  scrollLeft: 0,
+  maxScrollY: 1,
+  maxScrollX: 1,
+
+  cellStyle: undefined,
+  containerStyle: undefined,
+  guidelineStyle: undefined,
+  scrollbarHandleStyle: undefined,
+  scrollbarTrackStyle: undefined,
+};
+
 const enhance = compose(
   defaultProps({
     width: 800,
@@ -666,15 +351,12 @@ const enhance = compose(
     fixedBottomCount: 1,
     scrollbarWidth: 15,
     columns: [],
+    scrollTop: 0,
+    scrollLeft: 0,
     rows: null,
   }),
-  withPropsOnChange(['columns', 'rows', 'rowHeight'], ({ columns, rows, rowHeight }) => {
-  // // // console.log(columns);
-  // // // console.log(rows);
 
-  // if (rows === null || typeof rows !== 'object') {
-  //   return;
-  // }
+  withPropsOnChange(['columns', 'rows', 'rowHeight'], ({ columns, rows, rowHeight: _rowHeight }) => {
     if (!Array.isArray(rows)) {
       return;
     }
@@ -683,24 +365,13 @@ const enhance = compose(
 
     let getRowHeight;
 
-    if (typeof rowHeight === 'function') {
-      getRowHeight = index => rowHeight(index - 1);
-    } else if (typeof rowHeight === 'number') {
-      getRowHeight = index => rowHeight;
+    if (typeof _rowHeight === 'function') {
+      getRowHeight = index => _rowHeight(index - 1);
+    } else if (typeof _rowHeight === 'number') {
+      getRowHeight = () => _rowHeight;
     } else {
-      getRowHeight = index => 50;
+      getRowHeight = () => 50;
     }
-
-
-    // rowHeight = index => {
-    //   if (typeof this.props.rowHeight === 'function') {
-    //     return this.props.rowHeight(index - 1);
-    //   } else if (typeof this.props.rowHeight === 'number') {
-    //     return this.props.rowHeight;
-    //   }
-    //   return 40;
-    // }
-
 
     rows = rows.map((row) => {
       let _row;
@@ -712,8 +383,6 @@ const enhance = compose(
       } else {
         _row = { ...row };
       }
-
-      // const
 
       const data = {
         org: { ..._row },
@@ -743,17 +412,211 @@ const enhance = compose(
       _height: getRowHeight(i, e),
     }));
 
-    // // // console.log(rows);
     const te = new Date();
     console.info('data count', rows.length * columns.length, 'elapsed', te - ts);
-    // // // console.log(rows);
 
-    return { rows };
-  // return {
+    const rowCount = (rows || []).length;
 
-  // }
-  // // // console.log(rows)
+    const columnCount = (columns || []).length;
+
+    const columnWidthFn = (index) => {
+      let { width } = columns[index];
+      width = isNaN(width) ? 80 : width;
+      return width;
+    };
+
+    const rowHeightFn = index => rows[index]._height;
+
+    const overallWidth = (columns || [])
+      .reduce((prev, column, index) => prev + columnWidthFn(index, column), 0);
+
+    const overallHeight = (rows || [])
+      .reduce((prev, row, index) => prev + rowHeightFn(index, row), 0);
+
+    const columnWidth = (from, limit = 1) => {
+      limit = limit > 0 ? limit : 0;
+
+      return new Array(limit)
+        .fill(true)
+        .map((e, i) => from + i)
+        .reduce(
+          (prev, i) =>
+
+            prev + columnWidthFn(i)
+          , 0,
+        );
+    };
+
+    const rowHeight = (from, limit = 1) => {
+      limit = limit > 0 ? limit : 0;
+
+      return new Array(limit)
+        .fill(true)
+        .map((e, i) => from + i)
+        .reduce(
+          (prev, i) =>
+
+            prev + rowHeightFn(i)
+          , 0,
+        );
+    };
+
+    return {
+      rows,
+      rowCount,
+      columnCount,
+      columnWidth,
+      rowHeight,
+      overallWidth,
+      overallHeight,
+    };
+  }),
+  withPropsOnChange(['width', 'height',
+    'overallWidth', 'overallHeight', 'scrollbarWidth'], ({
+    width: _width, height: _height, overallWidth, overallHeight, scrollbarWidth,
+  }) => {
+    const containerStyle = css({
+      border: '1px solid #c4c4c4',
+      boxSizing: 'border-box',
+      width: _width,
+      height: _height,
+    });
+
+    const { width, height } = measure(containerStyle, _width, _height);
+
+    let contentWidth = width;
+    let contentHeight = height;
+
+    const scrollbarX = contentWidth < overallWidth;
+    let scrollbarY = contentHeight < overallHeight;
+
+    // scrollbarX = contentWidth < overallWidth;
+    // scrollbarY = contentHeight < overallHeight;
+
+    contentWidth -= (scrollbarY ? scrollbarWidth : 0);
+    contentHeight -= (scrollbarX ? scrollbarWidth : 0);
+
+    if (overallHeight < contentHeight) {
+      contentHeight = overallHeight;
+    }
+
+    if (scrollbarX && !scrollbarY && contentHeight < overallHeight) {
+      scrollbarY = true;
+      contentWidth -= scrollbarWidth;
+    }
+
+    return {
+      containerStyle,
+      width,
+      height,
+      scrollbarX,
+      scrollbarY,
+      contentWidth,
+      contentHeight,
+    };
+  }),
+
+  withPropsOnChange(['width', 'overallWidth',
+    'height',
+    'fixedLeftCount',
+    'fixedRightCount',
+    'fixedTopCount',
+    'fixedBottomCount',
+    'columnWidth',
+    'rowHeight',
+    'columnCount',
+    'rowCount',
+    'contentWidth',
+    'contentHeight',
+  ], ({
+    width, overallWidth,
+    fixedLeftCount,
+    fixedRightCount,
+    fixedTopCount,
+    fixedBottomCount,
+    columnWidth,
+    rowHeight,
+    columnCount,
+    rowCount,
+    contentWidth,
+    contentHeight,
+  }) => {
+    let leftCount = fixedLeftCount;
+    let rightCount = fixedRightCount;
+    const topCount = fixedTopCount;
+    const bottomCount = fixedBottomCount;
+    if (overallWidth <= width) {
+      leftCount = 0;
+      rightCount = 0;
+    }
+
+    const center = {
+      width: contentWidth -
+        columnWidth(0, leftCount) -
+        columnWidth(columnCount - rightCount, rightCount),
+      height: contentHeight -
+        rowHeight(0, topCount) -
+        rowHeight(rowCount - bottomCount, bottomCount),
+      rowOffset: topCount,
+      rowCount: rowCount - topCount - bottomCount,
+      columnOffset: leftCount,
+      columnCount: columnCount - leftCount - rightCount,
+    };
+
+    const top = topCount <= 0 ? null : {
+      height: rowHeight(0, topCount),
+      rowOffset: 0,
+      rowCount: topCount,
+    };
+
+    const bottom = bottomCount <= 0 ? null : {
+      height: rowHeight(rowCount - bottomCount, bottomCount),
+      rowOffset: rowCount - bottomCount,
+      rowCount: bottomCount,
+    };
+
+    const left = leftCount <= 0 ? null : {
+      width: columnWidth(0, leftCount),
+      columnOffset: 0,
+      columnCount: leftCount,
+    };
+
+    const right = rightCount <= 0 ? null : {
+      width: columnWidth(columnCount - rightCount, rightCount),
+      columnOffset: columnCount - rightCount,
+      columnCount: rightCount,
+    };
+
+    // const maxScrollX = Math.max(
+    //   0,
+    //   columnWidth(leftCount, columnCount - leftCount - rightCount) - center.width,
+    // );
+    // const maxScrollY = Math.max(
+    //   0,
+    //   rowHeight(topCount, rowCount - topCount - bottomCount) - center.height,
+    // );
+
+    return {
+      fixedLeftCount: leftCount,
+      fixedRightCount: rightCount,
+      fixedTopCount: topCount,
+      fixedBottomCount: bottomCount,
+      center,
+      maxScrollX: Math.max(
+        0,
+        columnWidth(leftCount, columnCount - leftCount - rightCount) - center.width,
+      ),
+      maxScrollY: Math.max(
+        0,
+        rowHeight(topCount, rowCount - topCount - bottomCount) - center.height,
+      ),
+      top,
+      left,
+      bottom,
+      right,
+    };
   }),
 );
+
 
 export default enhance(WindowTable);

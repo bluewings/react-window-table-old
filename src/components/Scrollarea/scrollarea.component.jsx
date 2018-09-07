@@ -10,8 +10,8 @@ import template from './scrollarea.component.pug';
 class Scrollarea extends PureComponent {
   constructor(props) {
     super(props);
-    this.state = { fieldValue: {}, y: 0, x: 0 };
-    this.state = { fieldValue: {}, y: 0, x: 0 };
+    // this.state = { fieldValue: {}, scrollTop: 0, scrollLeft: 0 };
+    this.state = { scrollTop: 0, scrollLeft: 0 };
     this.bumperRef = React.createRef();
     this.shimRef = React.createRef();
     this.scrollWrapRef = React.createRef();
@@ -23,15 +23,15 @@ class Scrollarea extends PureComponent {
       this.scrollWrapRef.current.style.width = this.bumperRef.current.style.width;
     }
     // window.addEventListener('wheel', (event) => {
-    //   // // console.log(event);
-    //   // console.log('wheel', event);
+    //   // // // console.log(event);
+    //   // // console.log('wheel', event);
     //   event.preventDefault();
     //   // event.preventDefault();
     //   // event.stopPropagation();
     //   return false;
     // });
     // window.addEventListener('mousewheel', (event) => {
-    //   // console.log('mousewheel', event);
+    //   // // console.log('mousewheel', event);
     //   // event.preventDefault();
     //   // event.stopPropagation();
     //   // return false;
@@ -39,8 +39,9 @@ class Scrollarea extends PureComponent {
   }
 
   componentDidUpdate() {
+    // console.log('www');
     if (this.bumperRef.current && this.scrollWrapRef.current) {
-      // // console.log(this.bumperRef.current.style.width);
+      // // // console.log(this.bumperRef.current.style.width);
       this.scrollWrapRef.current.style.width = `${this.bumperRef.current.getBoundingClientRect().width}px`;
     }
   }
@@ -50,12 +51,12 @@ class Scrollarea extends PureComponent {
   }
 
   // handleTouchstart = (event) => {
-  //   // console.log('%c touchstart', 'background:yellow');
-  //   // console.log(event);
+  //   // // console.log('%c touchstart', 'background:yellow');
+  //   // // console.log(event);
   // }
 
   handleMousewheel = (event) => {
-    // // console.log(this.scrollContent)
+    // // // console.log(this.scrollContent)
 
     // var wheelDistance = function(evt){
     //   if (!evt) evt = event;
@@ -65,19 +66,22 @@ class Scrollarea extends PureComponent {
     //     else return -d/3;              // Firefox;         TODO: do not /3 for OS X
     //   } else return w/120;             // IE/Safari/Chrome TODO: /3 for Chrome OS X
     // };
-    // // console.log(event.deltaX, event.deltaY);
+    // // // console.log(event.deltaX, event.deltaY);
     const contentHeight = this.props.contentHeight ||
       this.scrollContentRef.current.getBoundingClientRect().height;
-    const scrollHeight = this.scrollWrapRef.current.getBoundingClientRect().height -
-      contentHeight;
+    const scrollHeight = contentHeight - this.scrollWrapRef.current.getBoundingClientRect().height;
 
     const contentWidth = this.props.contentWidth ||
-      this.scrollContentRef.current.getBoundingClientRect().height;
+      this.scrollContentRef.current.getBoundingClientRect().width;
 
-    const scrollWidth = Math.min(this.scrollWrapRef.current.getBoundingClientRect().width -
-    contentWidth, 0);
+    const scrollWidth = Math.max(contentWidth -
+      this.scrollWrapRef.current.getBoundingClientRect().width, 0);
 
     let { deltaX, deltaY } = event;
+
+    // deltaX *= 1.2;
+    // deltaY *= 1.2;
+
 
     const _deltaX = Math.abs(deltaX);
     const _deltaY = Math.abs(deltaY);
@@ -91,51 +95,57 @@ class Scrollarea extends PureComponent {
     // if (Math.ab)
 
 
-    let { x, y } = this.state;
-    y -= deltaY;
-    if (y > 0) {
-      y = 0;
+    let { scrollLeft, scrollTop } = this.props;
+    scrollTop += deltaY;
+    if (scrollTop < 0) {
+      scrollTop = 0;
     }
-    // // console.log(y, scrollHeight);
-    if (y < scrollHeight) {
-      y = scrollHeight;
+    // // // console.log(scrollTop, scrollHeight);
+    if (scrollTop > scrollHeight) {
+      scrollTop = scrollHeight;
     }
 
-    x -= deltaX;
-    if (x > 0) {
-      x = 0;
-    }
-    // // console.log(y, scrollHeight);
-    if (x < scrollWidth) {
-      x = scrollWidth;
-    }
-    // // console.log(x, y, scrollWidth);
 
-    // const _x = Math.abs(event.deltaX);
-    // const _y = Math.abs(event.deltaY);
-    // // console.log(_y / _x)
-    // console.log(x, y);
+    scrollLeft += deltaX;
 
-    if (y !== this.state.y || x !== this.state.x) {
-      // // console.log('>>> moving...');
-      // this.state.x = x;
-      // this.state.y = y;
+    // console.log(scrollLeft, scrollWidth);
+    if (scrollLeft < 0) {
+      scrollLeft = 0;
+    }
+    // // // console.log(scrollTop, scrollHeight);
+    if (scrollLeft > scrollWidth) {
+      scrollLeft = scrollWidth;
+    }
+    // // // console.log(scrollLeft, scrollTop, scrollWidth);
+
+    // const _scrollLeft = Math.abs(event.deltaX);
+    // const _scrollTop = Math.abs(event.deltaY);
+    // // // console.log(_scrollTop / _scrollLeft)
+    // // console.log(scrollLeft, scrollTop);
+
+    if (scrollTop !== this.state.scrollTop || scrollLeft !== this.state.scrollLeft) {
+      // // // console.log('>>> moving...');
+      // this.state.scrollLeft = scrollLeft;
+      // this.state.scrollTop = scrollTop;
       event.preventDefault();
       event.stopPropagation();
-      this.setState(prevState => ({
-        ...prevState,
-        y,
-        x,
-      }));
+
       if (typeof this.props.onScroll === 'function') {
         // requestAnimationFrame(() => {
-        this.props.onScroll({ x, y });
+        // // console.log(scrollTop * -1);
+        // console.log(scrollLeft, scrollTop);
+        this.props.onScroll({ scrollLeft, scrollTop });
         // });
       }
+      this.setState(prevState => ({
+        ...prevState,
+        scrollTop,
+        scrollLeft,
+      }));
     }
-    // else if (_y / _x < 0.5) {
+    // else if (_scrollTop / _scrollLeft < 0.5) {
     //   // 가로 이동이다!!!
-    //   // console.log('>>> 가로 이동임....');
+    //   // // console.log('>>> 가로 이동임....');
     //   // event.preventDefault();
     //   // event.stopPropagation();
     //   // return false;
@@ -151,8 +161,8 @@ class Scrollarea extends PureComponent {
     } = this.props;
     const {
       fieldValue,
-      x,
-      y,
+      scrollLeft,
+      scrollTop,
     } = this.state;
 
     const scrollWrapStyle = {
@@ -162,9 +172,9 @@ class Scrollarea extends PureComponent {
     return template.call(this, {
       // variables
       unused_fieldValue: fieldValue,
+      unused_scrollLeft: scrollLeft,
+      unused_scrollTop: scrollTop,
       scrollWrapStyle,
-      unused_x: x,
-      unused_y: y,
     });
   }
 }
