@@ -6,28 +6,35 @@ import WindowTable from './components/WindowTable';
 import TmpTable from './components/TmpTable';
 import Scrollarea from './components/Scrollarea';
 import sampleImg from './sample.png';
+import { columns, data } from './example';
 
-const columns = [...Array(25)].map((e, i) => ({ name: `col-${i}`, width: 100 }));
+// const columns = [...Array(50)].map((e, i) => ({ name: `col-${i}`, width: 100 }));
 
-// const data = [...Array(100)].map((e, i) => columns.reduce((prev, f, j) => ({
-//   ...prev,
-//   [f.name]: `data ${i}_${j}`,
-// }), {}));
-columns[0].getValue = (e) => {
-  return '' + e;
+// // const data = [...Array(100)].map((e, i) => columns.reduce((prev, f, j) => ({
+// //   ...prev,
+// //   [f.name]: `data ${i}_${j}`,
+// // }), {}));
+// columns[0].getValue = (e) => {
+//   return '' + e;
+// }
+// columns[2].getValue = (e) => {
+//   return '_' + e;
+// }
+
+// const data = [...Array(5000)].map((e, i) => {
+
+//   return columns.map((f, j) => {
+//     if (j === 0) return i
+//     return parseInt(Math.random() * 1000, 10);
+//   })
+
+// });
+
+columns[3].render = (src) => {
+  return (
+    <img src={src}  height={40} />
+  )
 }
-columns[2].getValue = (e) => {
-  return '_' + e;
-}
-
-const data = [...Array(200)].map((e, i) => {
-
-  return columns.map((f, j) => {
-    if (j === 0) return i
-    return parseInt(Math.random() * 1000, 10);
-  })
-
-});
 
 const scrollbarTrackStyle = (base) => {
   return {
@@ -115,11 +122,11 @@ class App extends Component {
                   // headerStyle={headerStyle}
                   // cellStyle={cellStyle}
                   // rowHeight={rowHeight}
-                  columns={columns} rows={data.slice(0, 200)} width={800} height={300}
+                  columns={columns} rows={data.slice(0, 20000)} width={800} height={500}
                   fixedLeftCount={1} 
-                  fixedRightCount={1} 
+                  fixedRightCount={0} 
                   fixedTopCount={1} 
-                  fixedBottomCount={1} 
+                  fixedBottomCount={0} 
                   />
         {/* <table border={1} cellPadding={10}>
           <tbody>

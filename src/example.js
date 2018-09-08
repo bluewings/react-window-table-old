@@ -1,14 +1,14 @@
-const columns = [...Array(100)].map((e, i) => {
-  return { name: 'col-' + i, width: 120 }
-})
+const { pokemons } = require('./pokedex.json');
 
-const data = [...Array(30)].map((e, i) => {
-  return columns.reduce((prev, f, j) => {
-    return {
-      ...prev,
-      [f.name]: i + '_' + j
-    }
-  }, {})
-})
+const columns = pokemons.reduce((prev, e) => [...prev, ...Object.keys(e)], [])
+  .filter((v, i, a) => a.indexOf(v) === i)
+  .map(name => ({ name }));
 
-export { columns, data }
+
+console.log(columns);
+const data = pokemons;
+
+export {
+  columns,
+  data,
+};

@@ -229,20 +229,37 @@ class WindowTable extends PureComponent {
             _rowIndex % 2 ? 'row-odd' : 'row-even',
 
           ].join(' ');
+          if (_rowIndex === -1) {
+            return (
+              <div className={applyStyle} style={style}>
+                {this.props.columns[_colIndex].name}
+              </div>              
+            )
+          }
+          if (_rowIndex >= 0) {
+            const renderFn = this.props.columns[_colIndex].render;
+            const val = this.props.rows[_rowIndex].arr[_colIndex];
+            return (
+              <div className={applyStyle} style={style}>
+                {renderFn ? renderFn(val) : val}
+              </div>
+            )
+          }
+          return null;
 
-          return (
-            <div className={applyStyle} style={style}>
-              {/* <div style={newStyle}> */}
-              {_rowIndex === -1 && this.props.columns[_colIndex].name}
+          // return (
+          //   <div className={applyStyle} style={style}>
+          //     {/* <div style={newStyle}> */}
+          //     {_rowIndex === -1 && this.props.columns[_colIndex].name}
 
-              {_rowIndex >= 0 && (
+          //     {_rowIndex >= 0 && (
 
-              <span>{this.props.rows[_rowIndex].arr[_colIndex]}
-              </span>
-            )}
+          //     <span>{this.props.rows[_rowIndex].arr[_colIndex]}
+          //     </span>
+          //   )}
 
-            </div>
-          );
+          //   </div>
+          // );
         }}
         </Grid>
       </div>
@@ -411,7 +428,7 @@ const enhance = compose(
           if (typeof e.getValue === 'function') {
             value = e.getValue(value);
           }
-          if (typeof value === 'string') {
+          if (typeof value === 'string' || typeof value === 'number') {
             return value;
           }
           return '-';
