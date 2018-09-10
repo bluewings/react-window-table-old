@@ -139,9 +139,9 @@ class App extends Component {
                   rowHeight={50}
                   columnWidth={200}
                   fixedLeftCount={1} 
-                  fixedRightCount={0} 
+                  fixedRightCount={1} 
                   fixedTopCount={1} 
-                  fixedBottomCount={0} 
+                  fixedBottomCount={1} 
                   />
         {/* <table border={1} cellPadding={10}>
           <tbody>

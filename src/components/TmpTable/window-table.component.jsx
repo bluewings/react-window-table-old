@@ -11,34 +11,34 @@ import { compose, defaultProps, withPropsOnChange } from 'recompose';
 import memoize from 'memoize-one';
 import entries from 'object.entries';
 import { css } from 'emotion';
-import { Map } from 'immutable';
 import Scrollarea from '../Scrollarea';
 import Scrollbar from '../Scrollbar';
 import Guideline from '../Guideline';
+import cellStyle, { defaultClassNames as defaultCellClassNames } from './styles/cell.style';
 
 import template from './window-table.component.pug';
 import styles from './window-table.component.scss';
 
-const defaultCellClassNames = Map({
-  // row
-  oddRow: 'rwtc-odd-row',
-  evenRow: 'rwtc-even-row',
-  // column
-  oddColumn: 'rwtc-odd-col',
-  evenColumn: 'rwtc-even-col',
-  // area
-  top: 'rwtc-top',
-  middle: 'rwtc-middle',
-  bottom: 'rwtc-bottom',
-  left: 'rwtc-left',
-  center: 'rwtc-center',
-  right: 'rwtc-right',
-  // location within the area
-  horizontalFirst: 'rwtc-h-first',
-  horizontalLast: 'rwtc-h-last',
-  verticalFirst: 'rwtc-v-first',
-  verticalLast: 'rwtc-v-last',
-});
+// const defaultCellClassNames = Map({
+//   // row
+//   oddRow: 'rwtc-odd-row',
+//   evenRow: 'rwtc-even-row',
+//   // column
+//   oddColumn: 'rwtc-odd-col',
+//   evenColumn: 'rwtc-even-col',
+//   // area
+//   top: 'rwtc-top',
+//   middle: 'rwtc-middle',
+//   bottom: 'rwtc-bottom',
+//   left: 'rwtc-left',
+//   center: 'rwtc-center',
+//   right: 'rwtc-right',
+//   // location within the area
+//   horizontalFirst: 'rwtc-h-first',
+//   horizontalLast: 'rwtc-h-last',
+//   verticalFirst: 'rwtc-v-first',
+//   verticalLast: 'rwtc-v-last',
+// });
 
 class WindowTable extends PureComponent {
   constructor(props) {
@@ -141,59 +141,6 @@ class WindowTable extends PureComponent {
     return css({ ...styleObj });
   })
 
-  cellStyle = memoize((classNames, customStyle) => {
-    let styleObj = {
-      boxSizing: 'border-box',
-      overflow: 'hidden',
-
-      display: 'flex',
-      // justifyContent: 'center',
-      padding: '0 8px',
-      alignItems: 'center',
-
-      borderBottom: '1px solid #cacaca',
-      // borderRight: '1px solid #cacaca',
-      // '&.cell-text-align-center': {
-      //   justifyContent: 'center',
-      // },
-      // '&.cell-right': {
-      //   borderLeft: '1px solid #cacaca',
-      //   borderRight: 'none',
-      // },
-      // '&.cell-bottom': {
-      //   borderTop: '1px solid #cacaca',
-      //   borderBottom: 'none',
-      // },
-
-      // '&.cell-center': {
-      //   '&.cell-h-last': {
-      //     borderRight: 'none',
-      //   },
-
-      // },
-      ['&.' + classNames.middle]: {
-        // '&.cell-v-last'
-        ['&.' + classNames.verticalLast]: {
-          borderBottom: 'none',
-        },
-
-      },
-      ['&.' + classNames.evenRow]: {
-
-        // background: 'lightyellow',
-        // background: '#f0f0f0',
-      },
-    };
-    if (typeof customStyle === 'function') {
-      styleObj = customStyle(styleObj, { });
-    }
-
-    return css({
-      ...styleObj,
-
-    });
-  })
-
   renderGrid = ({
     section, width, height, columnCount, columnOffset, rowCount, rowOffset,
   }) => {
@@ -203,9 +150,7 @@ class WindowTable extends PureComponent {
       columnCount,
       columnWidth: index => this.props.columnWidth(index + columnOffset),
       rowCount,
-
       rowHeight: index =>
-
         this.props.rowHeight(index + rowOffset)
       ,
     };
@@ -240,13 +185,14 @@ class WindowTable extends PureComponent {
 
     const classNames = this.props.cellClassNames;
 
-    const cellStyle = this.cellStyle(classNames, this.props.cellStyle);
+    // const cellStyle = this.cellStyle(classNames, this.props.cellStyle);
     const sectionClass = (Array.isArray(section) ? section : [section]).map(e => classNames[e]).join(' ');
 
     // console.log(sectionClass);
     return (
 
       <div className={styles.gridWrap} style={{ width, height }}>
+        <h4 style={{ position:'absolute', margin:0, padding: 5, top: 0, left: 0, background:'yellow', zIndex: 10 }}>{section.join('-')}</h4>
         <Grid {...gridProps} >
           {({ columnIndex, rowIndex, style }) => {
           const _colIndex = columnOffset + columnIndex;
@@ -254,7 +200,7 @@ class WindowTable extends PureComponent {
           const column = this.props.columns[_colIndex];
           const row = this.props.rows[_rowIndex];
           const applyStyle = [
-            cellStyle,
+            this.props.cellStyle,
             sectionClass,
             columnIndex === 0 && classNames.horizontalFirst,
             rowIndex === 0 && classNames.verticalFirst,
@@ -271,7 +217,7 @@ class WindowTable extends PureComponent {
           //     </div>
           //   )
           // }
-          
+
           if (_rowIndex >= 0) {
             const renderFn = this.props.columns[_colIndex].render;
             const val = this.props.rows[_rowIndex].arr[_colIndex];
@@ -419,6 +365,12 @@ WindowTable.defaultProps = {
   guidelineStyle: undefined,
   scrollbarHandleStyle: undefined,
   scrollbarTrackStyle: undefined,
+
+  left: undefined,
+  right: undefined,
+
+  top: undefined,
+  bottom: undefined,
 };
 
 const enhance = compose(
@@ -439,20 +391,18 @@ const enhance = compose(
   withPropsOnChange(['cellClassNames'], ({ cellClassNames: classNames }) => {
     let cellClassNames = defaultCellClassNames;
     if (classNames && typeof classNames === 'object') {
-      entries(classNames).forEach(([key, className]) => {
-        return cellClassNames.has(key) && (cellClassNames = cellClassNames.set(key, className));
-      })
+      entries(classNames)
+        .filter(([key]) => cellClassNames.has(key))
+        .forEach(([key, className]) => {
+          cellClassNames = cellClassNames.set(key, className);
+        });
     }
-    return {
-      cellClassNames,
-    }
+    return { cellClassNames: cellClassNames.toJS() };
   }),
 
-  withPropsOnChange(['cellClassNames'], ({ cellClassNames }) => {
-    return {
-      cellClassNames: cellClassNames.toJS(),
-    }
-  }),
+  withPropsOnChange(['cellClassNames', 'cellStyle'], ({ cellClassNames, cellStyle: customStyle }) => ({
+    cellStyle: cellStyle(cellClassNames, customStyle),
+  })),
 
   withPropsOnChange(['columns'], ({ columns }) => ({
     columns: (columns || [])
