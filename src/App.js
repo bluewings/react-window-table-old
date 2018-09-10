@@ -30,11 +30,24 @@ import { columns, data } from './example';
 
 // });
 
-columns[3].render = (src) => {
-  return (
-    <img src={src}  height={40} />
-  )
-}
+// columns[0] = {
+//   name: 'img',
+//   width: 60,
+//   textAlign: 'center',
+//   render: (src) => {
+//     return (
+//       <img src={src} height={40} />
+//     )
+//   }
+// }
+
+// columns[3].render = (src) => {
+//   return (
+//     <img src={src}  height={40} />
+//   )
+// }
+
+// columns[3].textAlign = 'center';
 
 const scrollbarTrackStyle = (base) => {
   return {
@@ -122,7 +135,9 @@ class App extends Component {
                   // headerStyle={headerStyle}
                   // cellStyle={cellStyle}
                   // rowHeight={rowHeight}
-                  columns={columns} rows={data.slice(0, 20000)} width={800} height={500}
+                  columns={columns} rows={data.slice(0, 20000)} width={1000} height={516}
+                  rowHeight={50}
+                  columnWidth={200}
                   fixedLeftCount={1} 
                   fixedRightCount={0} 
                   fixedTopCount={1} 
