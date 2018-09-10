@@ -9,7 +9,9 @@ import PropTypes from 'prop-types';
 import { VariableSizeGrid as Grid } from 'react-window';
 import { compose, defaultProps, withPropsOnChange } from 'recompose';
 import memoize from 'memoize-one';
+import entries from 'object.entries';
 import { css } from 'emotion';
+import { Map } from 'immutable';
 import Scrollarea from '../Scrollarea';
 import Scrollbar from '../Scrollbar';
 import Guideline from '../Guideline';
@@ -17,16 +19,26 @@ import Guideline from '../Guideline';
 import template from './window-table.component.pug';
 import styles from './window-table.component.scss';
 
-const styleClass = {
-  ROW_ODD: '.rwt-row-odd',
-  ROW_EVEN: '.rwt-row-even',
-  CELL_ODD: '.rwt-cell-odd',
-  CELL_EVEN: '.rwt-cell-even',
-  CELL_TOP: '.rwt-cell-top',
-  CELL_LEFT: '.rwt-cell-left',
-  CELL_RIGHT: '.rwt-cell-right',
-  CELL_BOTTOM: '.rwt-cell-bottom',
-};
+const defaultCellClassNames = Map({
+  // row
+  oddRow: 'rwtc-odd-row',
+  evenRow: 'rwtc-even-row',
+  // column
+  oddColumn: 'rwtc-odd-col',
+  evenColumn: 'rwtc-even-col',
+  // area
+  top: 'rwtc-top',
+  middle: 'rwtc-middle',
+  bottom: 'rwtc-bottom',
+  left: 'rwtc-left',
+  center: 'rwtc-center',
+  right: 'rwtc-right',
+  // location within the area
+  horizontalFirst: 'rwtc-h-first',
+  horizontalLast: 'rwtc-h-last',
+  verticalFirst: 'rwtc-v-first',
+  verticalLast: 'rwtc-v-last',
+});
 
 class WindowTable extends PureComponent {
   constructor(props) {
@@ -129,7 +141,7 @@ class WindowTable extends PureComponent {
     return css({ ...styleObj });
   })
 
-  cellStyle = memoize((customStyle) => {
+  cellStyle = memoize((classNames, customStyle) => {
     let styleObj = {
       boxSizing: 'border-box',
       overflow: 'hidden',
@@ -159,13 +171,14 @@ class WindowTable extends PureComponent {
       //   },
 
       // },
-      // '&.cell-middle': {
-      //   '&.cell-v-last': {
-      //     borderBottom: 'none',
-      //   },
+      ['&.' + classNames.middle]: {
+        // '&.cell-v-last'
+        ['&.' + classNames.verticalLast]: {
+          borderBottom: 'none',
+        },
 
-      // },
-      '&.row-even': {
+      },
+      ['&.' + classNames.evenRow]: {
 
         // background: 'lightyellow',
         // background: '#f0f0f0',
@@ -225,9 +238,12 @@ class WindowTable extends PureComponent {
       };
     }
 
-    const cellStyle = this.cellStyle(this.props.cellStyle);
-    const sectionClass = (Array.isArray(section) ? section : [section]).map(e => `cell-${e}`).join(' ');
+    const classNames = this.props.cellClassNames;
 
+    const cellStyle = this.cellStyle(classNames, this.props.cellStyle);
+    const sectionClass = (Array.isArray(section) ? section : [section]).map(e => classNames[e]).join(' ');
+
+    // console.log(sectionClass);
     return (
 
       <div className={styles.gridWrap} style={{ width, height }}>
@@ -240,12 +256,12 @@ class WindowTable extends PureComponent {
           const applyStyle = [
             cellStyle,
             sectionClass,
-            columnIndex === 0 && 'cell-h-first',
-            rowIndex === 0 && 'cell-v-first',
-            columnIndex === columnCount - 1 && 'cell-h-last',
-            rowIndex === rowCount - 1 && 'cell-v-last',
-            _colIndex % 2 ? 'col-odd' : 'col-even',
-            _rowIndex % 2 ? 'row-odd' : 'row-even',
+            columnIndex === 0 && classNames.horizontalFirst,
+            rowIndex === 0 && classNames.verticalFirst,
+            columnIndex === columnCount - 1 && classNames.horizontalLast,
+            rowIndex === rowCount - 1 && classNames.verticalLast,
+            _colIndex % 2 ? classNames.oddColumn : classNames.evenColumn,
+            _rowIndex % 2 ? classNames.oddRow : classNames.evenRow,
             `cell-text-align-${column.textAlign}`,
           ].join(' ');
           // if (_rowIndex === -1) {
@@ -366,7 +382,7 @@ WindowTable.propTypes = {
 
   columns: PropTypes.array.isRequired,
   columnWidth: PropTypes.func.isRequired,
-  containerStyle: PropTypes.func,
+  containerStyle: PropTypes.string,
   contentHeight: PropTypes.number.isRequired,
   contentWidth: PropTypes.number.isRequired,
   guidelineStyle: PropTypes.func,
@@ -375,11 +391,11 @@ WindowTable.propTypes = {
   overallWidth: PropTypes.number.isRequired,
   // priority: PropTypes.number.isRequired,
 
-  left: PropTypes.object.isRequired,
-  right: PropTypes.object.isRequired,
+  left: PropTypes.object,
+  right: PropTypes.object,
   center: PropTypes.object.isRequired,
-  top: PropTypes.object.isRequired,
-  bottom: PropTypes.object.isRequired,
+  top: PropTypes.object,
+  bottom: PropTypes.object,
 
 
   rowHeight: PropTypes.func.isRequired,
@@ -418,6 +434,24 @@ const enhance = compose(
     scrollTop: 0,
     scrollLeft: 0,
     rows: null,
+  }),
+
+  withPropsOnChange(['cellClassNames'], ({ cellClassNames: classNames }) => {
+    let cellClassNames = defaultCellClassNames;
+    if (classNames && typeof classNames === 'object') {
+      entries(classNames).forEach(([key, className]) => {
+        return cellClassNames.has(key) && (cellClassNames = cellClassNames.set(key, className));
+      })
+    }
+    return {
+      cellClassNames,
+    }
+  }),
+
+  withPropsOnChange(['cellClassNames'], ({ cellClassNames }) => {
+    return {
+      cellClassNames: cellClassNames.toJS(),
+    }
   }),
 
   withPropsOnChange(['columns'], ({ columns }) => ({
