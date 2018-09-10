@@ -6,13 +6,13 @@ import WindowTable from './components/WindowTable';
 import TmpTable from './components/TmpTable';
 import Scrollarea from './components/Scrollarea';
 import sampleImg from './sample.png';
-import { columns, data } from './example';
+import { columns, rows } from './examples/data/pokedex';
 
 // const columns = [...Array(50)].map((e, i) => ({ name: `col-${i}`, width: 100 }));
 
-// // const data = [...Array(100)].map((e, i) => columns.reduce((prev, f, j) => ({
+// // const rows = [...Array(100)].map((e, i) => columns.reduce((prev, f, j) => ({
 // //   ...prev,
-// //   [f.name]: `data ${i}_${j}`,
+// //   [f.name]: `rows ${i}_${j}`,
 // // }), {}));
 // columns[0].getValue = (e) => {
 //   return '' + e;
@@ -21,7 +21,7 @@ import { columns, data } from './example';
 //   return '_' + e;
 // }
 
-// const data = [...Array(5000)].map((e, i) => {
+// const rows = [...Array(5000)].map((e, i) => {
 
 //   return columns.map((f, j) => {
 //     if (j === 0) return i
@@ -135,7 +135,7 @@ class App extends Component {
                   // headerStyle={headerStyle}
                   // cellStyle={cellStyle}
                   // rowHeight={rowHeight}
-                  columns={columns} rows={data.slice(0, 20000)} width={1000} height={516}
+                  columns={columns} rows={rows.slice(0, 20000)} width={1000} height={516}
                   rowHeight={50}
                   columnWidth={200}
                   fixedLeftCount={1} 
@@ -147,10 +147,10 @@ class App extends Component {
           <tbody>
             <tr>
               <td>
-                <WindowTable columns={columns.slice(0, 3)} rows={data.slice(0, 4)} fixedTopCount={0} fixedBottomCount={0} fixedLeftCount={0} fixedRightCount={0} width={500} height={300} />
+                <WindowTable columns={columns.slice(0, 3)} rows={rows.slice(0, 4)} fixedTopCount={0} fixedBottomCount={0} fixedLeftCount={0} fixedRightCount={0} width={500} height={300} />
               </td>
               <td>
-                <WindowTable columns={columns.slice(0,3)} rows={data} width={500} height={300} />
+                <WindowTable columns={columns.slice(0,3)} rows={rows} width={500} height={300} />
               </td>
             </tr>
             <tr>
@@ -162,10 +162,10 @@ class App extends Component {
                   headerStyle={headerStyle}
                   cellStyle={cellStyle}
                   rowHeight={rowHeight}
-                  columns={columns} rows={data.slice(0, 50)} width={500} height={300} />
+                  columns={columns} rows={rows.slice(0, 50)} width={500} height={300} />
               </td>
               <td>
-                <WindowTable columns={columns} rows={data.slice(0, 1000)}
+                <WindowTable columns={columns} rows={rows.slice(0, 1000)}
                   rowHeight={30}
                   fixedLeftCount={2} fixedBottomCount={2} fixedRightCount={0} width={500} height={300} />
               </td>
