@@ -3,8 +3,10 @@ import React, { PureComponent, Fragment } from 'react';
 import PropTypes from 'prop-types';
 import memoize from 'memoize-one';
 import { css } from 'emotion';
+import { compose, defaultProps, withPropsOnChange } from 'recompose';
 import Draggable from 'react-draggable';
-import { scrollbarTrackStyle, scrollbarHandleStyle } from '../../styles';
+import forwardRef from '../../hoc/forward-ref.hoc';
+import { scrollbarTrackStyle, scrollbarHandleStyle, defaultScrollbarClassNames } from '../../styles';
 
 import template from './scrollbar.component.pug';
 
@@ -99,10 +101,10 @@ class Scrollbar extends PureComponent {
     this.setState(prevState => ({ ...prevState, scrollTop, scrollLeft }));
   }
 
-  trackStyle = memoize((axis, trackLength, trackWidth, customStyleFn) => {
+  trackStyle = memoize((classNames, axis, trackLength, trackWidth, customStyleFn) => {
 
 
-    return scrollbarTrackStyle({axis, trackLength, trackWidth, customStyleFn})
+    return scrollbarTrackStyle({classNames, axis, trackLength, trackWidth, customStyleFn})
     
     // // , scrollbarHandleStyle
     // const width = axis === 'x' ? trackLength : trackWidth;
@@ -122,9 +124,9 @@ class Scrollbar extends PureComponent {
     // });
   })  
 
-  handleStyle = memoize((axis, handleLength, trackWidth, customStyleFn) => {
+  handleStyle = memoize((classNames, axis, handleLength, trackWidth, customStyleFn) => {
 
-    return scrollbarHandleStyle({axis, handleLength, trackWidth, customStyleFn})
+    return scrollbarHandleStyle({classNames, axis, handleLength, trackWidth, customStyleFn})
     // const width = axis === 'x' ? handleLength : trackWidth;
     // const height = axis === 'x' ? trackWidth : handleLength;
     // let styles = scrollbarHandleStyle({
@@ -269,6 +271,7 @@ class Scrollbar extends PureComponent {
       scrollbarWidth,
       trackStyle,
       handleStyle,
+      scrollbarClassNames,
 
     } = this.props;
 
@@ -293,9 +296,10 @@ class Scrollbar extends PureComponent {
     return template.call(this, {
       // variables
       dragProps,
-      handleStyle: this.handleStyle(axis, this.handleLength(), scrollbarWidth, handleStyle),
+      handleStyle: this.handleStyle(scrollbarClassNames, axis, this.handleLength(), scrollbarWidth, handleStyle),
+      scrollbarClassNames,
       status,
-      trackStyle: this.trackStyle(axis, scrollbarLength, scrollbarWidth, trackStyle),
+      trackStyle: this.trackStyle(scrollbarClassNames, axis, scrollbarLength, scrollbarWidth, trackStyle),
       // components
       Draggable,
       Fragment,
@@ -313,4 +317,22 @@ Scrollbar.defaultProps = {
   minHandleLength: 40,
 };
 
-export default Scrollbar;
+const enhance = compose(
+  forwardRef('outer'),
+
+  withPropsOnChange(['scrollbarClassNames'], ({ scrollbarClassNames: classNames }) => {
+    let scrollbarClassNames = defaultScrollbarClassNames;
+    if (classNames && typeof classNames === 'object') {
+      entries(classNames)
+        .filter(([key]) => scrollbarClassNames.has(key))
+        .forEach(([key, className]) => {
+          scrollbarClassNames = scrollbarClassNames.set(key, className);
+        });
+    }
+    return { scrollbarClassNames: scrollbarClassNames.toJS() };
+  }),
+
+  forwardRef('inner'),
+)
+
+export default enhance(Scrollbar);

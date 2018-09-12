@@ -21,10 +21,12 @@ const defaultScrollbarClassNames = Map({
   // horizontalLast: 'rwtc-h-last',
   // verticalFirst: 'rwtc-v-first',
   // verticalLast: 'rwtc-v-last',
-  dragging: 'dragging',
+  dragging: 'rwts-dragging',
+  dragend: 'rwts-dragend',
 });
 
 const baseTrackStyle = ({
+  classNames,
   axis, handleLength, trackWidth,
   width, height,
 }) => {
@@ -48,6 +50,7 @@ const baseTrackStyle = ({
 };
 
 const baseHandleStyle = ({
+  classNames,
   axis, handleLength, trackWidth,
   width, height,
 }) => ({
@@ -78,7 +81,7 @@ const baseHandleStyle = ({
       // boxShadow: 'inset 0 0 6px rgba(0,0,0,0.5)',
     },
   },
-  '&.dragging > div': {
+  [`&.${classNames.dragging} > div`]: {
     // background: 'blue',
     // background: 'rgba(204,204,204,0.8)',
     // background: 'rgba(0,0,0,0.5)',
@@ -88,11 +91,12 @@ const baseHandleStyle = ({
 });
 
 const scrollbarTrackStyle = ({
-  axis, trackLength, trackWidth, customStyleFn,
+  classNames, axis, trackLength, trackWidth, customStyleFn,
 }) => {
   const width = axis === 'x' ? trackLength : trackWidth;
   const height = axis === 'x' ? trackWidth : trackLength;
   let styles = baseTrackStyle({
+    classNames,
     axis,
     trackLength,
     trackWidth,
@@ -111,11 +115,12 @@ const scrollbarTrackStyle = ({
 };
 
 const scrollbarHandleStyle = ({
-  axis, handleLength, trackWidth, customStyleFn,
+  classNames, axis, handleLength, trackWidth, customStyleFn,
 }) => {
   const width = axis === 'x' ? handleLength : trackWidth;
   const height = axis === 'x' ? trackWidth : handleLength;
   let styles = baseHandleStyle({
+    classNames,
     axis,
     handleLength,
     trackWidth,
