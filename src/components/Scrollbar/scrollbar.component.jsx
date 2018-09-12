@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import memoize from 'memoize-one';
 import { css } from 'emotion';
 import Draggable from 'react-draggable';
+import { scrollbarTrackStyle, scrollbarHandleStyle } from '../../styles';
 
 import template from './scrollbar.component.pug';
 
@@ -20,70 +21,70 @@ const getClientRect = (elem) => {
 };
 
 
-const scrollbarTrackStyle = ({ 
-  axis, handleLength, trackWidth,
-  width, height,
-}) => {
-  let styles = {
-    position: 'relative',
-    width,
-    height,
-    // background: 'rgba(0, 0, 0, .1)',
-    // background: '#f9f9f9',
-    overflow: 'hidden',
-    boxSizing: 'border-box',
-  };
-  if (axis === 'x') {
-    styles.borderTop = '1px solid #e5e5e5';
-    styles.borderTop = '1px solid #cacaca';
-  } else {
-    styles.borderLeft = '1px solid #cacaca';
-  }
+// const scrollbarTrackStyle = ({ 
+//   axis, handleLength, trackWidth,
+//   width, height,
+// }) => {
+//   let styles = {
+//     position: 'relative',
+//     width,
+//     height,
+//     // background: 'rgba(0, 0, 0, .1)',
+//     // background: '#f9f9f9',
+//     overflow: 'hidden',
+//     boxSizing: 'border-box',
+//   };
+//   if (axis === 'x') {
+//     styles.borderTop = '1px solid #e5e5e5';
+//     styles.borderTop = '1px solid #cacaca';
+//   } else {
+//     styles.borderLeft = '1px solid #cacaca';
+//   }
 
-  return styles;
-};
+//   return styles;
+// };
 
-const scrollbarHandleStyle = ({ 
-  axis, handleLength, trackWidth,
-  width, height,
-}) => {
-  return {
-    // ...base,
-    background: 'transparent',
-    // background: 'red',
+// const scrollbarHandleStyle = ({ 
+//   axis, handleLength, trackWidth,
+//   width, height,
+// }) => {
+//   return {
+//     // ...base,
+//     background: 'transparent',
+//     // background: 'red',
 
-    '> div': {
-      position: 'absolute',
-      display: 'block',
-      top: 3,
-      left: 3,
-      right: 4,
-      bottom: 4,
-      pointerEvent: 'none',
-      // margin: 3,
-      borderRadius: ((height - 6) / 2) + 'px',
-      // background: 'red',
-      transition: 'background 0.2s',
-      // background: 'rgba(204,204,204,0.4)',
-      // background: 'rgba(204,204,204,0.4)',
-      // background: 'rgba(0,0,0,0.25)',
-      // background: '#c2c2c2',
-      background: '#c0c0c0',
+//     '> div': {
+//       position: 'absolute',
+//       display: 'block',
+//       top: 3,
+//       left: 3,
+//       right: 4,
+//       bottom: 4,
+//       pointerEvent: 'none',
+//       // margin: 3,
+//       borderRadius: ((height - 6) / 2) + 'px',
+//       // background: 'red',
+//       transition: 'background 0.2s',
+//       // background: 'rgba(204,204,204,0.4)',
+//       // background: 'rgba(204,204,204,0.4)',
+//       // background: 'rgba(0,0,0,0.25)',
+//       // background: '#c2c2c2',
+//       background: '#c0c0c0',
 
-      '&:hover': {
-        background: '#7b7b7b',
-        // boxShadow: 'inset 0 0 6px rgba(0,0,0,0.5)', 
-      }
-    },
-    '&.dragging > div': {
-      // background: 'blue',
-      // background: 'rgba(204,204,204,0.8)',
-      // background: 'rgba(0,0,0,0.5)',
-      background: '#7b7b7b',
-      // boxShadow: 'inset 0 0 6px rgba(0,0,0,0.5)',
-    },
-  }
-}
+//       '&:hover': {
+//         background: '#7b7b7b',
+//         // boxShadow: 'inset 0 0 6px rgba(0,0,0,0.5)', 
+//       }
+//     },
+//     '&.dragging > div': {
+//       // background: 'blue',
+//       // background: 'rgba(204,204,204,0.8)',
+//       // background: 'rgba(0,0,0,0.5)',
+//       background: '#7b7b7b',
+//       // boxShadow: 'inset 0 0 6px rgba(0,0,0,0.5)',
+//     },
+//   }
+// }
 
 class Scrollbar extends PureComponent {
   constructor(props) {
@@ -98,46 +99,53 @@ class Scrollbar extends PureComponent {
     this.setState(prevState => ({ ...prevState, scrollTop, scrollLeft }));
   }
 
-  trackStyle = memoize((axis, trackLength, trackWidth, customStyle) => {
-    const width = axis === 'x' ? trackLength : trackWidth;
-    const height = axis === 'x' ? trackWidth : trackLength;
-    let styles = scrollbarTrackStyle({
-      axis, trackLength, trackWidth,
-      width, height,
-    })
-    if (typeof customStyle === 'function') {
-      styles = customStyle(styles, { axis, trackLength, trackWidth });
-    }
-    return css({
-      ...styles,
-      position: 'relative',
-      width,
-      height,
-    });
-  })  
+  trackStyle = memoize((axis, trackLength, trackWidth, customStyleFn) => {
 
-  handleStyle = memoize((axis, handleLength, trackWidth, customStyle) => {
-    const width = axis === 'x' ? handleLength : trackWidth;
-    const height = axis === 'x' ? trackWidth : handleLength;
-    let styles = scrollbarHandleStyle({
-      axis, handleLength, trackWidth,
-      width, height,
-    })
-    // const width = axis === 'x' ? handleLength : trackWidth;
-    // const height = axis === 'x' ? trackWidth : handleLength;
-    // let styles = {
+
+    return scrollbarTrackStyle({axis, trackLength, trackWidth, customStyleFn})
+    
+    // // , scrollbarHandleStyle
+    // const width = axis === 'x' ? trackLength : trackWidth;
+    // const height = axis === 'x' ? trackWidth : trackLength;
+    // let styles = scrollbarTrackStyle({
+    //   axis, trackLength, trackWidth,
+    //   width, height,
+    // })
+    // if (typeof customStyleFn === 'function') {
+    //   styles = customStyleFn(styles, { axis, trackLength, trackWidth });
+    // }
+    // return css({
+    //   ...styles,
+    //   position: 'relative',
     //   width,
     //   height,
-    //   background: 'green',
-    // };
-    if (typeof customStyle === 'function') {
-      styles = customStyle(styles, { axis, handleLength, trackWidth });
-    }
-    return css({
-      ...styles,
-      width,
-      height,
-    });
+    // });
+  })  
+
+  handleStyle = memoize((axis, handleLength, trackWidth, customStyleFn) => {
+
+    return scrollbarHandleStyle({axis, handleLength, trackWidth, customStyleFn})
+    // const width = axis === 'x' ? handleLength : trackWidth;
+    // const height = axis === 'x' ? trackWidth : handleLength;
+    // let styles = scrollbarHandleStyle({
+    //   axis, handleLength, trackWidth,
+    //   width, height,
+    // })
+    // // const width = axis === 'x' ? handleLength : trackWidth;
+    // // const height = axis === 'x' ? trackWidth : handleLength;
+    // // let styles = {
+    // //   width,
+    // //   height,
+    // //   background: 'green',
+    // // };
+    // if (typeof customStyleFn === 'function') {
+    //   styles = customStyleFn(styles, { axis, handleLength, trackWidth });
+    // }
+    // return css({
+    //   ...styles,
+    //   width,
+    //   height,
+    // });
   })
 
   _handleLength = memoize((scrollLength, scrollbarLength, minHandleLength) => {

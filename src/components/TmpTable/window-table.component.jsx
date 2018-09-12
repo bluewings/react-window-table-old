@@ -14,7 +14,8 @@ import { css } from 'emotion';
 import Scrollarea from '../Scrollarea';
 import Scrollbar from '../Scrollbar';
 import Guideline from '../Guideline';
-import cellStyle, { defaultClassNames as defaultCellClassNames } from './styles/cell.style';
+// import cellStyle, { defaultClassNames as defaultCellClassNames } from '../../styles/cell.style';
+import { cellStyle, defaultCellClassNames } from '../../styles';
 
 import template from './window-table.component.pug';
 import styles from './window-table.component.scss';

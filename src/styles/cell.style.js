@@ -1,7 +1,7 @@
 import { Map } from 'immutable';
 import { css } from 'emotion';
 
-const defaultClassNames = Map({
+const defaultCellClassNames = Map({
   // row
   oddRow: 'rwtc-odd-row',
   evenRow: 'rwtc-even-row',
@@ -22,7 +22,7 @@ const defaultClassNames = Map({
   verticalLast: 'rwtc-v-last',
 });
 
-const cellStyle = (classNames, customStyle) => {
+const cellStyle = (classNames, customStyleFn) => {
   let styleObj = {
     boxSizing: 'border-box',
     overflow: 'hidden',
@@ -42,9 +42,10 @@ const cellStyle = (classNames, customStyle) => {
     //   borderRight: 'none',
     // },
     // '&.cell-bottom': {
-    //   borderTop: '1px solid #cacaca',
-    //   borderBottom: 'none',
-    // },
+    [`&.${classNames.bottom}`]: {
+      borderTop: '1px solid #cacaca',
+      borderBottom: 'none',
+    },
 
     // '&.cell-center': {
     //   '&.cell-h-last': {
@@ -65,13 +66,11 @@ const cellStyle = (classNames, customStyle) => {
       // background: '#f0f0f0',
     },
   };
-  if (typeof customStyle === 'function') {
-    styleObj = customStyle(styleObj, { classNames });
+  if (typeof customStyleFn === 'function') {
+    styleObj = customStyleFn(styleObj, { classNames });
   }
 
   return css({ ...styleObj });
 };
 
-export default cellStyle;
-
-export { defaultClassNames };
+export { cellStyle, defaultCellClassNames };
