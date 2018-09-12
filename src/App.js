@@ -135,7 +135,7 @@ class App extends Component {
                   // headerStyle={headerStyle}
                   // cellStyle={cellStyle}
                   // rowHeight={rowHeight}
-                  columns={columns} rows={rows.slice(0, 20000)} width={1000} height={516}
+                  columns={columns.slice(0, 15)} rows={rows.slice(0, 20000)} width={1000} height={516}
                   rowHeight={50}
                   columnWidth={200}
                   fixedLeftCount={1} 

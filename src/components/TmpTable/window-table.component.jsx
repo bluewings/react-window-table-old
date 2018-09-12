@@ -325,7 +325,7 @@ WindowTable.propTypes = {
   maxScrollY: PropTypes.number,
   maxScrollX: PropTypes.number,
 
-  cellStyle: PropTypes.func,
+  cellStyle: PropTypes.string,
 
   columns: PropTypes.array.isRequired,
   columnWidth: PropTypes.func.isRequired,
@@ -402,7 +402,7 @@ const enhance = compose(
   }),
 
   withPropsOnChange(['cellClassNames', 'cellStyle'], ({ cellClassNames, cellStyle: customStyle }) => ({
-    cellStyle: cellStyle(cellClassNames, customStyle),
+    cellStyle: cellStyle({ classNames: cellClassNames, customStyle }),
   })),
 
   withPropsOnChange(['columns'], ({ columns }) => ({

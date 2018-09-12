@@ -22,7 +22,7 @@ const defaultCellClassNames = Map({
   verticalLast: 'rwtc-v-last',
 });
 
-const cellStyle = (classNames, customStyleFn) => {
+const cellStyle = ({ classNames, customStyleFn }) => {
   let styleObj = {
     boxSizing: 'border-box',
     overflow: 'hidden',

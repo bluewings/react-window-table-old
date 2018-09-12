@@ -53,42 +53,46 @@ const baseHandleStyle = ({
   classNames,
   axis, handleLength, trackWidth,
   width, height,
-}) => ({
-  // ...base,
-  background: 'transparent',
-  // background: 'red',
-
-  '> div': {
-    position: 'absolute',
-    display: 'block',
-    top: 3,
-    left: 3,
-    right: 4,
-    bottom: 4,
-    pointerEvent: 'none',
-    // margin: 3,
-    borderRadius: `${(height - 6) / 2}px`,
+}) => {
+  const baseStyle = {
+    // ...base,
+    background: 'transparent',
     // background: 'red',
-    transition: 'background 0.2s',
-    // background: 'rgba(204,204,204,0.4)',
-    // background: 'rgba(204,204,204,0.4)',
-    // background: 'rgba(0,0,0,0.25)',
-    // background: '#c2c2c2',
-    background: '#c0c0c0',
 
-    '&:hover': {
+    '> div': {
+      position: 'absolute',
+      display: 'block',
+      top: 3,
+      left: 3,
+      right: axis === 'y' ? 4 : 3,
+      // bottom: 4,
+      bottom: axis === 'x' ? 4 : 3,
+      pointerEvent: 'none',
+      // margin: 3,
+      // borderRadius: `${(height - 6) / 2}px`,
+      // background: 'red',
+      transition: 'background 0.2s',
+      // background: 'rgba(204,204,204,0.4)',
+      // background: 'rgba(204,204,204,0.4)',
+      // background: 'rgba(0,0,0,0.25)',
+      // background: '#c2c2c2',
+      background: '#c0c0c0',
+
+      '&:hover': {
+        background: '#7b7b7b',
+        // boxShadow: 'inset 0 0 6px rgba(0,0,0,0.5)',
+      },
+    },
+    [`&.${classNames.dragging} > div`]: {
+      // background: 'blue',
+      // background: 'rgba(204,204,204,0.8)',
+      // background: 'rgba(0,0,0,0.5)',
       background: '#7b7b7b',
       // boxShadow: 'inset 0 0 6px rgba(0,0,0,0.5)',
     },
-  },
-  [`&.${classNames.dragging} > div`]: {
-    // background: 'blue',
-    // background: 'rgba(204,204,204,0.8)',
-    // background: 'rgba(0,0,0,0.5)',
-    background: '#7b7b7b',
-    // boxShadow: 'inset 0 0 6px rgba(0,0,0,0.5)',
-  },
-});
+  };
+  return baseStyle;
+};
 
 const scrollbarTrackStyle = ({
   classNames, axis, trackLength, trackWidth, customStyleFn,
