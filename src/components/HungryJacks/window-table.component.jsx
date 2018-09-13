@@ -312,6 +312,8 @@ class WindowTable extends PureComponent {
   //   clearInterval(this.timer);
   // }
 
+  _getItemListCache = memoizeOne((_, __) => ({}));
+
   _getItemStyleCache = memoizeOne((_, __) => ({}));
 
   _getItemStyle = (rowIndex, columnIndex) => {
@@ -594,10 +596,10 @@ class WindowTable extends PureComponent {
         - this.props._rows[rowIndex].meta.size;
         bottomItems.push(
           <div
-            key={rowIndex + ':' + rowIndex}
+            key={rowIndex + ':' + columnIndex}
             style={styles}
           >
-            {rowIndex + ' , ' + rowIndex}
+            {rowIndex + ' , ' + columnIndex}
           </div>
         )
       }
@@ -684,6 +686,354 @@ class WindowTable extends PureComponent {
     };
   })
 
+  _items = memoizeOne((
+    _rows, _rowStartIndex, _rowStopIndex,
+    _columns,
+    _columnStartIndex, _columnStopIndex,
+    fixedTopCount, fixedBottomCount, fixedLeftCount, fixedRightCount
+    ) => {
+
+      
+
+      const __rows = [
+        ['top', 0, fixedTopCount],
+        ['middle', _rowStartIndex, _rowStopIndex + 1],
+        ['bottom', _rows.length - fixedBottomCount, this.props._rows.length],
+      ]
+
+      const __columns = [
+        ['left', 0, fixedLeftCount],
+        ['center', _columnStartIndex, _columnStopIndex + 1],
+        ['right', _columns.length - fixedRightCount, this.props._columns.length],
+      ]
+
+
+      let totalWidth = 0;
+      for (
+        let columnIndex = 0;
+        columnIndex < _columns.length;
+        columnIndex++
+      ) {
+        totalWidth += _columns[columnIndex].meta.size;
+      }
+  
+      let totalHeight = 0;
+      for (
+        let rowIndex = 0;
+        rowIndex < _rows.length;
+        rowIndex++
+      ) {
+        totalHeight += _rows[rowIndex].meta.size;
+      }
+
+      const _rslt = {};
+
+      const listStyleCache = this._getItemListCache(0, 0);
+
+      const fixStyle = (type, styles, _row, _column) => {
+        switch(type) {
+          case 'top_right':
+          case 'middle_right': {
+            let newStyle = { ...styles };
+            delete newStyle.left;
+            newStyle.right = totalWidth - _column.meta.offset - _column.meta.size;
+            return newStyle;
+          }
+          case 'bottom_left':
+          case 'bottom_center': {
+            let newStyle = { ...styles };
+            delete newStyle.top;
+            newStyle.bottom = totalHeight - _row.meta.offset - _row.meta.size;
+            return newStyle;
+          }
+
+          case 'bottom_right': {
+            let newStyle = { ...styles };
+            delete newStyle.top;
+            newStyle.bottom = totalHeight - _row.meta.offset - _row.meta.size;
+            delete newStyle.left;
+            newStyle.right = totalWidth - _column.meta.offset - _column.meta.size;
+            return newStyle;
+          }
+          
+        }
+        return styles;
+      }
+
+      // console.log('>>>');
+
+      __rows.forEach(([rType, rowFr, rowTo]) => {
+
+        __columns.forEach(([cType, colFr, colTo]) => {
+          const key = rType + '_' + cType;
+          const _key = rowFr + ':' + rowTo + ':' + colFr + ':' + colTo;
+          // console.log('%c ' + key + ' ', 'background:yellow');
+          
+
+
+
+          if (listStyleCache[key] && listStyleCache[key][0] === _key) {
+            _rslt[key] = listStyleCache[key][1];
+            // console.log('using cache ', key)
+            return 
+          }
+          // console.log(listStyleCache);
+          _rslt[key] = [];
+
+
+
+          for (
+            let rowIndex = rowFr;
+            rowIndex < rowTo;
+            rowIndex++
+          ) {
+            for (
+              let columnIndex = colFr;
+              columnIndex < colTo;
+              columnIndex++
+            ) {
+              // console.log(rowIndex, columnIndex)
+              _rslt[key].push(
+                  <div
+                  key={rowIndex + ':' + columnIndex}
+                  style={fixStyle(key, this._getItemStyle(rowIndex, columnIndex), _rows[rowIndex], _columns[columnIndex])}
+                >
+                  {rowIndex + ' , ' + columnIndex}
+      
+      
+                </div>
+              )
+            }
+
+          }
+
+          listStyleCache[key] = [_key, _rslt[key]];
+          // console.log(key, (rowTo - rowFr), (colTo - colFr), (colTo - colFr) * (rowTo - rowFr));
+        
+        })
+      })
+
+      return _rslt;
+
+    // //   for (
+    // //     let rowIndex = 0;
+    // //     rowIndex < fixedTopCount;
+    // //     rowIndex++
+    // //   ) {
+
+    // //   let rowIndex = this.props._rows.length - fixedBottomCount;
+    // //   rowIndex < this.props._rows.length;
+    // //   rowIndex++
+
+    // // let rowIndex = rowStartIndex;
+    // // rowIndex <= rowStopIndex;
+    // // rowIndex++
+
+
+    // // for (
+    // //   let rowIndex = 0;
+    // //   rowIndex < _rows.length;
+    // //   rowIndex++
+    // // ) {
+    // //   for (
+    // //     let columnIndex = 0;
+    // //     columnIndex < _columns.length;
+    // //     columnIndex++
+    // //   ) {
+    // //   }
+    // // }
+
+    // const items = [];
+
+    // const topItems = [];
+    // const topLeftItems = [];
+
+    // const leftItems = [];
+
+    // const rightItems = [];
+
+    // const bottomItems = [];
+
+    // const rowStartIndex = Math.max(_rowStartIndex, fixedTopCount);
+    // const rowStopIndex = _rowStopIndex;
+
+    // const columnStartIndex = Math.max(_columnStartIndex, fixedLeftCount);
+    // const columnStopIndex = _columnStopIndex;
+
+    // let totalWidth = 0;
+    // for (
+    //   let columnIndex = 0;
+    //   columnIndex < this.props._columns.length;
+    //   columnIndex++
+    // ) {
+    //   totalWidth += this.props._columns[columnIndex].meta.size;
+    // }
+
+    // let totalHeight = 0;
+    // for (
+    //   let rowIndex = 0;
+    //   rowIndex < this.props._rows.length;
+    //   rowIndex++
+    // ) {
+    //   totalHeight += this.props._rows[rowIndex].meta.size;
+    // }
+    // for (
+    //   let columnIndex = 0;
+    //   columnIndex <= columnStopIndex;
+    //   columnIndex++
+    // ) {
+
+
+    //   if (columnIndex < columnStartIndex) {
+    //     if (columnIndex < fixedLeftCount) {
+    //     for (
+    //       let rowIndex = 0;
+    //       rowIndex < fixedTopCount;
+    //       rowIndex++
+    //     ) {
+    //       topLeftItems.push(
+    //         <div
+    //           key={rowIndex + ':' + columnIndex}
+    //           style={{
+    //             ...this._getItemStyle(rowIndex, columnIndex),
+    //             // top: 0,
+    //             // background: 'lightyellow',
+    //             // border: '1px solid black',
+    //             // zIndex: 1,
+    //           }}
+    //         >
+    //           {rowIndex + ' , ' + columnIndex}
+    //         </div>
+    //       )
+    //     }
+    //     }
+
+    //   } else if (columnIndex <= columnStopIndex) {
+
+
+    //   for (
+    //     let rowIndex = 0;
+    //     rowIndex < fixedTopCount;
+    //     rowIndex++
+    //   ) {
+    //     topItems.push(
+    //       <div
+    //         key={rowIndex + ':' + columnIndex}
+    //         style={{
+    //           ...this._getItemStyle(rowIndex, columnIndex),
+    //           // top: 0,
+    //           // background: 'lightyellow',
+    //           // border: '1px solid black',
+    //           // zIndex: 1,
+    //         }}
+    //       >
+    //         {rowIndex + ' , ' + columnIndex}
+    //       </div>
+    //     )
+    //   }
+
+
+    //   for (
+    //     let rowIndex = this.props._rows.length - fixedBottomCount;
+    //     rowIndex < this.props._rows.length;
+    //     rowIndex++
+    //   ) {
+    //     const styles = { ...this._getItemStyle(rowIndex, columnIndex) };
+    //     delete styles.top;
+    //     styles.bottom = totalHeight - this.props._rows[rowIndex].meta.offset
+    //     - this.props._rows[rowIndex].meta.size;
+    //     bottomItems.push(
+    //       <div
+    //         key={rowIndex + ':' + rowIndex}
+    //         style={styles}
+    //       >
+    //         {rowIndex + ' , ' + rowIndex}
+    //       </div>
+    //     )
+    //   }
+    //   }
+    // }
+
+
+
+    // for (
+    //   let rowIndex = rowStartIndex;
+    //   rowIndex <= rowStopIndex;
+    //   rowIndex++
+    // ) {
+    //   for (
+    //     let columnIndex = 0;
+    //     columnIndex < fixedLeftCount;
+    //     columnIndex++
+    //   ) {
+    //     leftItems.push(
+    //       <div
+    //         key={rowIndex + ':' + columnIndex}
+    //         style={{ ...this._getItemStyle(rowIndex, columnIndex),
+    //           // border: '1px solid black',
+    //           // background: 'lightblue'
+    //         }}
+    //       >
+    //         {rowIndex + ' , ' + columnIndex}
+    //       </div>
+    //     )
+    //   }
+    //   for (
+    //     let columnIndex = this.props._columns.length - fixedRightCount;
+    //     columnIndex < this.props._columns.length;
+    //     columnIndex++
+    //   ) {
+    //     const styles = { ...this._getItemStyle(rowIndex, columnIndex) };
+    //     delete styles.left;
+    //     styles.right = totalWidth - this.props._columns[columnIndex].meta.offset
+    //     - this.props._columns[columnIndex].meta.size;
+    //     rightItems.push(
+    //       <div
+    //         key={rowIndex + ':' + columnIndex}
+    //         style={styles}
+    //       >
+    //         {rowIndex + ' , ' + columnIndex}
+    //       </div>
+    //     )
+    //   }
+    //   for (
+    //     let columnIndex = columnStartIndex;
+    //     columnIndex <= columnStopIndex;
+    //     columnIndex++
+    //   ) {
+    //     items.push(
+    //       <div
+    //         key={rowIndex + ':' + columnIndex}
+    //         style={this._getItemStyle(rowIndex, columnIndex)}
+    //       >
+    //         {rowIndex + ' , ' + columnIndex}
+
+
+    //       </div>
+    //       // createElement(this.props.children, {
+    //       //   rowIndex,
+    //       //   columnIndex,
+    //       //   // data: itemData,
+    //       //   // isScrolling: useIsScrolling ? isScrolling : undefined,
+    //       //   // key: itemKey({ columnIndex, rowIndex }),
+    //       //   key: rowIndex + ':' + columnIndex,
+    //       //   // itemKey({ columnIndex, rowIndex }),
+    //       //   style: this._getItemStyle(rowIndex, columnIndex),
+    //       // })
+    //     )
+
+    //   }
+    // }
+    // return {
+    //   topItems,
+    //   topLeftItems,
+    //   leftItems,
+    //   items,
+    //   rightItems,
+    //   bottomItems,
+    // };
+  })
+
   _getHorizontalRangeToRender = () => {
     const columnStartIndex = this.getColumnStartIndexForOffset(
       this.state.scrollLeft
@@ -737,16 +1087,27 @@ class WindowTable extends PureComponent {
 
     const [rowStartIndex, rowStopIndex] = this._getVerticalRangeToRender();
 
-    const items = this.items(rowStartIndex, rowStopIndex, columnStartIndex, columnStopIndex,
-      this.props.fixedTopCount,
-      this.props.fixedBottomCount,
-      this.props.fixedLeftCount,
-      this.props.fixedRightCount
-      );
+    // const items = this.items(rowStartIndex, rowStopIndex, columnStartIndex, columnStopIndex,
+    //   this.props.fixedTopCount,
+    //   this.props.fixedBottomCount,
+    //   this.props.fixedLeftCount,
+    //   this.props.fixedRightCount
+    //   );
+
+
+      const _items = this._items(
+        this.props._rows, rowStartIndex, rowStopIndex,
+        this.props._columns, columnStartIndex, columnStopIndex,
+        this.props.fixedTopCount,
+        this.props.fixedBottomCount,
+        this.props.fixedLeftCount,
+        this.props.fixedRightCount
+        );
 
 
     return template.call(this, {
       // variables
+      _items,
       unused_bottom: bottom,
       unused_center: center,
       columnStartIndex,
@@ -755,7 +1116,7 @@ class WindowTable extends PureComponent {
       contentHeight,
       contentWidth,
       unused_guidelineStyle: guidelineStyle,
-      items,
+      // unused_items: items,
       unused_left: left,
       overallHeight,
       overallWidth,

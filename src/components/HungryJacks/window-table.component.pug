@@ -5,7 +5,7 @@ div
   div
     h1 {columnStartIndex} ~ {columnStopIndex}
     h1 {rowStartIndex} ~ {rowStopIndex}
-    h2 {items.topLeftItems.length}
+    //- h2 {items.topLeftItems.length}
   div(className='{cx(styles.root, containerStyle)}',
     ref='{this.containerRef}')
     table(className='{styles.table}', border='{0}', cellPadding='{0}', cellSpacing='{0}', ref='{this.tableRef}')
@@ -18,27 +18,68 @@ div
               contentWidth='{overallWidth}',
               contentHeight='{overallHeight}',
               onScroll='{this.scrollTo}')
-                div(style='{{ position: "absolute", zIndex: 3, transform: "translate3d(0, 0, 0)" }}')
+                //- div(style='{{ position: "absolute", zIndex: 3, transform: "translate3d(0, 0, 0)" }}')
 
                   | {items.topLeftItems}
-                div(style='{{ position: "absolute", zIndex: 2, transform: "translate3d(" + (this.state.scrollLeft * -1) + "px, 0, 0)" }}')
+                //- div(style='{{ position: "absolute", zIndex: 2, transform: "translate3d(" + (this.state.scrollLeft * -1) + "px, 0, 0)" }}')
 
                   | {items.topItems}
-                div(style='{{ position: "absolute", zIndex: 2, bottom: 0, transform: "translate3d(" + (this.state.scrollLeft * -1) + "px, 0, 0)" }}')
+                //- div(style='{{ position: "absolute", zIndex: 2, bottom: 0, transform: "translate3d(" + (this.state.scrollLeft * -1) + "px, 0, 0)" }}')
 
                   | {items.bottomItems}
 
-                div(style='{{ position: "absolute", zIndex: 2, transform: "translate3d(0, " + (this.state.scrollTop * -1) + "px, 0)" }}')
+                //- div(style='{{ position: "absolute", zIndex: 2, transform: "translate3d(0, " + (this.state.scrollTop * -1) + "px, 0)" }}')
 
                   | {items.leftItems}
 
-                div(style='{{ position: "absolute", zIndex: 2, right: 0, transform: "translate3d(0, " + (this.state.scrollTop * -1) + "px, 0)" }}')
+                //- div(style='{{ position: "absolute", zIndex: 2, right: 0, transform: "translate3d(0, " + (this.state.scrollTop * -1) + "px, 0)" }}')
 
                   | {items.rightItems}
 
-                div(ref='{this.secRef}', style='{{ transform: "translate3d(" + (this.state.scrollLeft * -1) + "px, " + (this.state.scrollTop * -1) + "px, 0)" }}')
+                //- div(ref='{this.secRef}', style='{{ transform: "translate3d(" + (this.state.scrollLeft * -1) + "px, " + (this.state.scrollTop * -1) + "px, 0)" }}')
 
                   | {items.items}
+
+                div(ref='{this.secRef}', style='{{ transform: "translate3d(" + (this.state.scrollLeft * -1) + "px, " + (this.state.scrollTop * -1) + "px, 0)" }}')
+
+                  | {_items.middle_center}
+
+                div(style='{{ position: "absolute", zIndex: 2, transform: "translate3d(" + (this.state.scrollLeft * -1) + "px, 0, 0)" }}')
+
+                  //- | {items.topItems}
+                  | {_items.top_center}
+
+                div(style='{{ position: "absolute", zIndex: 2, transform: "translate3d(0, " + (this.state.scrollTop * -1) + "px, 0)" }}')
+
+                  | {_items.middle_left}
+
+                div(style='{{ position: "absolute", zIndex: 2, right: 0, transform: "translate3d(0, " + (this.state.scrollTop * -1) + "px, 0)" }}')
+
+                  | {_items.middle_right}
+
+                div(style='{{ position: "absolute", zIndex: 2, bottom: 0, transform: "translate3d(" + (this.state.scrollLeft * -1) + "px, 0, 0)" }}')
+
+                  | {_items.bottom_center}
+
+                div(style='{{ position: "absolute", zIndex: 3, transform: "translate3d(0, 0, 0)" }}')
+
+                  | {_items.top_left}
+
+                div(style='{{ position: "absolute", zIndex: 3, right: 0, transform: "translate3d(0, 0, 0)" }}')
+
+                  | {_items.top_right}
+
+                div(style='{{ position: "absolute", zIndex: 3, bottom: 0, transform: "translate3d(0, 0, 0)" }}')
+
+                  | {_items.bottom_left}
+
+                div(style='{{ position: "absolute", zIndex: 3, right: 0, bottom: 0, transform: "translate3d(0, 0, 0)" }}')
+
+                  | {_items.bottom_right}
+
+
+                
+
 
 
               //- div
