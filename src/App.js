@@ -3,7 +3,7 @@ import React, { Component } from 'react';
 // import logo from './logo.svg';
 import './App.css';
 import WindowTable from './components/WindowTable';
-import TmpTable from './components/TmpTable';
+import TmpTable from './components/HungryJacks';
 import Scrollarea from './components/Scrollarea';
 import sampleImg from './sample.png';
 import { columns, rows } from './examples/data/pokedex';
@@ -135,13 +135,13 @@ class App extends Component {
                   // headerStyle={headerStyle}
                   // cellStyle={cellStyle}
                   // rowHeight={rowHeight}
-                  columns={columns.slice(0, 15)} rows={rows.slice(0, 20000)} width={1000} height={516}
+                  columns={columns.slice(0, 100)} rows={rows.slice(0, 20000)} width={640} height={480}
                   rowHeight={50}
-                  columnWidth={200}
-                  fixedLeftCount={1} 
-                  fixedRightCount={1} 
-                  fixedTopCount={1} 
-                  fixedBottomCount={1} 
+                  columnWidth={80}
+                  fixedLeftCount={2} 
+                  fixedRightCount={2} 
+                  fixedTopCount={2} 
+                  fixedBottomCount={2} 
                   />
         {/* <table border={1} cellPadding={10}>
           <tbody>
