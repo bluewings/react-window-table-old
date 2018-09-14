@@ -1,8 +1,8 @@
 // @import .scss => styles
 div
   //- pre {JSON.stringify(this.props.cellClassNames, null, 2)}
-  pre {this.state.scrollTop}, {this.state.scrollLeft}
-  div
+  //- pre {this.props.maxScrollX}, {this.props.maxScrollY}
+  //- div
     h1 {columnStartIndex} ~ {columnStopIndex}
     h1 {rowStartIndex} ~ {rowStopIndex}
     //- pre {JSON.stringify(this.props.rows, null, 2)}
@@ -14,70 +14,37 @@ div
         tr
           td
             Scrollarea(width='{contentWidth}', height='{contentHeight}',
-              scrollTop='{this.state.scrollTop}'
-              scrollLeft='{this.state.scrollLeft}'
-              //- contentWidth='{overallWidth}',
-              //- contentHeight='{overallHeight}',
+              scrollTop='{scrollTop}'
+              scrollLeft='{scrollLeft}'
               contentWidth='{totalWidth}',
               contentHeight='{totalHeight}',
               onScroll='{this.scrollTo}')
-                //- div(style='{{ position: "absolute", zIndex: 3, transform: "translate3d(0, 0, 0)" }}')
 
-                  | {items.topLeftItems}
-                //- div(style='{{ position: "absolute", zIndex: 2, transform: "translate3d(" + (this.state.scrollLeft * -1) + "px, 0, 0)" }}')
+                //- scroll-y, scroll-x
+                div(ref='{this.secRef}', style='{{ transform: "translate3d(" + (scrollLeft * -1) + "px, " + (scrollTop * -1) + "px, 0)" }}')
+                  | {items.middle_center}
 
-                  | {items.topItems}
-                //- div(style='{{ position: "absolute", zIndex: 2, bottom: 0, transform: "translate3d(" + (this.state.scrollLeft * -1) + "px, 0, 0)" }}')
+                //- scroll-x
+                div(style='{{ position: "absolute", zIndex: 2, transform: "translate3d(" + (scrollLeft * -1) + "px, 0, 0)" }}')
+                  | {items.top_center}
+                div(style='{{ position: "absolute", zIndex: 2, bottom: 0, transform: "translate3d(" + (scrollLeft * -1) + "px, 0, 0)" }}')
+                  | {items.bottom_center}
 
-                  | {items.bottomItems}
+                //- scroll-x
+                div(style='{{ position: "absolute", zIndex: 2, transform: "translate3d(0, " + (scrollTop * -1) + "px, 0)" }}')
+                  | {items.middle_left}
+                div(style='{{ position: "absolute", zIndex: 2, right: 0, transform: "translate3d(0, " + (scrollTop * -1) + "px, 0)" }}')
+                  | {items.middle_right}
 
-                //- div(style='{{ position: "absolute", zIndex: 2, transform: "translate3d(0, " + (this.state.scrollTop * -1) + "px, 0)" }}')
-
-                  | {items.leftItems}
-
-                //- div(style='{{ position: "absolute", zIndex: 2, right: 0, transform: "translate3d(0, " + (this.state.scrollTop * -1) + "px, 0)" }}')
-
-                  | {items.rightItems}
-
-                //- div(ref='{this.secRef}', style='{{ transform: "translate3d(" + (this.state.scrollLeft * -1) + "px, " + (this.state.scrollTop * -1) + "px, 0)" }}')
-
-                  | {items.items}
-
-                div(ref='{this.secRef}', style='{{ transform: "translate3d(" + (this.state.scrollLeft * -1) + "px, " + (this.state.scrollTop * -1) + "px, 0)" }}')
-
-                  | {_items.middle_center}
-
-                div(style='{{ position: "absolute", zIndex: 2, transform: "translate3d(" + (this.state.scrollLeft * -1) + "px, 0, 0)" }}')
-
-                  | {_items.top_center}
-
-                div(style='{{ position: "absolute", zIndex: 2, transform: "translate3d(0, " + (this.state.scrollTop * -1) + "px, 0)" }}')
-
-                  | {_items.middle_left}
-
-                div(style='{{ position: "absolute", zIndex: 2, right: 0, transform: "translate3d(0, " + (this.state.scrollTop * -1) + "px, 0)" }}')
-
-                  | {_items.middle_right}
-
-                div(style='{{ position: "absolute", zIndex: 2, bottom: 0, transform: "translate3d(" + (this.state.scrollLeft * -1) + "px, 0, 0)" }}')
-
-                  | {_items.bottom_center}
-
+                //- scroll-none
                 div(style='{{ position: "absolute", zIndex: 3, transform: "translate3d(0, 0, 0)" }}')
-
-                  | {_items.top_left}
-
+                  | {items.top_left}
                 div(style='{{ position: "absolute", zIndex: 3, right: 0, transform: "translate3d(0, 0, 0)" }}')
-
-                  | {_items.top_right}
-
+                  | {items.top_right}
                 div(style='{{ position: "absolute", zIndex: 3, bottom: 0, transform: "translate3d(0, 0, 0)" }}')
-
-                  | {_items.bottom_left}
-
+                  | {items.bottom_left}
                 div(style='{{ position: "absolute", zIndex: 3, right: 0, bottom: 0, transform: "translate3d(0, 0, 0)" }}')
-
-                  | {_items.bottom_right}
+                  | {items.bottom_right}
 
 
                 
@@ -121,7 +88,7 @@ div
               axis='y',
               ref='{this.scrollbarRef.y}',
               scrollbarLength='{contentHeight}',
-              scrollLength='{overallHeight}',
+              scrollLength='{totalHeight}',
               scrollbarWidth='{scrollbarWidth}',
               onScroll='{this.scrollTo}',
               trackStyle='{scrollbarTrackStyle}',
@@ -133,7 +100,7 @@ div
               axis='x',
               ref='{this.scrollbarRef.x}',
               scrollbarLength='{contentWidth}',
-              scrollLength='{overallWidth}',
+              scrollLength='{totalWidth}',
               scrollbarWidth='{scrollbarWidth}',
               onScroll='{this.scrollTo}',
               trackStyle='{scrollbarTrackStyle}',

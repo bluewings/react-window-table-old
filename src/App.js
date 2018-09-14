@@ -117,7 +117,7 @@ const headerStyle = base => {
   };
 };
 
-const rowHeight = index => {
+const rowHeight_ = index => {
   // console.log(index, index % 3, 40 + (index % 3) * 10)
   return 40 + (index % 3) * 10;
 };
@@ -132,6 +132,13 @@ class ItemRenderer extends PureComponent {
   }
 }
 
+const columnWidth = index => {
+  return 60 + (index % 3) * 20;
+};
+
+const rowHeight = index => {
+  return 20 + (index % 3) * 10;
+};
 class App extends Component {
   render() {
     return (
@@ -150,14 +157,14 @@ class App extends Component {
           // columns={columns.slice(0, 100)} rows={rows.slice(0, 20000)}
 
           width={640}
-          height={480}
-          columnCount={100}
+          height={380}
+          columnCount={50}
           rowCount={100}
-          rowHeight={80}
-          columnWidth={80}
-          fixedLeftCount={2}
+          rowHeight={rowHeight_}
+          columnWidth={columnWidth}
+          fixedLeftCount={1}
           fixedRightCount={1}
-          fixedTopCount={2}
+          fixedTopCount={1}
           fixedBottomCount={1}
         >
           {ItemRenderer}
