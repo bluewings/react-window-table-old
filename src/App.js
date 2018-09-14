@@ -50,14 +50,14 @@ import { columns, rows } from './examples/data/pokedex';
 
 // columns[3].textAlign = 'center';
 
-const scrollbarTrackStyle = (base) => {
+const scrollbarTrackStyle = base => {
   return {
     ...base,
     background: 'yellow',
-  }
-}
+  };
+};
 
-const scrollbarHandleStyle = (base) => {
+const scrollbarHandleStyle = base => {
   return {
     ...base,
     background: 'transparent',
@@ -68,7 +68,7 @@ const scrollbarHandleStyle = (base) => {
       width: base.width - 6,
       height: base.height - 6,
       margin: 3,
-      borderRadius: ((base.height - 6) / 2) + 'px',
+      borderRadius: (base.height - 6) / 2 + 'px',
       // background: 'red',
       transition: 'background 0.1s',
       // background: 'rgba(204,204,204,0.4)',
@@ -79,8 +79,8 @@ const scrollbarHandleStyle = (base) => {
         // background: 'blue',
         // background: 'rgba(204,204,204,0.8)',
         background: 'rgba(0,0,0,0.5)',
-        // boxShadow: 'inset 0 0 6px rgba(0,0,0,0.5)', 
-      }
+        // boxShadow: 'inset 0 0 6px rgba(0,0,0,0.5)',
+      },
     },
     '&.dragging > div': {
       // background: 'blue',
@@ -88,10 +88,10 @@ const scrollbarHandleStyle = (base) => {
       background: 'rgba(0,0,0,0.5)',
       // boxShadow: 'inset 0 0 6px rgba(0,0,0,0.5)',
     },
-  }
-}
+  };
+};
 
-const guidelineStyle = (base) => {
+const guidelineStyle = base => {
   return {
     ...base,
     width: 1,
@@ -99,28 +99,28 @@ const guidelineStyle = (base) => {
     background: 'black',
     opacity: '1 !important',
     // zIndex: 1,
-  }
-}
+  };
+};
 
-const cellStyle = (base) => {
+const cellStyle = base => {
   return {
     ...base,
-    borderBottom: '1px solid silver'
-  }
-}
+    borderBottom: '1px solid silver',
+  };
+};
 
-const headerStyle = (base) => {
+const headerStyle = base => {
   return {
     ...base,
     background: '#e8e8e8',
     // borderBottom: '1px solid silver'
-  }
-}
+  };
+};
 
-const rowHeight = (index) => {
+const rowHeight = index => {
   // console.log(index, index % 3, 40 + (index % 3) * 10)
   return 40 + (index % 3) * 10;
-}
+};
 
 class ItemRenderer extends PureComponent {
   render() {
@@ -139,35 +139,34 @@ class App extends Component {
         {/* <Scrollarea contentHeight={1000}>
           <img src={sampleImg} />
         </Scrollarea> */}
-                <TmpTable
-                  // scrollbarTrackStyle={scrollbarTrackStyle}
-                  // scrollbarHandleStyle={scrollbarHandleStyle}
-                  // guidelineStyle={guidelineStyle}
-                  // headerStyle={headerStyle}
-                  // cellStyle={cellStyle}
-                  // rowHeight={rowHeight}
-                  
-                  
-                  // columns={columns.slice(0, 100)} rows={rows.slice(0, 20000)}
-                  
-                  width={640} height={480}
-                  columnCount={100}
-                  rowCount={100}
+        <TmpTable
+          // scrollbarTrackStyle={scrollbarTrackStyle}
+          // scrollbarHandleStyle={scrollbarHandleStyle}
+          // guidelineStyle={guidelineStyle}
+          // headerStyle={headerStyle}
+          // cellStyle={cellStyle}
+          // rowHeight={rowHeight}
 
-                  rowHeight={80}
-                  columnWidth={80}
-                  fixedLeftCount={2} 
-                  fixedRightCount={2} 
-                  fixedTopCount={2} 
-                  fixedBottomCount={2} 
-                >
-                  {ItemRenderer}
-                  {/* {({ columnIndex, rowIndex, style }) => (
+          // columns={columns.slice(0, 100)} rows={rows.slice(0, 20000)}
+
+          width={640}
+          height={480}
+          columnCount={100}
+          rowCount={100}
+          rowHeight={80}
+          columnWidth={80}
+          fixedLeftCount={2}
+          fixedRightCount={2}
+          fixedTopCount={2}
+          fixedBottomCount={2}
+        >
+          {ItemRenderer}
+          {/* {({ columnIndex, rowIndex, style }) => (
                     <div style={style}>
                       {rowIndex} , {columnIndex}
                     </div>
                   )} */}
-                </TmpTable>
+        </TmpTable>
         {/* <table border={1} cellPadding={10}>
           <tbody>
             <tr>
@@ -197,8 +196,7 @@ class App extends Component {
             </tr>
           </tbody>
         </table> */}
-        
-        
+
         {/* <header className="App-header">
           <img src={logo} className="App-logo" alt="logo" />
           <h1 className="App-title">Welcome to React</h1>

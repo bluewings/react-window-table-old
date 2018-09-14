@@ -58,10 +58,8 @@ const cellStyle = ({ classNames, customStyleFn }) => {
       [`&.${classNames.verticalLast}`]: {
         borderBottom: 'none',
       },
-
     },
     [`&.${classNames.evenRow}`]: {
-
       // background: 'lightyellow',
       // background: '#f0f0f0',
     },
