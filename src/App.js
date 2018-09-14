@@ -1,9 +1,10 @@
 /* eslint-disable */
-import React, { Component } from 'react';
+import React, { Component, PureComponent } from 'react';
 // import logo from './logo.svg';
 import './App.css';
 import WindowTable from './components/WindowTable';
-import TmpTable from './components/HungryJacks';
+// import TmpTable from './components/HungryJacks';
+import TmpTable from './components/WithColumns';
 import Scrollarea from './components/Scrollarea';
 import sampleImg from './sample.png';
 import { columns, rows } from './examples/data/pokedex';
@@ -121,6 +122,16 @@ const rowHeight = (index) => {
   return 40 + (index % 3) * 10;
 }
 
+class ItemRenderer extends PureComponent {
+  render() {
+    return (
+      <div style={this.props.style}>
+        {this.props.rowIndex} , {this.props.columnIndex}
+      </div>
+    );
+  }
+}
+
 class App extends Component {
   render() {
     return (
@@ -135,19 +146,27 @@ class App extends Component {
                   // headerStyle={headerStyle}
                   // cellStyle={cellStyle}
                   // rowHeight={rowHeight}
-                  columns={columns.slice(0, 100)} rows={rows.slice(0, 20000)} width={640} height={480}
-                  rowHeight={50}
+                  
+                  
+                  // columns={columns.slice(0, 100)} rows={rows.slice(0, 20000)}
+                  
+                  width={640} height={480}
+                  columnCount={100}
+                  rowCount={100}
+
+                  rowHeight={80}
                   columnWidth={80}
                   fixedLeftCount={2} 
                   fixedRightCount={2} 
                   fixedTopCount={2} 
                   fixedBottomCount={2} 
                 >
-                  {({ columnIndex, rowIndex, style }) => (
+                  {ItemRenderer}
+                  {/* {({ columnIndex, rowIndex, style }) => (
                     <div style={style}>
                       {rowIndex} , {columnIndex}
                     </div>
-                  )}
+                  )} */}
                 </TmpTable>
         {/* <table border={1} cellPadding={10}>
           <tbody>

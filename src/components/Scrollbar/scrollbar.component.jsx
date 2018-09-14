@@ -5,7 +5,7 @@ import memoize from 'memoize-one';
 import { css } from 'emotion';
 import { compose, defaultProps, withPropsOnChange } from 'recompose';
 import Draggable from 'react-draggable';
-import forwardRef from '../../hoc/forward-ref.hoc';
+import forwardRef from '../../hocs/forward-ref.hoc';
 import { scrollbarTrackStyle, scrollbarHandleStyle, defaultScrollbarClassNames } from '../../styles';
 
 import template from './scrollbar.component.pug';

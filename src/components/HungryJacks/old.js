@@ -521,16 +521,6 @@ const enhance = compose(
   //     .map(column => (typeof column === 'string' ? { name: column } : { ...column }))
   //     .filter(column => column.name),
   // })),
-  withPropsOnChange(['columnWidth'], ({ columnWidth }) => {
-    console.log(columnWidth);
-  }),
-
-  withPropsOnChange(['columnCount', 'columnWidth'], ({ columnWidth }) => {
-
-    const itemMetadataMap = {};
-
-    console.log(columnWidth);
-  }),
 
   withPropsOnChange(['columns'], ({ columns, columnWidth }) => {
     let offset = 0;
