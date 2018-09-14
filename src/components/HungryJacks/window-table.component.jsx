@@ -77,36 +77,56 @@ class WindowTable extends PureComponent {
     this.secRef = React.createRef();
   }
 
-  componentWillUnmount() {
-    if (this._resetIsScrollingTimeoutId !== null) {
-      clearTimeout(this._resetIsScrollingTimeoutId);
+  componentDidUpdate(prevProps, prevState) {
+    const { scrollTop, scrollLeft } = this.state;
+
+    if (
+      prevState.scrollTop !== scrollTop ||
+      prevState.scrollLeft !== scrollLeft
+    ) {
+      // cancelAnimationFrame(this.animFrame);
+      // this.animFrame = requestAnimationFrame(() => {
+        // Object.keys(this.gridRef)
+        //   .filter(key => this.gridRef[key].current)
+        //   .forEach(key => this.gridRef[key].current.scrollTo(this.state));
+        if (this.scrollbarRef.x.current) {
+          this.scrollbarRef.x.current.scrollTo(this.state);
+        }
+        if (this.scrollbarRef.y.current) {
+          this.scrollbarRef.y.current.scrollTo(this.state);
+        }
+        // Object.keys(this.guidelineRef)
+        //   .filter(key => this.guidelineRef[key].current)
+        //   .forEach(key => this.guidelineRef[key].current.update(this.state));
+      // });
     }
   }
 
-  _resetIsScrollingDebounced = () => {
-    if (this._resetIsScrollingTimeoutId !== null) {
-      clearTimeout(this._resetIsScrollingTimeoutId);
+  componentWillUnmount() {
+    if (this.resetIsScrollingTimeoutId !== null) {
+      clearTimeout(this.resetIsScrollingTimeoutId);
+    }
+  }
+
+  resetIsScrollingDebounced = () => {
+    if (this.resetIsScrollingTimeoutId !== null) {
+      clearTimeout(this.resetIsScrollingTimeoutId);
     }
 
-    this._resetIsScrollingTimeoutId = setTimeout(
-      this._resetIsScrolling,
-      IS_SCROLLING_DEBOUNCE_INTERVAL
+    this.resetIsScrollingTimeoutId = setTimeout(
+      this.resetIsScrolling,
+      IS_SCROLLING_DEBOUNCE_INTERVAL,
     );
   };
 
-  _resetIsScrolling = () => {
-    this._resetIsScrollingTimeoutId = null;
-    this._getItemListCache(-1);
-    this.setState({ isScrolling: false }, () => {
-      // Clear style cache after state update has been committed.
-      // This way we don't break pure sCU for items that don't use isScrolling param.
-      // this._getItemStyleCache(-1);
-      // this._getItemListCache(-1);
-    });
+  resetIsScrolling = () => {
+    this.resetIsScrollingTimeoutId = null;
+    this.itemCache(-1);
+    this.setState(prevState => ({ ...prevState, isScrolling: false }));
   };
 
   getItemCount = itemType =>
-    itemType === 'row' ? this.props.rowCount : this.props.columnCount;
+    (itemType === 'row' ? this.props.rowCount : this.props.columnCount);
 
   getStartIndexForOffset = (itemType, offset) => {
     const { fixedTopCount, fixedLeftCount, getItemMetadata } = this.props;
@@ -180,7 +200,7 @@ class WindowTable extends PureComponent {
     return low > 0 ? low - 1 : 0;
   };
 
-  _getItemListCache = memoizeOne((_, __) => ({}));
+  itemCache = memoizeOne((_, __) => ({}));
 
   _getItemStyleCache = memoizeOne((_, __) => ({}));
 
@@ -206,8 +226,8 @@ class WindowTable extends PureComponent {
         width,
         background:
           (rowIndex + columnIndex) % 2 === 0
-            ? 'rgba(0,0,0,.05)'
-            : 'rgba(0,0,0,.1',
+            ? '#fff' // 'rgba(0,0,0,.05)'
+            : '#eee', // 'rgba(0,0,0,.1',
       };
     }
     return itemStyleCache[key];
@@ -222,14 +242,17 @@ class WindowTable extends PureComponent {
       this.state.scrollTop !== scrollTop ||
       this.state.scrollLeft !== scrollLeft
     ) {
-      this.setState(prevState => ({
-        ...prevState,
-        isScrolling: true,
-        scrollTop: _scrollTop,
-        scrollLeft: _scrollLeft,
-        scrollY: _scrollTop / this.props.maxScrollY,
-        scrollX: _scrollLeft / this.props.maxScrollX,
-      }), this._resetIsScrollingDebounced);
+      this.setState(
+        prevState => ({
+          ...prevState,
+          isScrolling: true,
+          scrollTop: _scrollTop,
+          scrollLeft: _scrollLeft,
+          scrollY: _scrollTop / this.props.maxScrollY,
+          scrollX: _scrollLeft / this.props.maxScrollX,
+        }),
+        this.resetIsScrollingDebounced,
+      );
     }
   };
 
@@ -244,115 +267,107 @@ class WindowTable extends PureComponent {
     return css({ ...styleObj });
   });
 
-  items = memoizeOne(
-    (
-      totalHeight,
-      totalWidth,
-      rowCount,
-      rowStartIndex,
-      rowStopIndex,
-      columnCount,
-      columnStartIndex,
-      columnStopIndex,
-      fixedTopCount,
-      fixedBottomCount,
-      fixedLeftCount,
-      fixedRightCount,
-      isScrolling,
-    ) => {
+  itemStyle = (type, rowIndex, columnIndex, totalHeight, totalWidth) => {
+    const styles = this._getItemStyle(rowIndex, columnIndex);
+    const _row = this.props.getItemMetadata('row', rowIndex);
+    const _column = this.props.getItemMetadata('column', columnIndex);
+    // this.props.getItemMetadata('column', columnIndex),
 
-      const ranges = {
-        row: [
-          ['top', 0, fixedTopCount],
-          ['middle', rowStartIndex, rowStopIndex + 1],
-          ['bottom', rowCount - fixedBottomCount, rowCount],
-        ],
-        column: [
-          ['left', 0, fixedLeftCount],
-          ['center', columnStartIndex, columnStopIndex + 1],
-          ['right', columnCount - fixedRightCount, columnCount],
-        ]
+    switch (type) {
+      case 'top_right':
+      case 'middle_right': {
+        const newStyle = { ...styles };
+        delete newStyle.left;
+        newStyle.right = totalWidth - _column.offset - _column.size;
+        return newStyle;
       }
-      // const ranges.;
+      case 'bottom_left':
+      case 'bottom_center': {
+        const newStyle = { ...styles };
+        delete newStyle.top;
+        newStyle.bottom = totalHeight - _row.offset - _row.size;
+        return newStyle;
+      }
 
-      // const ranges.column = [
-      //   ['left', 0, fixedLeftCount],
-      //   ['center', columnStartIndex, columnStopIndex + 1],
-      //   ['right', columnCount - fixedRightCount, columnCount],
-      // ];
+      case 'bottom_right': {
+        const newStyle = { ...styles };
+        delete newStyle.top;
+        newStyle.bottom = totalHeight - _row.offset - _row.size;
+        delete newStyle.left;
+        newStyle.right = totalWidth - _column.offset - _column.size;
+        return newStyle;
+      }
+    }
+    return styles;
+  };
 
-      const _rslt = {};
+  items = memoizeOne((
+    totalHeight,
+    totalWidth,
+    rowCount,
+    rowStartIndex,
+    rowStopIndex,
+    columnCount,
+    columnStartIndex,
+    columnStopIndex,
+    fixedTopCount,
+    fixedBottomCount,
+    fixedLeftCount,
+    fixedRightCount,
+    isScrolling,
+  ) => {
+    const rowRanges = [
+      ['top', 0, fixedTopCount],
+      ['middle', rowStartIndex, rowStopIndex + 1],
+      ['bottom', rowCount - fixedBottomCount, rowCount],
+    ];
+    const columnRanges = [
+      ['left', 0, fixedLeftCount],
+      ['center', columnStartIndex, columnStopIndex + 1],
+      ['right', columnCount - fixedRightCount, columnCount],
+    ];
 
-      const listStyleCache = this._getItemListCache(0, 0);
+    const items = {};
 
-      const fixStyle = (type, styles, _row, _column) => {
-        switch (type) {
-          case 'top_right':
-          case 'middle_right': {
-            const newStyle = { ...styles };
-            delete newStyle.left;
-            newStyle.right = totalWidth - _column.offset - _column.size;
-            return newStyle;
-          }
-          case 'bottom_left':
-          case 'bottom_center': {
-            const newStyle = { ...styles };
-            delete newStyle.top;
-            newStyle.bottom = totalHeight - _row.offset - _row.size;
-            return newStyle;
-          }
+    const itemCache = this.itemCache(0, 0);
 
-          case 'bottom_right': {
-            const newStyle = { ...styles };
-            delete newStyle.top;
-            newStyle.bottom = totalHeight - _row.offset - _row.size;
-            delete newStyle.left;
-            newStyle.right = totalWidth - _column.offset - _column.size;
-            return newStyle;
+    rowRanges.forEach(([rType, rowFr, rowTo]) => {
+      columnRanges.forEach(([cType, colFr, colTo]) => {
+        const section = `${rType}_${cType}`;
+        const rangeKey = `${rowFr}_${rowTo}_${colFr}_${colTo}`;
+
+        if (itemCache[section] && itemCache[section][0] === rangeKey) {
+          items[section] = itemCache[section][1];
+
+          return;
+        }
+
+        items[section] = [];
+
+        for (let rowIndex = rowFr; rowIndex < rowTo; rowIndex++) {
+          for (let columnIndex = colFr; columnIndex < colTo; columnIndex++) {
+            items[section].push(createElement(this.props.children, {
+              columnIndex,
+              isScrolling,
+              key: `${rowIndex}_${columnIndex}`,
+              rowIndex,
+              style: this.itemStyle(
+                section,
+                rowIndex,
+                columnIndex,
+                totalHeight,
+                totalWidth,
+              ),
+            }));
           }
         }
-        return styles;
-      };
 
-      ranges.row.forEach(([rType, rowFr, rowTo]) => {
-        ranges.column.forEach(([cType, colFr, colTo]) => {
-          const key = `${rType}_${cType}`;
-          const _key = `${rowFr}:${rowTo}:${colFr}:${colTo}`;
-
-          if (listStyleCache[key] && listStyleCache[key][0] === _key) {
-            _rslt[key] = listStyleCache[key][1];
-
-            return;
-          }
-
-          _rslt[key] = [];
-
-          for (let rowIndex = rowFr; rowIndex < rowTo; rowIndex++) {
-            for (let columnIndex = colFr; columnIndex < colTo; columnIndex++) {
-              _rslt[key].push(
-                createElement(this.props.children, {
-                  columnIndex,
-                  isScrolling,
-                  key: `${rowIndex}:${columnIndex}`,
-                  rowIndex,
-                  style: fixStyle(
-                    key,
-                    this._getItemStyle(rowIndex, columnIndex),
-                    this.props.getItemMetadata('row', rowIndex),
-                    this.props.getItemMetadata('column', columnIndex),
-                  ),
-                }),
-              );
-            }
-          }
-
-          listStyleCache[key] = [_key, _rslt[key]];
-        });
+        itemCache[section] = [rangeKey, items[section]];
       });
+    });
 
-      return _rslt;
-    },
-  );
+    return items;
+  });
 
   render() {
     const {
@@ -541,7 +556,9 @@ const enhance = compose(
 
   withPropsOnChange(
     ['columnMetadataMap', 'rowMetadataMap'],
-    ({ columnMetadataMap, rowMetadataMap, columnCount, rowCount }) => ({
+    ({
+      columnMetadataMap, rowMetadataMap, columnCount, rowCount,
+    }) => ({
       getItemMetadata: (itemType, itemIndex) =>
         (itemType === 'column' ? columnMetadataMap : rowMetadataMap)[itemIndex],
       _getSize: (itemType, count) => {
@@ -657,9 +674,9 @@ const enhance = compose(
       contentWidth,
       contentHeight,
       columnCount,
-      
+
       rowCount,
-      
+
       fixedTopCount: topCount,
       fixedBottomCount: bottomCount,
       fixedLeftCount,
@@ -675,16 +692,16 @@ const enhance = compose(
         rightCount = 0;
       }
 
-      const center = {
-        width:
-          contentWidth -
-          _getSize('column', leftCount) -
-          _getSize('column', rightCount * -1),
-        height:
-          contentHeight -
-          _getSize('row', topCount) -
-          _getSize('row', bottomCount * -1),
-      };
+      // const center = {
+      //   // width:
+      //   //   contentWidth -
+      //   //   _getSize('column', leftCount) -
+      //   //   _getSize('column', rightCount * -1),
+      //   height:
+      //     contentHeight -
+      //     _getSize('row', topCount) -
+      //     _getSize('row', bottomCount * -1),
+      // };
 
       return {
         topCount,
@@ -695,12 +712,19 @@ const enhance = compose(
         _maxScrollX: Math.max(
           0,
           getSize('column', leftCount, columnCount - leftCount - rightCount) -
-            center.width,
+            // center.width,
+
+            (contentWidth -
+              _getSize('column', leftCount) -
+              _getSize('column', rightCount * -1)),
         ),
         maxScrollY: Math.max(
           0,
           getSize('row', topCount, rowCount - topCount - bottomCount) -
-            center.height,
+            // center.height,
+            (contentHeight -
+              _getSize('row', topCount) -
+              _getSize('row', bottomCount * -1)),
         ),
       };
     },

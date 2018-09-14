@@ -127,9 +127,9 @@ class ItemRenderer extends PureComponent {
     const { isScrolling } = this.props;
     return (
       <div style={this.props.style}>
-        {isScrolling ? 'scrolling' :
-        this.props.rowIndex + ' , ' + this.props.columnIndex
-        }
+        {isScrolling
+          ? 'scrolling'
+          : this.props.rowIndex + ' , ' + this.props.columnIndex}
         {/* {this.props.rowIndex} , {this.props.columnIndex} */}
       </div>
     );
