@@ -67,8 +67,8 @@ class WindowTable extends PureComponent {
       isScrolling: false,
       scrollTop: props.scrollTop || 0,
       scrollLeft: props.scrollLeft || 0,
-      scrollX: props.scrollLeft / props.maxScrollX,
-      scrollY: props.scrollTop / props.maxScrollY,
+      // scrollX: props.scrollLeft / props.maxScrollX,
+      // scrollY: props.scrollTop / props.maxScrollY,
     };
 
     this.tableRef = React.createRef();
@@ -142,7 +142,7 @@ class WindowTable extends PureComponent {
       fixedBottomCount,
       fixedRightCount,
       getItemMetadata,
-      _getSize,
+      getSize,
     } = this.props;
 
     let maxOffset =
@@ -150,7 +150,7 @@ class WindowTable extends PureComponent {
     const postfixCount =
       itemType === 'row' ? fixedBottomCount : fixedRightCount;
     if (postfixCount > 0) {
-      maxOffset -= _getSize(itemType, postfixCount * -1);
+      maxOffset -= getSize(itemType, postfixCount * -1);
     }
 
     const itemMetadata = getItemMetadata(itemType, startIndex);
@@ -248,8 +248,8 @@ class WindowTable extends PureComponent {
           isScrolling: true,
           scrollTop: _scrollTop,
           scrollLeft: _scrollLeft,
-          scrollY: _scrollTop / this.props.maxScrollY,
-          scrollX: _scrollLeft / this.props.maxScrollX,
+          // scrollY: _scrollTop / this.props.maxScrollY,
+          // scrollX: _scrollLeft / this.props.maxScrollX,
         }),
         this.resetIsScrollingDebounced,
       );
@@ -443,8 +443,8 @@ class WindowTable extends PureComponent {
 WindowTable.propTypes = {
   scrollTop: PropTypes.number,
   scrollLeft: PropTypes.number,
-  maxScrollY: PropTypes.number,
-  maxScrollX: PropTypes.number,
+  // maxScrollY: PropTypes.number,
+  // maxScrollX: PropTypes.number,
 
   cellStyle: PropTypes.string,
 
@@ -473,8 +473,8 @@ WindowTable.propTypes = {
 WindowTable.defaultProps = {
   scrollTop: 0,
   scrollLeft: 0,
-  maxScrollY: 1,
-  maxScrollX: 1,
+  // maxScrollY: 1,
+  // maxScrollX: 1,
 
   cellStyle: undefined,
   containerStyle: undefined,
@@ -561,7 +561,7 @@ const enhance = compose(
     }) => ({
       getItemMetadata: (itemType, itemIndex) =>
         (itemType === 'column' ? columnMetadataMap : rowMetadataMap)[itemIndex],
-      _getSize: (itemType, count) => {
+      getSize: (itemType, count) => {
         const itemMetadataMap =
           itemType === 'column' ? columnMetadataMap : rowMetadataMap;
         const itemCount = itemType === 'column' ? columnCount : rowCount;
@@ -581,19 +581,19 @@ const enhance = compose(
         }
         return size;
       },
-      getSize: (itemType, startIndex, stopIndex) => {
-        const itemMetadataMap =
-          itemType === 'column' ? columnMetadataMap : rowMetadataMap;
-        let size = 0;
-        for (
-          let itemIndex = startIndex;
-          itemIndex < stopIndex + 1;
-          itemIndex += 1
-        ) {
-          size += itemMetadataMap[itemIndex].size;
-        }
-        return size;
-      },
+      // getSize: (itemType, startIndex, stopIndex) => {
+      //   const itemMetadataMap =
+      //     itemType === 'column' ? columnMetadataMap : rowMetadataMap;
+      //   let size = 0;
+      //   for (
+      //     let itemIndex = startIndex;
+      //     itemIndex < stopIndex + 1;
+      //     itemIndex += 1
+      //   ) {
+      //     size += itemMetadataMap[itemIndex].size;
+      //   }
+      //   return size;
+      // },
     }),
   ),
 
@@ -682,7 +682,7 @@ const enhance = compose(
       fixedLeftCount,
       fixedRightCount,
       getSize,
-      _getSize,
+      // getSize,
     }) => {
       let leftCount = fixedLeftCount;
       let rightCount = fixedRightCount;
@@ -695,12 +695,12 @@ const enhance = compose(
       // const center = {
       //   // width:
       //   //   contentWidth -
-      //   //   _getSize('column', leftCount) -
-      //   //   _getSize('column', rightCount * -1),
+      //   //   getSize('column', leftCount) -
+      //   //   getSize('column', rightCount * -1),
       //   height:
       //     contentHeight -
-      //     _getSize('row', topCount) -
-      //     _getSize('row', bottomCount * -1),
+      //     getSize('row', topCount) -
+      //     getSize('row', bottomCount * -1),
       // };
 
       return {
@@ -708,24 +708,25 @@ const enhance = compose(
         bottomCount,
         leftCount,
         rightCount,
-        maxScrollX: 0,
-        _maxScrollX: Math.max(
-          0,
-          getSize('column', leftCount, columnCount - leftCount - rightCount) -
-            // center.width,
+        // maxScrollX: 0,
+        // _maxScrollX: Math.max(
+        //   0,
+        //   getSize('column', leftCount, columnCount - leftCount - rightCount) -
+        //     // center.width,
 
-            (contentWidth -
-              _getSize('column', leftCount) -
-              _getSize('column', rightCount * -1)),
-        ),
-        maxScrollY: Math.max(
-          0,
-          getSize('row', topCount, rowCount - topCount - bottomCount) -
-            // center.height,
-            (contentHeight -
-              _getSize('row', topCount) -
-              _getSize('row', bottomCount * -1)),
-        ),
+        //     (contentWidth -
+        //       getSize('column', leftCount) -
+        //       getSize('column', rightCount * -1)),
+        // ),
+        // maxScrollY: 0,
+        // _maxScrollY: Math.max(
+        //   0,
+        //   getSize('row', topCount, rowCount - topCount - bottomCount) -
+        //     // center.height,
+        //     (contentHeight -
+        //       getSize('row', topCount) -
+        //       getSize('row', bottomCount * -1)),
+        // ),
       };
     },
   ),
