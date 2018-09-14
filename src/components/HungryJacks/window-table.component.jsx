@@ -1,9 +1,12 @@
 /* eslint-disable
-  react/no-unused-state,
   no-underscore-dangle,
-  react/forbid-prop-types,
+
+  react/prop-types,
+  react/no-unused-prop-types,
+  no-prototype-builtins,
+  no-unused-vars,
 */
-/* eslint-disable */
+/* eslint-disabl */
 import React, { PureComponent, createElement } from 'react';
 import PropTypes from 'prop-types';
 import { compose, defaultProps, withPropsOnChange } from 'recompose';
@@ -86,18 +89,18 @@ class WindowTable extends PureComponent {
     ) {
       // cancelAnimationFrame(this.animFrame);
       // this.animFrame = requestAnimationFrame(() => {
-        // Object.keys(this.gridRef)
-        //   .filter(key => this.gridRef[key].current)
-        //   .forEach(key => this.gridRef[key].current.scrollTo(this.state));
-        if (this.scrollbarRef.x.current) {
-          this.scrollbarRef.x.current.scrollTo(this.state);
-        }
-        if (this.scrollbarRef.y.current) {
-          this.scrollbarRef.y.current.scrollTo(this.state);
-        }
-        // Object.keys(this.guidelineRef)
-        //   .filter(key => this.guidelineRef[key].current)
-        //   .forEach(key => this.guidelineRef[key].current.update(this.state));
+      // Object.keys(this.gridRef)
+      //   .filter(key => this.gridRef[key].current)
+      //   .forEach(key => this.gridRef[key].current.scrollTo(this.state));
+      if (this.scrollbarRef.x.current) {
+        this.scrollbarRef.x.current.scrollTo(this.state);
+      }
+      if (this.scrollbarRef.y.current) {
+        this.scrollbarRef.y.current.scrollTo(this.state);
+      }
+      // Object.keys(this.guidelineRef)
+      //   .filter(key => this.guidelineRef[key].current)
+      //   .forEach(key => this.guidelineRef[key].current.update(this.state));
       // });
     }
   }
@@ -107,23 +110,6 @@ class WindowTable extends PureComponent {
       clearTimeout(this.resetIsScrollingTimeoutId);
     }
   }
-
-  resetIsScrollingDebounced = () => {
-    if (this.resetIsScrollingTimeoutId !== null) {
-      clearTimeout(this.resetIsScrollingTimeoutId);
-    }
-
-    this.resetIsScrollingTimeoutId = setTimeout(
-      this.resetIsScrolling,
-      IS_SCROLLING_DEBOUNCE_INTERVAL,
-    );
-  };
-
-  resetIsScrolling = () => {
-    this.resetIsScrollingTimeoutId = null;
-    this.itemCache(-1);
-    this.setState(prevState => ({ ...prevState, isScrolling: false }));
-  };
 
   getItemCount = itemType =>
     (itemType === 'row' ? this.props.rowCount : this.props.columnCount);
@@ -158,7 +144,7 @@ class WindowTable extends PureComponent {
     let stopIndex = startIndex;
     const itemCount = this.getItemCount(itemType);
     while (stopIndex < itemCount - 1 && currOffset < maxOffset) {
-      stopIndex++;
+      stopIndex += 1;
       currOffset += getItemMetadata(itemType, stopIndex).size;
     }
 
@@ -199,6 +185,7 @@ class WindowTable extends PureComponent {
     }
     return low > 0 ? low - 1 : 0;
   };
+
 
   itemCache = memoizeOne((_, __) => ({}));
 
@@ -256,6 +243,23 @@ class WindowTable extends PureComponent {
     }
   };
 
+  resetIsScrollingDebounced = () => {
+    if (this.resetIsScrollingTimeoutId !== null) {
+      clearTimeout(this.resetIsScrollingTimeoutId);
+    }
+
+    this.resetIsScrollingTimeoutId = setTimeout(
+      this.resetIsScrolling,
+      IS_SCROLLING_DEBOUNCE_INTERVAL,
+    );
+  };
+
+  resetIsScrolling = () => {
+    this.resetIsScrollingTimeoutId = null;
+    this.itemCache(-1);
+    this.setState(prevState => ({ ...prevState, isScrolling: false }));
+  };
+
   headerStyle = memoizeOne((cellStyles, customStyle) => {
     let styleObj = {
       ...cellStyles,
@@ -288,7 +292,6 @@ class WindowTable extends PureComponent {
         newStyle.bottom = totalHeight - _row.offset - _row.size;
         return newStyle;
       }
-
       case 'bottom_right': {
         const newStyle = { ...styles };
         delete newStyle.top;
@@ -297,6 +300,8 @@ class WindowTable extends PureComponent {
         newStyle.right = totalWidth - _column.offset - _column.size;
         return newStyle;
       }
+      default:
+        break;
     }
     return styles;
   };
@@ -337,15 +342,16 @@ class WindowTable extends PureComponent {
         const rangeKey = `${rowFr}_${rowTo}_${colFr}_${colTo}`;
 
         if (itemCache[section] && itemCache[section][0] === rangeKey) {
-          items[section] = itemCache[section][1];
+          // [,items[section]] = itemCache[section][1];
+          [, items[section]] = itemCache[section];
 
           return;
         }
 
         items[section] = [];
 
-        for (let rowIndex = rowFr; rowIndex < rowTo; rowIndex++) {
-          for (let columnIndex = colFr; columnIndex < colTo; columnIndex++) {
+        for (let rowIndex = rowFr; rowIndex < rowTo; rowIndex += 1) {
+          for (let columnIndex = colFr; columnIndex < colTo; columnIndex += 1) {
             items[section].push(createElement(this.props.children, {
               columnIndex,
               isScrolling,
@@ -448,21 +454,21 @@ WindowTable.propTypes = {
 
   cellStyle: PropTypes.string,
 
-  columns: PropTypes.array.isRequired,
-  columnWidth: PropTypes.func.isRequired,
+  // columns: PropTypes.array.isRequired,
+  // columnWidth: PropTypes.func.isRequired,
   containerStyle: PropTypes.string,
   contentHeight: PropTypes.number.isRequired,
   contentWidth: PropTypes.number.isRequired,
   guidelineStyle: PropTypes.func,
 
-  left: PropTypes.object,
-  right: PropTypes.object,
-  center: PropTypes.object.isRequired,
-  top: PropTypes.object,
-  bottom: PropTypes.object,
+  // left: PropTypes.object,
+  // right: PropTypes.object,
+  // center: PropTypes.object.isRequired,
+  // top: PropTypes.object,
+  // bottom: PropTypes.object,
 
-  rowHeight: PropTypes.func.isRequired,
-  rows: PropTypes.array.isRequired,
+  // rowHeight: PropTypes.func.isRequired,
+  // rows: PropTypes.array.isRequired,
   scrollbarHandleStyle: PropTypes.func,
   scrollbarTrackStyle: PropTypes.func,
   scrollbarWidth: PropTypes.number.isRequired,
@@ -482,11 +488,11 @@ WindowTable.defaultProps = {
   scrollbarHandleStyle: undefined,
   scrollbarTrackStyle: undefined,
 
-  left: undefined,
-  right: undefined,
+  // left: undefined,
+  // right: undefined,
 
-  top: undefined,
-  bottom: undefined,
+  // top: undefined,
+  // bottom: undefined,
 };
 
 const enhance = compose(
@@ -655,11 +661,11 @@ const enhance = compose(
     [
       'width',
       'totalWidth',
-      'contentWidth',
-      'contentHeight',
-      'columnCount',
+      // 'contentWidth',
+      // 'contentHeight',
+      // 'columnCount',
       'columnWidth',
-      'rowCount',
+      // 'rowCount',
       'rowHeight',
       'fixedTopCount',
       'fixedBottomCount',
@@ -671,17 +677,17 @@ const enhance = compose(
       width,
 
       totalWidth,
-      contentWidth,
-      contentHeight,
-      columnCount,
+      // contentWidth,
+      // contentHeight,
+      // columnCount,
 
-      rowCount,
+      // rowCount,
 
       fixedTopCount: topCount,
       fixedBottomCount: bottomCount,
       fixedLeftCount,
       fixedRightCount,
-      getSize,
+      // getSize,
       // getSize,
     }) => {
       let leftCount = fixedLeftCount;
