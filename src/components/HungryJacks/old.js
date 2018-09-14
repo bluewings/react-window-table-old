@@ -79,7 +79,7 @@ class WindowTable extends PureComponent {
 
       high,
       0,
-      offset
+      offset,
     );
   };
 
@@ -99,7 +99,7 @@ class WindowTable extends PureComponent {
   getColumnStartIndexForOffset = scrollLeft => {
     const itemMetadata = this.getItemMetadata(
       'column',
-      this.props.fixedLeftCount
+      this.props.fixedLeftCount,
     );
 
     return this.findNearestItem('column', scrollLeft + itemMetadata.offset);
@@ -195,11 +195,11 @@ class WindowTable extends PureComponent {
     if (!itemStyleCache.hasOwnProperty(key)) {
       const { offset: left, size: width } = this.getItemMetadata(
         'column',
-        columnIndex
+        columnIndex,
       );
       const { offset: top, size: height } = this.getItemMetadata(
         'row',
-        rowIndex
+        rowIndex,
       );
       itemStyleCache[key] = {
         position: 'absolute',
@@ -257,7 +257,7 @@ class WindowTable extends PureComponent {
       fixedTopCount,
       fixedBottomCount,
       fixedLeftCount,
-      fixedRightCount
+      fixedRightCount,
     ) => {
       const __rows = [
         ['top', 0, fixedTopCount],
@@ -345,9 +345,9 @@ class WindowTable extends PureComponent {
                     key,
                     this._getItemStyle(rowIndex, columnIndex),
                     _rows[rowIndex],
-                    _columns[columnIndex]
+                    _columns[columnIndex],
                   ),
-                })
+                }),
               );
             }
           }
@@ -357,17 +357,17 @@ class WindowTable extends PureComponent {
       });
 
       return _rslt;
-    }
+    },
   );
 
   _getHorizontalRangeToRender = () => {
     const columnStartIndex = this.getColumnStartIndexForOffset(
-      this.state.scrollLeft
+      this.state.scrollLeft,
     );
 
     const columnStopIndex = this.getColumnStopIndexForStartIndex(
       columnStartIndex,
-      this.state.scrollLeft
+      this.state.scrollLeft,
     );
     return [columnStartIndex, columnStopIndex];
   };
@@ -377,7 +377,7 @@ class WindowTable extends PureComponent {
 
     const rowStopIndex = this.getRowStopIndexForStartIndex(
       rowStartIndex,
-      this.state.scrollTop
+      this.state.scrollTop,
     );
     return [rowStartIndex, rowStopIndex];
   };
@@ -416,7 +416,7 @@ class WindowTable extends PureComponent {
       this.props.fixedTopCount,
       this.props.fixedBottomCount,
       this.props.fixedLeftCount,
-      this.props.fixedRightCount
+      this.props.fixedRightCount,
     );
 
     return template.call(this, {
@@ -437,6 +437,8 @@ class WindowTable extends PureComponent {
       scrollbarWidth,
       scrollbarX,
       scrollbarY,
+      totalHeight,
+      totalWidth,
       unused_Guideline: Guideline,
       // components
       Scrollarea,
@@ -546,7 +548,7 @@ const enhance = compose(
     ['cellClassNames', 'cellStyle'],
     ({ cellClassNames, cellStyle: customStyle }) => ({
       cellStyle: cellStyle({ classNames: cellClassNames, customStyle }),
-    })
+    }),
   ),
 
   // withPropsOnChange(['columns'], ({ columns }) => ({
@@ -561,11 +563,11 @@ const enhance = compose(
     const _columns = (columns || [])
       .filter(
         column =>
-          column && (typeof column === 'string' || typeof column === 'object')
+          column && (typeof column === 'string' || typeof column === 'object'),
       )
       .map(
         column =>
-          typeof column === 'string' ? { name: column } : { ...column }
+          typeof column === 'string' ? { name: column } : { ...column },
       )
       .filter(column => column.name)
       .map((data, i) => {
@@ -610,7 +612,7 @@ const enhance = compose(
               ...prev,
               [e.name]: row[i],
             }),
-            {}
+            {},
           );
         } else {
           _row = { ...row };
@@ -660,12 +662,12 @@ const enhance = compose(
 
       const overallWidth = (columns || []).reduce(
         (prev, column, index) => prev + columnWidthFn(index, column),
-        0
+        0,
       );
 
       const overallHeight = (rows || []).reduce(
         (prev, row, index) => prev + rowHeightFn(index, row),
-        0
+        0,
       );
 
       const columnWidth = (from, limit = 1) => {
@@ -695,7 +697,7 @@ const enhance = compose(
         overallWidth,
         overallHeight,
       };
-    }
+    },
   ),
 
   withPropsOnChange(['rows'], ({ rows }) => {
@@ -769,7 +771,7 @@ const enhance = compose(
         contentWidth,
         contentHeight,
       };
-    }
+    },
   ),
 
   withPropsOnChange(
@@ -830,19 +832,19 @@ const enhance = compose(
           0,
           columnWidth(
             fixedLeftCount,
-            columnCount - fixedLeftCount - fixedRightCount
-          ) - center.width
+            columnCount - fixedLeftCount - fixedRightCount,
+          ) - center.width,
         ),
         maxScrollY: Math.max(
           0,
           rowHeight(
             fixedTopCount,
-            rowCount - fixedTopCount - fixedBottomCount
-          ) - center.height
+            rowCount - fixedTopCount - fixedBottomCount,
+          ) - center.height,
         ),
       };
-    }
-  )
+    },
+  ),
 );
 
 export default enhance(WindowTable);

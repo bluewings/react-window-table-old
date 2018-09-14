@@ -22,11 +22,11 @@ const enhance = [
     columns: (columns || [])
       .filter(
         column =>
-          column && (typeof column === 'string' || typeof column === 'object')
+          column && (typeof column === 'string' || typeof column === 'object'),
       )
       .map(
         column =>
-          typeof column === 'string' ? { name: column } : { ...column }
+          typeof column === 'string' ? { name: column } : { ...column },
       )
       .filter(column => column.name),
   })),

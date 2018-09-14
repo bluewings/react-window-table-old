@@ -6,11 +6,15 @@ import { css } from 'emotion';
 import { compose, defaultProps, withPropsOnChange } from 'recompose';
 import Draggable from 'react-draggable';
 import forwardRef from '../../hocs/forward-ref.hoc';
-import { scrollbarTrackStyle, scrollbarHandleStyle, defaultScrollbarClassNames } from '../../styles';
+import {
+  scrollbarTrackStyle,
+  scrollbarHandleStyle,
+  defaultScrollbarClassNames,
+} from '../../styles';
 
 import template from './scrollbar.component.pug';
 
-const getClientRect = (elem) => {
+const getClientRect = elem => {
   const rect = elem.getBoundingClientRect();
   return {
     top: rect.top,
@@ -22,8 +26,7 @@ const getClientRect = (elem) => {
   };
 };
 
-
-// const scrollbarTrackStyle = ({ 
+// const scrollbarTrackStyle = ({
 //   axis, handleLength, trackWidth,
 //   width, height,
 // }) => {
@@ -46,7 +49,7 @@ const getClientRect = (elem) => {
 //   return styles;
 // };
 
-// const scrollbarHandleStyle = ({ 
+// const scrollbarHandleStyle = ({
 //   axis, handleLength, trackWidth,
 //   width, height,
 // }) => {
@@ -75,7 +78,7 @@ const getClientRect = (elem) => {
 
 //       '&:hover': {
 //         background: '#7b7b7b',
-//         // boxShadow: 'inset 0 0 6px rgba(0,0,0,0.5)', 
+//         // boxShadow: 'inset 0 0 6px rgba(0,0,0,0.5)',
 //       }
 //     },
 //     '&.dragging > div': {
@@ -96,80 +99,95 @@ class Scrollbar extends PureComponent {
     this.handleRef = React.createRef();
     this.cache = {};
   }
-  
+
   scrollTo = ({ scrollTop, scrollLeft }) => {
     this.setState(prevState => ({ ...prevState, scrollTop, scrollLeft }));
-  }
+  };
 
-  trackStyle = memoize((classNames, axis, trackLength, trackWidth, customStyleFn) => {
+  trackStyle = memoize(
+    (classNames, axis, trackLength, trackWidth, customStyleFn) => {
+      return scrollbarTrackStyle({
+        classNames,
+        axis,
+        trackLength,
+        trackWidth,
+        customStyleFn,
+      });
 
+      // // , scrollbarHandleStyle
+      // const width = axis === 'x' ? trackLength : trackWidth;
+      // const height = axis === 'x' ? trackWidth : trackLength;
+      // let styles = scrollbarTrackStyle({
+      //   axis, trackLength, trackWidth,
+      //   width, height,
+      // })
+      // if (typeof customStyleFn === 'function') {
+      //   styles = customStyleFn(styles, { axis, trackLength, trackWidth });
+      // }
+      // return css({
+      //   ...styles,
+      //   position: 'relative',
+      //   width,
+      //   height,
+      // });
+    },
+  );
 
-    return scrollbarTrackStyle({classNames, axis, trackLength, trackWidth, customStyleFn})
-    
-    // // , scrollbarHandleStyle
-    // const width = axis === 'x' ? trackLength : trackWidth;
-    // const height = axis === 'x' ? trackWidth : trackLength;
-    // let styles = scrollbarTrackStyle({
-    //   axis, trackLength, trackWidth,
-    //   width, height,
-    // })
-    // if (typeof customStyleFn === 'function') {
-    //   styles = customStyleFn(styles, { axis, trackLength, trackWidth });
-    // }
-    // return css({
-    //   ...styles,
-    //   position: 'relative',
-    //   width,
-    //   height,
-    // });
-  })  
-
-  handleStyle = memoize((classNames, axis, handleLength, trackWidth, customStyleFn) => {
-
-    return scrollbarHandleStyle({classNames, axis, handleLength, trackWidth, customStyleFn})
-    // const width = axis === 'x' ? handleLength : trackWidth;
-    // const height = axis === 'x' ? trackWidth : handleLength;
-    // let styles = scrollbarHandleStyle({
-    //   axis, handleLength, trackWidth,
-    //   width, height,
-    // })
-    // // const width = axis === 'x' ? handleLength : trackWidth;
-    // // const height = axis === 'x' ? trackWidth : handleLength;
-    // // let styles = {
-    // //   width,
-    // //   height,
-    // //   background: 'green',
-    // // };
-    // if (typeof customStyleFn === 'function') {
-    //   styles = customStyleFn(styles, { axis, handleLength, trackWidth });
-    // }
-    // return css({
-    //   ...styles,
-    //   width,
-    //   height,
-    // });
-  })
+  handleStyle = memoize(
+    (classNames, axis, handleLength, trackWidth, customStyleFn) => {
+      return scrollbarHandleStyle({
+        classNames,
+        axis,
+        handleLength,
+        trackWidth,
+        customStyleFn,
+      });
+      // const width = axis === 'x' ? handleLength : trackWidth;
+      // const height = axis === 'x' ? trackWidth : handleLength;
+      // let styles = scrollbarHandleStyle({
+      //   axis, handleLength, trackWidth,
+      //   width, height,
+      // })
+      // // const width = axis === 'x' ? handleLength : trackWidth;
+      // // const height = axis === 'x' ? trackWidth : handleLength;
+      // // let styles = {
+      // //   width,
+      // //   height,
+      // //   background: 'green',
+      // // };
+      // if (typeof customStyleFn === 'function') {
+      //   styles = customStyleFn(styles, { axis, handleLength, trackWidth });
+      // }
+      // return css({
+      //   ...styles,
+      //   width,
+      //   height,
+      // });
+    },
+  );
 
   _handleLength = memoize((scrollLength, scrollbarLength, minHandleLength) => {
     const scale = Math.min(scrollbarLength / scrollLength, 1);
     return Math.max(scrollbarLength * scale, minHandleLength);
-  })
+  });
 
   handleLength = () => {
     const { scrollLength, scrollbarLength, minHandleLength } = this.props;
     return this._handleLength(scrollLength, scrollbarLength, minHandleLength);
-  }
+  };
 
-  _scale = memoize((scrollLength, scrollbarLength, handleLength) => 
-    (scrollbarLength - handleLength) / (scrollLength - scrollbarLength))
+  _scale = memoize(
+    (scrollLength, scrollbarLength, handleLength) =>
+      (scrollbarLength - handleLength) / (scrollLength - scrollbarLength),
+  );
 
   scale = () => {
     const { scrollLength, scrollbarLength } = this.props;
     return this._scale(scrollLength, scrollbarLength, this.handleLength());
-  }
+  };
 
   _scrollTo = (point, eventType) => {
-    let data = { eventType }
+    let data = { eventType };
     if (point !== null) {
       const { axis, scrollbarLength } = this.props;
       const handleSize = this.handleLength();
@@ -183,29 +201,31 @@ class Scrollbar extends PureComponent {
       if (axis === 'x') {
         data = { ...data, scrollLeft: point };
       } else {
-        data = { ...data, scrollTop: point };        
+        data = { ...data, scrollTop: point };
       }
     }
     this.props.onScroll(data);
-  }
+  };
 
-  handleClick = (event) => {
+  handleClick = event => {
     if (this.trackRef.current === event.target) {
       const { axis } = this.props;
       const { top, left } = getClientRect(this.trackRef.current);
-      const point = (axis === 'x' ? event.clientX - left : event.clientY - top) - (this.handleLength() / 2);
+      const point =
+        (axis === 'x' ? event.clientX - left : event.clientY - top) -
+        this.handleLength() / 2;
       this._scrollTo(point);
     }
-  }
+  };
 
-  scaled = (point) => {
+  scaled = point => {
     const scale = this.scale();
     const key = `${scale}_${point}`;
     if (!this.cache[key]) {
       this.cache[key] = point * scale;
     }
     return this.cache[key];
-  }
+  };
 
   handleDragStart = (event, { lastX, lastY }) => {
     // console.log('%c handleDragStart ', 'color:red');
@@ -220,28 +240,28 @@ class Scrollbar extends PureComponent {
     };
     this._scrollTo(null, 'dragstart');
     // this.updateStatus('dragst')
+  };
 
-  }
-
-  updateStatus = (status) => {
+  updateStatus = status => {
     if (this.state.status !== status) {
       this.setState(prevState => {
         return {
           ...prevState,
           status,
-        }
-      })
+        };
+      });
     }
-  }
+  };
 
   handleDrag = (event, { lastX, lastY }) => {
     if (!this.trackRef.current || !this.handleRef.current || !this._ondrag) {
       return;
     }
     const { axis } = this.props;
-    const point = axis === 'x' ? lastX - this._ondrag.x : lastY - this._ondrag.y;
+    const point =
+      axis === 'x' ? lastX - this._ondrag.x : lastY - this._ondrag.y;
     this._scrollTo(point, 'drag');
-    this.updateStatus('dragging')
+    this.updateStatus('dragging');
     // if (this.state.status !== 'dragging') {
     //   this.setState(prevState => {
     //     return {
@@ -250,7 +270,7 @@ class Scrollbar extends PureComponent {
     //     }
     //   })
     // }
-  }
+  };
 
   handleDragStop = (event, { lastX, lastY }) => {
     if (!this.trackRef.current || !this.handleRef.current || !this._ondrag) {
@@ -258,11 +278,12 @@ class Scrollbar extends PureComponent {
       return;
     }
     const { axis } = this.props;
-    const point = axis === 'x' ? lastX - this._ondrag.x : lastY - this._ondrag.y;
+    const point =
+      axis === 'x' ? lastX - this._ondrag.x : lastY - this._ondrag.y;
     this._scrollTo(point, 'dragend');
     delete this._ondrag;
-    this.updateStatus('dragend')
-  }
+    this.updateStatus('dragend');
+  };
 
   render() {
     const {
@@ -272,7 +293,6 @@ class Scrollbar extends PureComponent {
       trackStyle,
       handleStyle,
       scrollbarClassNames,
-
     } = this.props;
 
     const { scrollTop, scrollLeft, status } = this.state;
@@ -296,10 +316,22 @@ class Scrollbar extends PureComponent {
     return template.call(this, {
       // variables
       dragProps,
-      handleStyle: this.handleStyle(scrollbarClassNames, axis, this.handleLength(), scrollbarWidth, handleStyle),
+      handleStyle: this.handleStyle(
+        scrollbarClassNames,
+        axis,
+        this.handleLength(),
+        scrollbarWidth,
+        handleStyle,
+      ),
       scrollbarClassNames,
       status,
-      trackStyle: this.trackStyle(scrollbarClassNames, axis, scrollbarLength, scrollbarWidth, trackStyle),
+      trackStyle: this.trackStyle(
+        scrollbarClassNames,
+        axis,
+        scrollbarLength,
+        scrollbarWidth,
+        trackStyle,
+      ),
       // components
       Draggable,
       Fragment,
@@ -320,19 +352,22 @@ Scrollbar.defaultProps = {
 const enhance = compose(
   forwardRef('outer'),
 
-  withPropsOnChange(['scrollbarClassNames'], ({ scrollbarClassNames: classNames }) => {
-    let scrollbarClassNames = defaultScrollbarClassNames;
-    if (classNames && typeof classNames === 'object') {
-      entries(classNames)
-        .filter(([key]) => scrollbarClassNames.has(key))
-        .forEach(([key, className]) => {
-          scrollbarClassNames = scrollbarClassNames.set(key, className);
-        });
-    }
-    return { scrollbarClassNames: scrollbarClassNames.toJS() };
-  }),
+  withPropsOnChange(
+    ['scrollbarClassNames'],
+    ({ scrollbarClassNames: classNames }) => {
+      let scrollbarClassNames = defaultScrollbarClassNames;
+      if (classNames && typeof classNames === 'object') {
+        entries(classNames)
+          .filter(([key]) => scrollbarClassNames.has(key))
+          .forEach(([key, className]) => {
+            scrollbarClassNames = scrollbarClassNames.set(key, className);
+          });
+      }
+      return { scrollbarClassNames: scrollbarClassNames.toJS() };
+    },
+  ),
 
   forwardRef('inner'),
-)
+);
 
 export default enhance(Scrollbar);

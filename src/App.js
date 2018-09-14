@@ -156,9 +156,9 @@ class App extends Component {
           rowHeight={80}
           columnWidth={80}
           fixedLeftCount={2}
-          fixedRightCount={2}
+          fixedRightCount={1}
           fixedTopCount={2}
-          fixedBottomCount={2}
+          fixedBottomCount={1}
         >
           {ItemRenderer}
           {/* {({ columnIndex, rowIndex, style }) => (

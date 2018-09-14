@@ -94,7 +94,10 @@ class WindowTable extends PureComponent {
   componentDidUpdate(prevProps, prevState) {
     const { scrollTop, scrollLeft } = this.state;
 
-    if (prevState.scrollTop !== scrollTop || prevState.scrollLeft !== scrollLeft) {
+    if (
+      prevState.scrollTop !== scrollTop ||
+      prevState.scrollLeft !== scrollLeft
+    ) {
       cancelAnimationFrame(this.animFrame);
       this.animFrame = requestAnimationFrame(() => {
         Object.keys(this.gridRef)
@@ -118,9 +121,14 @@ class WindowTable extends PureComponent {
   // }
 
   scrollTo = ({ scrollTop, scrollLeft }) => {
-    const _scrollTop = typeof scrollTop === 'number' ? scrollTop : this.state.scrollTop;
-    const _scrollLeft = typeof scrollLeft === 'number' ? scrollLeft : this.state.scrollLeft;
-    if (this.state.scrollTop !== scrollTop || this.state.scrollLeft !== scrollLeft) {
+    const _scrollTop =
+      typeof scrollTop === 'number' ? scrollTop : this.state.scrollTop;
+    const _scrollLeft =
+      typeof scrollLeft === 'number' ? scrollLeft : this.state.scrollLeft;
+    if (
+      this.state.scrollTop !== scrollTop ||
+      this.state.scrollLeft !== scrollLeft
+    ) {
       this.setState(prevState => ({
         ...prevState,
         scrollTop: _scrollTop,
@@ -129,7 +137,7 @@ class WindowTable extends PureComponent {
         scrollX: _scrollLeft / this.props.maxScrollX,
       }));
     }
-  }
+  };
 
   headerStyle = memoize((cellStyles, customStyle) => {
     let styleObj = {
@@ -137,13 +145,19 @@ class WindowTable extends PureComponent {
       background: 'silver',
     };
     if (typeof customStyle === 'function') {
-      styleObj = customStyle(styleObj, { });
+      styleObj = customStyle(styleObj, {});
     }
     return css({ ...styleObj });
-  })
+  });
 
   renderGrid = ({
-    section, width, height, columnCount, columnOffset, rowCount, rowOffset,
+    section,
+    width,
+    height,
+    columnCount,
+    columnOffset,
+    rowCount,
+    rowOffset,
   }) => {
     let gridProps = {
       width,
@@ -151,9 +165,7 @@ class WindowTable extends PureComponent {
       columnCount,
       columnWidth: index => this.props.columnWidth(index + columnOffset),
       rowCount,
-      rowHeight: index =>
-        this.props.rowHeight(index + rowOffset)
-      ,
+      rowHeight: index => this.props.rowHeight(index + rowOffset),
     };
     let aaa;
     if (section) {
@@ -180,81 +192,93 @@ class WindowTable extends PureComponent {
       gridProps = {
         ...gridProps,
         ref: this.gridRef[aaa],
-
       };
     }
 
     const classNames = this.props.cellClassNames;
 
     // const cellStyle = this.cellStyle(classNames, this.props.cellStyle);
-    const sectionClass = (Array.isArray(section) ? section : [section]).map(e => classNames[e]).join(' ');
+    const sectionClass = (Array.isArray(section) ? section : [section])
+      .map(e => classNames[e])
+      .join(' ');
 
     // console.log(sectionClass);
     return (
-
       <div className={styles.gridWrap} style={{ width, height }}>
-        <h4 style={{ position:'absolute', margin:0, padding: 5, top: 0, left: 0, background:'yellow', zIndex: 10 }}>{section.join('-')}</h4>
-        <Grid {...gridProps} >
+        <h4
+          style={{
+            position: 'absolute',
+            margin: 0,
+            padding: 5,
+            top: 0,
+            left: 0,
+            background: 'yellow',
+            zIndex: 10,
+          }}
+        >
+          {section.join('-')}
+        </h4>
+        <Grid {...gridProps}>
           {({ columnIndex, rowIndex, style }) => {
-          const _colIndex = columnOffset + columnIndex;
-          const _rowIndex = rowOffset + rowIndex;
-          const column = this.props.columns[_colIndex];
-          const row = this.props.rows[_rowIndex];
-          const applyStyle = [
-            this.props.cellStyle,
-            sectionClass,
-            columnIndex === 0 && classNames.horizontalFirst,
-            rowIndex === 0 && classNames.verticalFirst,
-            columnIndex === columnCount - 1 && classNames.horizontalLast,
-            rowIndex === rowCount - 1 && classNames.verticalLast,
-            _colIndex % 2 ? classNames.oddColumn : classNames.evenColumn,
-            _rowIndex % 2 ? classNames.oddRow : classNames.evenRow,
-            `cell-text-align-${column.textAlign}`,
-          ].join(' ');
-          // if (_rowIndex === -1) {
-          //   return (
-          //     <div className={applyStyle} style={style}>
-          //       {this.props.columns[_colIndex].name}
-          //     </div>
-          //   )
-          // }
+            const _colIndex = columnOffset + columnIndex;
+            const _rowIndex = rowOffset + rowIndex;
+            const column = this.props.columns[_colIndex];
+            const row = this.props.rows[_rowIndex];
+            const applyStyle = [
+              this.props.cellStyle,
+              sectionClass,
+              columnIndex === 0 && classNames.horizontalFirst,
+              rowIndex === 0 && classNames.verticalFirst,
+              columnIndex === columnCount - 1 && classNames.horizontalLast,
+              rowIndex === rowCount - 1 && classNames.verticalLast,
+              _colIndex % 2 ? classNames.oddColumn : classNames.evenColumn,
+              _rowIndex % 2 ? classNames.oddRow : classNames.evenRow,
+              `cell-text-align-${column.textAlign}`,
+            ].join(' ');
+            // if (_rowIndex === -1) {
+            //   return (
+            //     <div className={applyStyle} style={style}>
+            //       {this.props.columns[_colIndex].name}
+            //     </div>
+            //   )
+            // }
 
-          if (_rowIndex >= 0) {
-            const renderFn = this.props.columns[_colIndex].render;
-            const val = this.props.rows[_rowIndex].arr[_colIndex];
-            if (row._isHeader) {
+            if (_rowIndex >= 0) {
+              const renderFn = this.props.columns[_colIndex].render;
+              const val = this.props.rows[_rowIndex].arr[_colIndex];
+              if (row._isHeader) {
+                return (
+                  <div className={applyStyle} style={style}>
+                    {val}
+                  </div>
+                );
+              }
               return (
                 <div className={applyStyle} style={style}>
-                  {val}
+                  {renderFn ? renderFn(val) : val}
                 </div>
               );
             }
-            return (
-              <div className={applyStyle} style={style}>
-                {renderFn ? renderFn(val) : val}
-              </div>
-            );
-          }
-          return null;
+            return null;
 
-          // return (
-          //   <div className={applyStyle} style={style}>
-          //     {/* <div style={newStyle}> */}
-          //     {_rowIndex === -1 && this.props.columns[_colIndex].name}
+            // return (
+            //   <div className={applyStyle} style={style}>
+            //     {/* <div style={newStyle}> */}
+            //     {_rowIndex === -1 && this.props.columns[_colIndex].name}
 
-          //     {_rowIndex >= 0 && (
+            //     {_rowIndex >= 0 && (
 
-          //     <span>{this.props.rows[_rowIndex].arr[_colIndex]}
-          //     </span>
-          //   )}
+            //     <span>{this.props.rows[_rowIndex].arr[_colIndex]}
+            //     </span>
+            //   )}
 
-          //   </div>
-          // );
-        }}
+            //   </div>
+            // );
+          }}
         </Grid>
       </div>
     );
-  }
+  };
 
   render() {
     const {
@@ -318,7 +342,6 @@ const measure = (containerStyle, width, height) => {
   };
 };
 
-
 WindowTable.propTypes = {
   scrollTop: PropTypes.number,
   scrollLeft: PropTypes.number,
@@ -344,7 +367,6 @@ WindowTable.propTypes = {
   top: PropTypes.object,
   bottom: PropTypes.object,
 
-
   rowHeight: PropTypes.func.isRequired,
   rows: PropTypes.array.isRequired,
   scrollbarHandleStyle: PropTypes.func,
@@ -352,7 +374,6 @@ WindowTable.propTypes = {
   scrollbarWidth: PropTypes.number.isRequired,
   scrollbarX: PropTypes.bool.isRequired,
   scrollbarY: PropTypes.bool.isRequired,
-
 };
 
 WindowTable.defaultProps = {
@@ -401,259 +422,316 @@ const enhance = compose(
     return { cellClassNames: cellClassNames.toJS() };
   }),
 
-  withPropsOnChange(['cellClassNames', 'cellStyle'], ({ cellClassNames, cellStyle: customStyle }) => ({
-    cellStyle: cellStyle({ classNames: cellClassNames, customStyle }),
-  })),
+  withPropsOnChange(
+    ['cellClassNames', 'cellStyle'],
+    ({ cellClassNames, cellStyle: customStyle }) => ({
+      cellStyle: cellStyle({ classNames: cellClassNames, customStyle }),
+    }),
+  ),
 
   withPropsOnChange(['columns'], ({ columns }) => ({
     columns: (columns || [])
-      .filter(column => column && (typeof column === 'string' || typeof column === 'object'))
-      .map(column => (typeof column === 'string' ? { name: column } : { ...column }))
+      .filter(
+        column =>
+          column && (typeof column === 'string' || typeof column === 'object'),
+      )
+      .map(
+        column =>
+          typeof column === 'string' ? { name: column } : { ...column },
+      )
       .filter(column => column.name),
   })),
 
-  withPropsOnChange(['columns', 'rows', 'rowHeight'], ({ columns, rows, rowHeight: _rowHeight }) => {
-    if (!Array.isArray(rows)) {
-      return;
-    }
-
-    let getRowHeight;
-
-    if (typeof _rowHeight === 'function') {
-      getRowHeight = index => _rowHeight(index - 1);
-    } else if (typeof _rowHeight === 'number') {
-      getRowHeight = () => _rowHeight;
-    } else {
-      getRowHeight = () => 50;
-    }
-
-    rows = rows.map((row) => {
-      let _row;
-      if (Array.isArray(row)) {
-        _row = columns.reduce((prev, e, i) => ({
-          ...prev,
-          [e.name]: row[i],
-        }), {});
-      } else {
-        _row = { ...row };
+  withPropsOnChange(
+    ['columns', 'rows', 'rowHeight'],
+    ({ columns, rows, rowHeight: _rowHeight }) => {
+      if (!Array.isArray(rows)) {
+        return;
       }
 
-      const data = {
-        org: { ..._row },
-        arr: columns.map((e) => {
-          let value = _row[e.name];
-          if (typeof e.getValue === 'function') {
-            value = e.getValue(value);
-          }
-          if (typeof value === 'string' || typeof value === 'number') {
-            return value;
-          }
-          return '-';
-        }),
+      let getRowHeight;
+
+      if (typeof _rowHeight === 'function') {
+        getRowHeight = index => _rowHeight(index - 1);
+      } else if (typeof _rowHeight === 'number') {
+        getRowHeight = () => _rowHeight;
+      } else {
+        getRowHeight = () => 50;
+      }
+
+      rows = rows.map(row => {
+        let _row;
+        if (Array.isArray(row)) {
+          _row = columns.reduce(
+            (prev, e, i) => ({
+              ...prev,
+              [e.name]: row[i],
+            }),
+            {},
+          );
+        } else {
+          _row = { ...row };
+        }
+
+        const data = {
+          org: { ..._row },
+          arr: columns.map(e => {
+            let value = _row[e.name];
+            if (typeof e.getValue === 'function') {
+              value = e.getValue(value);
+            }
+            if (typeof value === 'string' || typeof value === 'number') {
+              return value;
+            }
+            return '-';
+          }),
+        };
+
+        return data;
+      });
+
+      rows = [
+        {
+          org: {},
+          _isHeader: true,
+          arr: columns.map(e => e.name),
+        },
+        ...rows,
+      ].map((e, i) => ({
+        ...e,
+        _height: getRowHeight(i, e),
+      }));
+
+      // const te = new Date();
+      // console.info('data count', rows.length * columns.length, 'elapsed', te - ts);
+
+      const rowCount = (rows || []).length;
+
+      const columnCount = (columns || []).length;
+
+      const columnWidthFn = index => {
+        let { width } = columns[index];
+        width = isNaN(width) ? 120 : width;
+        return width;
       };
 
-      return data;
-    });
+      const rowHeightFn = index => rows[index]._height;
 
-    rows = [
-      {
-        org: {},
-        _isHeader: true,
-        arr: columns.map(e => e.name),
-      },
-      ...rows,
-    ].map((e, i) => ({
-      ...e,
-      _height: getRowHeight(i, e),
-    }));
+      const overallWidth = (columns || []).reduce(
+        (prev, column, index) => prev + columnWidthFn(index, column),
+        0,
+      );
 
-    // const te = new Date();
-    // console.info('data count', rows.length * columns.length, 'elapsed', te - ts);
+      const overallHeight = (rows || []).reduce(
+        (prev, row, index) => prev + rowHeightFn(index, row),
+        0,
+      );
 
-    const rowCount = (rows || []).length;
+      const columnWidth = (from, limit = 1) => {
+        limit = limit > 0 ? limit : 0;
 
-    const columnCount = (columns || []).length;
+        return new Array(limit)
+          .fill(true)
+          .map((e, i) => from + i)
+          .reduce((prev, i) => prev + columnWidthFn(i), 0);
+      };
 
-    const columnWidthFn = (index) => {
-      let { width } = columns[index];
-      width = isNaN(width) ? 120 : width;
-      return width;
-    };
+      const rowHeight = (from, limit = 1) => {
+        limit = limit > 0 ? limit : 0;
 
-    const rowHeightFn = index => rows[index]._height;
+        return new Array(limit)
+          .fill(true)
+          .map((e, i) => from + i)
+          .reduce((prev, i) => prev + rowHeightFn(i), 0);
+      };
 
-    const overallWidth = (columns || [])
-      .reduce((prev, column, index) => prev + columnWidthFn(index, column), 0);
-
-    const overallHeight = (rows || [])
-      .reduce((prev, row, index) => prev + rowHeightFn(index, row), 0);
-
-    const columnWidth = (from, limit = 1) => {
-      limit = limit > 0 ? limit : 0;
-
-      return new Array(limit)
-        .fill(true)
-        .map((e, i) => from + i)
-        .reduce(
-          (prev, i) =>
-
-            prev + columnWidthFn(i)
-          , 0,
-        );
-    };
-
-    const rowHeight = (from, limit = 1) => {
-      limit = limit > 0 ? limit : 0;
-
-      return new Array(limit)
-        .fill(true)
-        .map((e, i) => from + i)
-        .reduce(
-          (prev, i) =>
-
-            prev + rowHeightFn(i)
-          , 0,
-        );
-    };
-
-    return {
-      rows,
-      rowCount,
-      columnCount,
-      columnWidth,
-      rowHeight,
-      overallWidth,
-      overallHeight,
-    };
-  }),
-  withPropsOnChange(['width', 'height',
-    'overallWidth', 'overallHeight', 'scrollbarWidth'], ({
-    width: _width, height: _height, overallWidth, overallHeight, scrollbarWidth,
-  }) => {
-    let containerStyle = css({
-      border: '1px solid #c4c4c4',
-      boxSizing: 'border-box',
+      return {
+        rows,
+        rowCount,
+        columnCount,
+        columnWidth,
+        rowHeight,
+        overallWidth,
+        overallHeight,
+      };
+    },
+  ),
+  withPropsOnChange(
+    ['width', 'height', 'overallWidth', 'overallHeight', 'scrollbarWidth'],
+    ({
       width: _width,
       height: _height,
-    });
+      overallWidth,
+      overallHeight,
+      scrollbarWidth,
+    }) => {
+      let containerStyle = css({
+        border: '1px solid #c4c4c4',
+        boxSizing: 'border-box',
+        width: _width,
+        height: _height,
+      });
 
-    const { width, height } = measure(containerStyle, _width, _height);
+      const { width, height } = measure(containerStyle, _width, _height);
 
-    containerStyle = css({
-      border: '1px solid #c4c4c4',
-      boxSizing: 'border-box',
-      width: _width,
-      // height: _height,
-    });
+      containerStyle = css({
+        border: '1px solid #c4c4c4',
+        boxSizing: 'border-box',
+        width: _width,
+        // height: _height,
+      });
 
-    let contentWidth = width;
-    let contentHeight = height;
+      let contentWidth = width;
+      let contentHeight = height;
 
-    const scrollbarX = contentWidth < overallWidth;
-    let scrollbarY = contentHeight < overallHeight;
+      const scrollbarX = contentWidth < overallWidth;
+      let scrollbarY = contentHeight < overallHeight;
 
-    // scrollbarX = contentWidth < overallWidth;
-    // scrollbarY = contentHeight < overallHeight;
+      // scrollbarX = contentWidth < overallWidth;
+      // scrollbarY = contentHeight < overallHeight;
 
-    contentWidth -= (scrollbarY ? scrollbarWidth : 0);
-    contentHeight -= (scrollbarX ? scrollbarWidth : 0);
+      contentWidth -= scrollbarY ? scrollbarWidth : 0;
+      contentHeight -= scrollbarX ? scrollbarWidth : 0;
 
-    if (overallHeight < contentHeight) {
-      contentHeight = overallHeight;
-    }
+      if (overallHeight < contentHeight) {
+        contentHeight = overallHeight;
+      }
 
-    if (scrollbarX && !scrollbarY && contentHeight < overallHeight) {
-      scrollbarY = true;
-      contentWidth -= scrollbarWidth;
-    }
+      if (scrollbarX && !scrollbarY && contentHeight < overallHeight) {
+        scrollbarY = true;
+        contentWidth -= scrollbarWidth;
+      }
 
-    return {
-      containerStyle,
+      return {
+        containerStyle,
+        width,
+        height,
+        scrollbarX,
+        scrollbarY,
+        contentWidth,
+        contentHeight,
+      };
+    },
+  ),
+
+  withPropsOnChange(
+    [
+      'width',
+      'overallWidth',
+      'contentWidth',
+      'contentHeight',
+      'columnCount',
+      'columnWidth',
+      'rowCount',
+      'rowHeight',
+      'fixedTopCount',
+      'fixedBottomCount',
+      'fixedLeftCount',
+      'fixedRightCount',
+    ],
+    ({
       width,
-      height,
-      scrollbarX,
-      scrollbarY,
+      overallWidth,
       contentWidth,
       contentHeight,
-    };
-  }),
-
-  withPropsOnChange([
-    'width', 'overallWidth',
-    'contentWidth', 'contentHeight',
-    'columnCount', 'columnWidth', 'rowCount', 'rowHeight',
-    'fixedTopCount', 'fixedBottomCount', 'fixedLeftCount', 'fixedRightCount',
-  ], ({
-    width, overallWidth,
-    contentWidth, contentHeight,
-    columnCount, columnWidth, rowCount, rowHeight,
-    fixedTopCount, fixedBottomCount, fixedLeftCount: leftCount, fixedRightCount: rightCount,
-  }) => {
-    let fixedLeftCount = leftCount;
-    let fixedRightCount = rightCount;
-
-    if (overallWidth <= width) {
-      fixedLeftCount = 0;
-      fixedRightCount = 0;
-    }
-
-    const center = {
-      width: contentWidth -
-        columnWidth(0, fixedLeftCount) -
-        columnWidth(columnCount - fixedRightCount, fixedRightCount),
-      height: contentHeight -
-        rowHeight(0, fixedTopCount) -
-        rowHeight(rowCount - fixedBottomCount, fixedBottomCount),
-      rowOffset: fixedTopCount,
-      rowCount: rowCount - fixedTopCount - fixedBottomCount,
-      columnOffset: fixedLeftCount,
-      columnCount: columnCount - fixedLeftCount - fixedRightCount,
-    };
-
-    const top = fixedTopCount <= 0 ? null : {
-      height: rowHeight(0, fixedTopCount),
-      rowOffset: 0,
-      rowCount: fixedTopCount,
-    };
-
-    const bottom = fixedBottomCount <= 0 ? null : {
-      height: rowHeight(rowCount - fixedBottomCount, fixedBottomCount),
-      rowOffset: rowCount - fixedBottomCount,
-      rowCount: fixedBottomCount,
-    };
-
-    const left = fixedLeftCount <= 0 ? null : {
-      width: columnWidth(0, fixedLeftCount),
-      columnOffset: 0,
-      columnCount: fixedLeftCount,
-    };
-
-    const right = fixedRightCount <= 0 ? null : {
-      width: columnWidth(columnCount - fixedRightCount, fixedRightCount),
-      columnOffset: columnCount - fixedRightCount,
-      columnCount: fixedRightCount,
-    };
-
-    return {
+      columnCount,
+      columnWidth,
+      rowCount,
+      rowHeight,
       fixedTopCount,
       fixedBottomCount,
-      fixedLeftCount,
-      fixedRightCount,
-      center,
-      top,
-      bottom,
-      left,
-      right,
-      maxScrollX: Math.max(
-        0,
-        columnWidth(fixedLeftCount, columnCount - fixedLeftCount - fixedRightCount) - center.width,
-      ),
-      maxScrollY: Math.max(
-        0,
-        rowHeight(fixedTopCount, rowCount - fixedTopCount - fixedBottomCount) - center.height,
-      ),
-    };
-  }),
+      fixedLeftCount: leftCount,
+      fixedRightCount: rightCount,
+    }) => {
+      let fixedLeftCount = leftCount;
+      let fixedRightCount = rightCount;
+
+      if (overallWidth <= width) {
+        fixedLeftCount = 0;
+        fixedRightCount = 0;
+      }
+
+      const center = {
+        width:
+          contentWidth -
+          columnWidth(0, fixedLeftCount) -
+          columnWidth(columnCount - fixedRightCount, fixedRightCount),
+        height:
+          contentHeight -
+          rowHeight(0, fixedTopCount) -
+          rowHeight(rowCount - fixedBottomCount, fixedBottomCount),
+        rowOffset: fixedTopCount,
+        rowCount: rowCount - fixedTopCount - fixedBottomCount,
+        columnOffset: fixedLeftCount,
+        columnCount: columnCount - fixedLeftCount - fixedRightCount,
+      };
+
+      const top =
+        fixedTopCount <= 0
+          ? null
+          : {
+              height: rowHeight(0, fixedTopCount),
+              rowOffset: 0,
+              rowCount: fixedTopCount,
+            };
+
+      const bottom =
+        fixedBottomCount <= 0
+          ? null
+          : {
+              height: rowHeight(rowCount - fixedBottomCount, fixedBottomCount),
+              rowOffset: rowCount - fixedBottomCount,
+              rowCount: fixedBottomCount,
+            };
+
+      const left =
+        fixedLeftCount <= 0
+          ? null
+          : {
+              width: columnWidth(0, fixedLeftCount),
+              columnOffset: 0,
+              columnCount: fixedLeftCount,
+            };
+
+      const right =
+        fixedRightCount <= 0
+          ? null
+          : {
+              width: columnWidth(
+                columnCount - fixedRightCount,
+                fixedRightCount,
+              ),
+              columnOffset: columnCount - fixedRightCount,
+              columnCount: fixedRightCount,
+            };
+
+      return {
+        fixedTopCount,
+        fixedBottomCount,
+        fixedLeftCount,
+        fixedRightCount,
+        center,
+        top,
+        bottom,
+        left,
+        right,
+        maxScrollX: Math.max(
+          0,
+          columnWidth(
+            fixedLeftCount,
+            columnCount - fixedLeftCount - fixedRightCount,
+          ) - center.width,
+        ),
+        maxScrollY: Math.max(
+          0,
+          rowHeight(
+            fixedTopCount,
+            rowCount - fixedTopCount - fixedBottomCount,
+          ) - center.height,
+        ),
+      };
+    },
+  ),
 );
 
 export default enhance(WindowTable);
