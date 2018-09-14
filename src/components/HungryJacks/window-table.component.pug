@@ -7,6 +7,7 @@ div
     h1 {rowStartIndex} ~ {rowStopIndex}
     //- pre {JSON.stringify(this.props.rows, null, 2)}
     //- h2 {items.topLeftItems.length}
+  h1 {JSON.stringify(this.state.isScrolling)}
   div(className='{cx(styles.root, containerStyle)}',
     ref='{this.containerRef}')
     table(className='{styles.table}', border='{0}', cellPadding='{0}', cellSpacing='{0}', ref='{this.tableRef}')

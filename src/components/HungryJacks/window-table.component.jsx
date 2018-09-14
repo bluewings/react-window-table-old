@@ -19,6 +19,8 @@ import { cellStyle, defaultCellClassNames } from '../../styles';
 
 import template from './window-table.component.pug';
 
+const IS_SCROLLING_DEBOUNCE_INTERVAL = 150;
+
 const measure = (className, width, height) => {
   const divEl = document.createElement('div');
   divEl.classList.add(className);
@@ -62,6 +64,7 @@ class WindowTable extends PureComponent {
     };
 
     this.state = {
+      isScrolling: false,
       scrollTop: props.scrollTop || 0,
       scrollLeft: props.scrollLeft || 0,
       scrollX: props.scrollLeft / props.maxScrollX,
@@ -73,6 +76,34 @@ class WindowTable extends PureComponent {
 
     this.secRef = React.createRef();
   }
+
+  componentWillUnmount() {
+    if (this._resetIsScrollingTimeoutId !== null) {
+      clearTimeout(this._resetIsScrollingTimeoutId);
+    }
+  }
+
+  _resetIsScrollingDebounced = () => {
+    if (this._resetIsScrollingTimeoutId !== null) {
+      clearTimeout(this._resetIsScrollingTimeoutId);
+    }
+
+    this._resetIsScrollingTimeoutId = setTimeout(
+      this._resetIsScrolling,
+      IS_SCROLLING_DEBOUNCE_INTERVAL
+    );
+  };
+
+  _resetIsScrolling = () => {
+    this._resetIsScrollingTimeoutId = null;
+    this._getItemListCache(-1);
+    this.setState({ isScrolling: false }, () => {
+      // Clear style cache after state update has been committed.
+      // This way we don't break pure sCU for items that don't use isScrolling param.
+      // this._getItemStyleCache(-1);
+      // this._getItemListCache(-1);
+    });
+  };
 
   getItemCount = itemType =>
     itemType === 'row' ? this.props.rowCount : this.props.columnCount;
@@ -193,11 +224,12 @@ class WindowTable extends PureComponent {
     ) {
       this.setState(prevState => ({
         ...prevState,
+        isScrolling: true,
         scrollTop: _scrollTop,
         scrollLeft: _scrollLeft,
         scrollY: _scrollTop / this.props.maxScrollY,
         scrollX: _scrollLeft / this.props.maxScrollX,
-      }));
+      }), this._resetIsScrollingDebounced);
     }
   };
 
@@ -217,27 +249,37 @@ class WindowTable extends PureComponent {
       totalHeight,
       totalWidth,
       rowCount,
-      _rowStartIndex,
-      _rowStopIndex,
+      rowStartIndex,
+      rowStopIndex,
       columnCount,
-      _columnStartIndex,
-      _columnStopIndex,
+      columnStartIndex,
+      columnStopIndex,
       fixedTopCount,
       fixedBottomCount,
       fixedLeftCount,
       fixedRightCount,
+      isScrolling,
     ) => {
-      const __rows = [
-        ['top', 0, fixedTopCount],
-        ['middle', _rowStartIndex, _rowStopIndex + 1],
-        ['bottom', rowCount - fixedBottomCount, rowCount],
-      ];
 
-      const __columns = [
-        ['left', 0, fixedLeftCount],
-        ['center', _columnStartIndex, _columnStopIndex + 1],
-        ['right', columnCount - fixedRightCount, columnCount],
-      ];
+      const ranges = {
+        row: [
+          ['top', 0, fixedTopCount],
+          ['middle', rowStartIndex, rowStopIndex + 1],
+          ['bottom', rowCount - fixedBottomCount, rowCount],
+        ],
+        column: [
+          ['left', 0, fixedLeftCount],
+          ['center', columnStartIndex, columnStopIndex + 1],
+          ['right', columnCount - fixedRightCount, columnCount],
+        ]
+      }
+      // const ranges.;
+
+      // const ranges.column = [
+      //   ['left', 0, fixedLeftCount],
+      //   ['center', columnStartIndex, columnStopIndex + 1],
+      //   ['right', columnCount - fixedRightCount, columnCount],
+      // ];
 
       const _rslt = {};
 
@@ -272,8 +314,8 @@ class WindowTable extends PureComponent {
         return styles;
       };
 
-      __rows.forEach(([rType, rowFr, rowTo]) => {
-        __columns.forEach(([cType, colFr, colTo]) => {
+      ranges.row.forEach(([rType, rowFr, rowTo]) => {
+        ranges.column.forEach(([cType, colFr, colTo]) => {
           const key = `${rType}_${cType}`;
           const _key = `${rowFr}:${rowTo}:${colFr}:${colTo}`;
 
@@ -290,7 +332,7 @@ class WindowTable extends PureComponent {
               _rslt[key].push(
                 createElement(this.props.children, {
                   columnIndex,
-
+                  isScrolling,
                   key: `${rowIndex}:${columnIndex}`,
                   rowIndex,
                   style: fixStyle(
@@ -333,7 +375,7 @@ class WindowTable extends PureComponent {
         totalHeight,
         totalWidth,
       },
-      state: { scrollLeft, scrollTop },
+      state: { scrollLeft, scrollTop, isScrolling },
     } = this;
 
     const [
@@ -356,6 +398,7 @@ class WindowTable extends PureComponent {
       fixedBottomCount,
       fixedLeftCount,
       fixedRightCount,
+      isScrolling,
     );
 
     return template.call(this, {
@@ -594,7 +637,6 @@ const enhance = compose(
   withPropsOnChange(
     [
       'width',
-
       'totalWidth',
       'contentWidth',
       'contentHeight',
@@ -615,14 +657,13 @@ const enhance = compose(
       contentWidth,
       contentHeight,
       columnCount,
-      columnWidth,
+      
       rowCount,
-      rowHeight,
+      
       fixedTopCount: topCount,
       fixedBottomCount: bottomCount,
       fixedLeftCount,
       fixedRightCount,
-      getItemMetadata,
       getSize,
       _getSize,
     }) => {

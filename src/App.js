@@ -124,9 +124,13 @@ const rowHeight_ = index => {
 
 class ItemRenderer extends PureComponent {
   render() {
+    const { isScrolling } = this.props;
     return (
       <div style={this.props.style}>
-        {this.props.rowIndex} , {this.props.columnIndex}
+        {isScrolling ? 'scrolling' :
+        this.props.rowIndex + ' , ' + this.props.columnIndex
+        }
+        {/* {this.props.rowIndex} , {this.props.columnIndex} */}
       </div>
     );
   }
