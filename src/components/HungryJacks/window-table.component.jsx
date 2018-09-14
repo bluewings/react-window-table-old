@@ -6,7 +6,6 @@
 /* eslint-disable */
 import React, { PureComponent, createElement } from 'react';
 import PropTypes from 'prop-types';
-import { VariableSizeGrid as Grid } from 'react-window';
 import { compose, defaultProps, withPropsOnChange } from 'recompose';
 import memoizeOne from 'memoize-one';
 import entries from 'object.entries';
@@ -20,19 +19,6 @@ import { cellStyle, defaultCellClassNames } from '../../styles';
 import template from './window-table.component.pug';
 import styles from './window-table.component.scss';
 
-const Avatar = (key, rowIndex, columnIndex, _rows, _columns, fixStyle, _getItemStyle) => {
-
-  return (
-        <div
-                  key={rowIndex + ':' + columnIndex}
-                  style={fixStyle(key, _getItemStyle(rowIndex, columnIndex), _rows[rowIndex], _columns[columnIndex])}
-                >
-                  <a href="#">{rowIndex + ' , ' + columnIndex}</a>
-
-                </div>
-  );
-  
-}
 class WindowTable extends PureComponent {
   constructor(props) {
     super(props);
@@ -72,13 +58,13 @@ class WindowTable extends PureComponent {
     this.secRef = React.createRef();
   }
 
-  componentDidUpdate(prevProps, prevState) {
-    const { scrollTop, scrollLeft } = this.state;
+  // componentDidUpdate(prevProps, prevState) {
+  //   const { scrollTop, scrollLeft } = this.state;
 
-    if (prevState.scrollTop !== scrollTop || prevState.scrollLeft !== scrollLeft) {
+  //   if (prevState.scrollTop !== scrollTop || prevState.scrollLeft !== scrollLeft) {
 
-    }
-  }
+  //   }
+  // }
 
   findNearestItem = (itemType, offset) => {
     let high;
@@ -92,41 +78,35 @@ class WindowTable extends PureComponent {
 
       high,
       0,
-      offset
+      offset,
     );
   }
 
   getRowStartIndexForOffset = (scrollTop) => {
-
     const itemMetadata = this.getItemMetadata('row', this.props.fixedTopCount);
 
     return this.findNearestItem('row', scrollTop + itemMetadata.offset);
   }
 
-  getRowStopIndexForStartIndex = (startIndex, scrollTop) => {
-    return this._getColumnStopIndexForStartIndex('row', startIndex, scrollTop);
-  }
+  getRowStopIndexForStartIndex = (startIndex, scrollTop) => this._getColumnStopIndexForStartIndex('row', startIndex, scrollTop)
 
   getColumnOffset = (index) => {
-    
+
   }
 
   getColumnWidth = (index) => {}
 
   getColumnStartIndexForOffset = (scrollLeft) => {
-
     const itemMetadata = this.getItemMetadata('column', this.props.fixedLeftCount);
 
     return this.findNearestItem('column', scrollLeft + itemMetadata.offset);
   }
 
-  getColumnStopIndexForStartIndex = (startIndex, scrollLeft) => {
-    return this._getColumnStopIndexForStartIndex('column', startIndex, scrollLeft);
-  }
+  getColumnStopIndexForStartIndex = (startIndex, scrollLeft) => this._getColumnStopIndexForStartIndex('column', startIndex, scrollLeft)
 
   _getColumnStopIndexForStartIndex = (itemType, startIndex, offset) => {
     const { itemCount_, contentWidth: width, contentHeight: height } = this.props;
-    
+
     let itemCount = this.props._columns.length;
     if (itemType === 'row') {
       itemCount = this.props._rows.length;
@@ -134,33 +114,24 @@ class WindowTable extends PureComponent {
 
     const itemMetadata = this.getItemMetadata(itemType, startIndex);
 
-    let maxOffset
+    let maxOffset;
 
     if (itemType === 'row') {
       maxOffset = offset + height;
       if (this.props.fixedBottomCount > 0) {
         const rWidth = this.props._rows.slice(this.props.fixedBottomCount * -1)
-          .reduce((prev, {meta}) => {
+          .reduce((prev, { meta }) => prev + meta.size, 0);
 
-            return prev + meta.size;
-          }, 0)
-
-          maxOffset = maxOffset - rWidth;
-
+        maxOffset -= rWidth;
       }
     } else {
       maxOffset = offset + width;
       if (this.props.fixedRightCount > 0) {
         const rWidth = this.props._columns.slice(this.props.fixedRightCount * -1)
-          .reduce((prev, {meta}) => {
+          .reduce((prev, { meta }) => prev + meta.size, 0);
 
-            return prev + meta.size;
-          }, 0)
-
-          maxOffset = maxOffset - rWidth;
-
+        maxOffset -= rWidth;
       }
-
     }
 
     let currOffset = itemMetadata.offset + itemMetadata.size;
@@ -168,7 +139,7 @@ class WindowTable extends PureComponent {
 
     while (stopIndex < itemCount - 1 && currOffset < maxOffset) {
       stopIndex++;
-      
+
       currOffset += this.getItemMetadata(itemType, stopIndex).size;
     }
 
@@ -180,15 +151,13 @@ class WindowTable extends PureComponent {
       return this.props._columns[index].meta;
     }
     return this.props._rows[index].meta;
-    
   }
 
-  findNearestItemBinarySearch = (itemType, high, low, offset)  => {
-
+  findNearestItemBinarySearch = (itemType, high, low, offset) => {
     while (low <= high) {
       const middle = low + Math.floor((high - low) / 2);
       const currentOffset = this.getItemMetadata(itemType, middle).offset;
-  
+
       if (currentOffset === offset) {
         return middle;
       } else if (currentOffset < offset) {
@@ -197,12 +166,11 @@ class WindowTable extends PureComponent {
         high = middle - 1;
       }
     }
-  
+
     if (low > 0) {
       return low - 1;
-    } else {
-      return 0;
     }
+    return 0;
   }
 
   _getItemListCache = memoizeOne((_, __) => ({}));
@@ -213,9 +181,8 @@ class WindowTable extends PureComponent {
     const key = `${rowIndex}:${columnIndex}`;
 
     const itemStyleCache = this._getItemStyleCache(0, 0);
-    
-    if (!itemStyleCache.hasOwnProperty(key)) {
 
+    if (!itemStyleCache.hasOwnProperty(key)) {
       const { offset: left, size: width } = this.getItemMetadata('column', columnIndex);
       const { offset: top, size: height } = this.getItemMetadata('row', rowIndex);
       itemStyleCache[key] = {
@@ -224,12 +191,11 @@ class WindowTable extends PureComponent {
         top,
         height,
         width,
-        background: (rowIndex + columnIndex) % 2 === 0 ? 'rgba(0,0,0,.05)' : 'rgba(0,0,0,.1'
+        background: (rowIndex + columnIndex) % 2 === 0 ? 'rgba(0,0,0,.05)' : 'rgba(0,0,0,.1',
 
       };
     }
     return itemStyleCache[key];
-
   }
 
   scrollTo = ({ scrollTop, scrollLeft }) => {
@@ -261,191 +227,176 @@ class WindowTable extends PureComponent {
     _rows, _rowStartIndex, _rowStopIndex,
     _columns,
     _columnStartIndex, _columnStopIndex,
-    fixedTopCount, fixedBottomCount, fixedLeftCount, fixedRightCount
-    ) => {
+    fixedTopCount, fixedBottomCount, fixedLeftCount, fixedRightCount,
+  ) => {
+    const __rows = [
+      ['top', 0, fixedTopCount],
+      ['middle', _rowStartIndex, _rowStopIndex + 1],
+      ['bottom', _rows.length - fixedBottomCount, this.props._rows.length],
+    ];
 
-      const __rows = [
-        ['top', 0, fixedTopCount],
-        ['middle', _rowStartIndex, _rowStopIndex + 1],
-        ['bottom', _rows.length - fixedBottomCount, this.props._rows.length],
-      ]
+    const __columns = [
+      ['left', 0, fixedLeftCount],
+      ['center', _columnStartIndex, _columnStopIndex + 1],
+      ['right', _columns.length - fixedRightCount, this.props._columns.length],
+    ];
 
-      const __columns = [
-        ['left', 0, fixedLeftCount],
-        ['center', _columnStartIndex, _columnStopIndex + 1],
-        ['right', _columns.length - fixedRightCount, this.props._columns.length],
-      ]
+    let totalWidth = 0;
+    for (
+      let columnIndex = 0;
+      columnIndex < _columns.length;
+      columnIndex++
+    ) {
+      totalWidth += _columns[columnIndex].meta.size;
+    }
 
-      let totalWidth = 0;
-      for (
-        let columnIndex = 0;
-        columnIndex < _columns.length;
-        columnIndex++
-      ) {
-        totalWidth += _columns[columnIndex].meta.size;
-      }
-  
-      let totalHeight = 0;
-      for (
-        let rowIndex = 0;
-        rowIndex < _rows.length;
-        rowIndex++
-      ) {
-        totalHeight += _rows[rowIndex].meta.size;
-      }
+    let totalHeight = 0;
+    for (
+      let rowIndex = 0;
+      rowIndex < _rows.length;
+      rowIndex++
+    ) {
+      totalHeight += _rows[rowIndex].meta.size;
+    }
 
-      const _rslt = {};
+    const _rslt = {};
 
-      const listStyleCache = this._getItemListCache(0, 0);
+    const listStyleCache = this._getItemListCache(0, 0);
 
-      const fixStyle = (type, styles, _row, _column) => {
-        switch(type) {
-          case 'top_right':
-          case 'middle_right': {
-            let newStyle = { ...styles };
-            delete newStyle.left;
-            newStyle.right = totalWidth - _column.meta.offset - _column.meta.size;
-            return newStyle;
-          }
-          case 'bottom_left':
-          case 'bottom_center': {
-            let newStyle = { ...styles };
-            delete newStyle.top;
-            newStyle.bottom = totalHeight - _row.meta.offset - _row.meta.size;
-            return newStyle;
-          }
-
-          case 'bottom_right': {
-            let newStyle = { ...styles };
-            delete newStyle.top;
-            newStyle.bottom = totalHeight - _row.meta.offset - _row.meta.size;
-            delete newStyle.left;
-            newStyle.right = totalWidth - _column.meta.offset - _column.meta.size;
-            return newStyle;
-          }
-          
+    const fixStyle = (type, styles, _row, _column) => {
+      switch (type) {
+        case 'top_right':
+        case 'middle_right': {
+          const newStyle = { ...styles };
+          delete newStyle.left;
+          newStyle.right = totalWidth - _column.meta.offset - _column.meta.size;
+          return newStyle;
         }
-        return styles;
+        case 'bottom_left':
+        case 'bottom_center': {
+          const newStyle = { ...styles };
+          delete newStyle.top;
+          newStyle.bottom = totalHeight - _row.meta.offset - _row.meta.size;
+          return newStyle;
+        }
+
+        case 'bottom_right': {
+          const newStyle = { ...styles };
+          delete newStyle.top;
+          newStyle.bottom = totalHeight - _row.meta.offset - _row.meta.size;
+          delete newStyle.left;
+          newStyle.right = totalWidth - _column.meta.offset - _column.meta.size;
+          return newStyle;
+        }
       }
+      return styles;
+    };
 
-      __rows.forEach(([rType, rowFr, rowTo]) => {
+    __rows.forEach(([rType, rowFr, rowTo]) => {
+      __columns.forEach(([cType, colFr, colTo]) => {
+        const key = `${rType}_${cType}`;
+        const _key = `${rowFr}:${rowTo}:${colFr}:${colTo}`;
 
-        __columns.forEach(([cType, colFr, colTo]) => {
-          const key = rType + '_' + cType;
-          const _key = rowFr + ':' + rowTo + ':' + colFr + ':' + colTo;
+        if (listStyleCache[key] && listStyleCache[key][0] === _key) {
+          _rslt[key] = listStyleCache[key][1];
 
-          if (listStyleCache[key] && listStyleCache[key][0] === _key) {
-            _rslt[key] = listStyleCache[key][1];
-            
-            return 
-          }
-          
-          _rslt[key] = [];
+          return;
+        }
 
+        _rslt[key] = [];
+
+        for (
+          let rowIndex = rowFr;
+          rowIndex < rowTo;
+          rowIndex++
+        ) {
           for (
-            let rowIndex = rowFr;
-            rowIndex < rowTo;
-            rowIndex++
+            let columnIndex = colFr;
+            columnIndex < colTo;
+            columnIndex++
           ) {
-            for (
-              let columnIndex = colFr;
-              columnIndex < colTo;
-              columnIndex++
-            ) {
-              
-              _rslt[key].push(
+            _rslt[key].push(createElement(this.props.children, {
+              columnIndex,
 
-                Avatar(key, rowIndex, columnIndex, _rows, _columns, fixStyle, this._getItemStyle)
-
-              )
-            }
-
+              key: `${rowIndex}:${columnIndex}`,
+              rowIndex,
+              style: fixStyle(key, this._getItemStyle(rowIndex, columnIndex), _rows[rowIndex], _columns[columnIndex]),
+            }));
           }
+        }
 
-          listStyleCache[key] = [_key, _rslt[key]];
+        listStyleCache[key] = [_key, _rslt[key]];
+      });
+    });
 
-        })
-      })
-
-      return _rslt;
-
+    return _rslt;
   })
 
   _getHorizontalRangeToRender = () => {
-    const columnStartIndex = this.getColumnStartIndexForOffset(
-      this.state.scrollLeft
-    );
-  
+    const columnStartIndex = this.getColumnStartIndexForOffset(this.state.scrollLeft);
+
     const columnStopIndex = this.getColumnStopIndexForStartIndex(
       columnStartIndex,
       this.state.scrollLeft,
-      
+
     );
     return [columnStartIndex, columnStopIndex];
   }
 
   _getVerticalRangeToRender = () => {
-    const rowStartIndex = this.getRowStartIndexForOffset(
-      this.state.scrollTop
-    );
-  
+    const rowStartIndex = this.getRowStartIndexForOffset(this.state.scrollTop);
+
     const rowStopIndex = this.getRowStopIndexForStartIndex(
       rowStartIndex,
       this.state.scrollTop,
-      
+
     );
     return [rowStartIndex, rowStopIndex];
   }
 
   render() {
     const {
-      bottom,
-      center,
+
       containerStyle,
       contentHeight,
       contentWidth,
       guidelineStyle,
-      left,
+
       overallHeight,
       overallWidth,
-      right,
+
       scrollbarHandleStyle,
       scrollbarTrackStyle,
       scrollbarWidth,
       scrollbarX,
       scrollbarY,
-      top,
+
     } = this.props;
 
     const [columnStartIndex, columnStopIndex] = this._getHorizontalRangeToRender();
 
     const [rowStartIndex, rowStopIndex] = this._getVerticalRangeToRender();
 
-      const _items = this._items(
-        this.props._rows, rowStartIndex, rowStopIndex,
-        this.props._columns, columnStartIndex, columnStopIndex,
-        this.props.fixedTopCount,
-        this.props.fixedBottomCount,
-        this.props.fixedLeftCount,
-        this.props.fixedRightCount
-        );
+    const _items = this._items(
+      this.props._rows, rowStartIndex, rowStopIndex,
+      this.props._columns, columnStartIndex, columnStopIndex,
+      this.props.fixedTopCount,
+      this.props.fixedBottomCount,
+      this.props.fixedLeftCount,
+      this.props.fixedRightCount,
+    );
 
     return template.call(this, {
-      
+      // variables
       _items,
-      unused_bottom: bottom,
-      unused_center: center,
       columnStartIndex,
       columnStopIndex,
       containerStyle,
       contentHeight,
       contentWidth,
       unused_guidelineStyle: guidelineStyle,
-      
-      unused_left: left,
       overallHeight,
       overallWidth,
-      unused_right: right,
       rowStartIndex,
       rowStopIndex,
       scrollbarHandleStyle,
@@ -453,9 +404,8 @@ class WindowTable extends PureComponent {
       scrollbarWidth,
       scrollbarX,
       scrollbarY,
-      unused_top: top,
       unused_Guideline: Guideline,
-      
+      // components
       Scrollarea,
       Scrollbar,
     });
@@ -572,23 +522,23 @@ const enhance = compose(
   withPropsOnChange(['columns'], ({ columns, columnWidth }) => {
     let offset = 0;
     const _columns = (columns || [])
-    .filter(column => column && (typeof column === 'string' || typeof column === 'object'))
-    .map(column => (typeof column === 'string' ? { name: column } : { ...column }))
-    .filter(column => column.name)
-    .map((data, i) => {
-      let meta = {
-        offset,
-        size: columnWidth,
-      }
-      offset += columnWidth;
-      return {
-        i,
-        meta,
-        data,
-      }
-    })
+      .filter(column => column && (typeof column === 'string' || typeof column === 'object'))
+      .map(column => (typeof column === 'string' ? { name: column } : { ...column }))
+      .filter(column => column.name)
+      .map((data, i) => {
+        const meta = {
+          offset,
+          size: columnWidth,
+        };
+        offset += columnWidth;
+        return {
+          i,
+          meta,
+          data,
+        };
+      });
     return {
-      _columns
+      _columns,
     };
   }),
 
@@ -653,7 +603,7 @@ const enhance = compose(
 
     const columnWidthFn = (index) => {
       let { width } = columns[index];
-      
+
       width = isNaN(width) ? 80 : width;
       return width;
     };
@@ -709,21 +659,21 @@ const enhance = compose(
     let offset = 0;
     const _rows = (rows || [])
 
-    .map((data, i) => {
-      let size = data._height;
-      let meta = {
-        offset,
-        size,
-      }
-      offset += size;
-      return {
-        i,
-        meta,
-        data,
-      }
-    })
+      .map((data, i) => {
+        const size = data._height;
+        const meta = {
+          offset,
+          size,
+        };
+        offset += size;
+        return {
+          i,
+          meta,
+          data,
+        };
+      });
     return {
-      _rows
+      _rows,
     };
   }),
 
@@ -744,7 +694,7 @@ const enhance = compose(
       border: '1px solid #c4c4c4',
       boxSizing: 'border-box',
       width: _width,
-      
+
     });
 
     let contentWidth = width;

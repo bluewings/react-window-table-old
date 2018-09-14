@@ -142,7 +142,13 @@ class App extends Component {
                   fixedRightCount={2} 
                   fixedTopCount={2} 
                   fixedBottomCount={2} 
-                  />
+                >
+                  {({ columnIndex, rowIndex, style }) => (
+                    <div style={style}>
+                      {rowIndex} , {columnIndex}
+                    </div>
+                  )}
+                </TmpTable>
         {/* <table border={1} cellPadding={10}>
           <tbody>
             <tr>
