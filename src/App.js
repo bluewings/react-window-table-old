@@ -58,6 +58,11 @@ const scrollbarTrackStyle = base => {
   };
 };
 
+columns[2] = {
+  name: columns[2],
+  width: 40,
+}
+
 const scrollbarHandleStyle = base => {
   return {
     ...base,
@@ -138,8 +143,8 @@ class ItemRenderer extends PureComponent {
   }
 }
 
-const columnWidth = index => {
-  return 60 + (index % 3) * 20;
+const columnWidth = (index, column) => {
+  return column.width || (60 + (index % 3) * 20);
 };
 
 const rowHeight = index => {

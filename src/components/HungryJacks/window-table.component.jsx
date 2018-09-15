@@ -212,10 +212,12 @@ class WindowTable extends PureComponent {
         width,
         background:
           (rowIndex + columnIndex) % 2 === 0
-            ? '#fff' // 'rgba(0,0,0,.05)'
-            : '#eee', // 'rgba(0,0,0,.1',
+            ? 'rgba(0,0,0,.05)'
+            : 'rgba(0,0,0,.1',
       };
     }
+    // ? '#fff' // 'rgba(0,0,0,.05)'
+    // : '#eee', // 'rgba(0,0,0,.1',
     return itemStyleCache[key];
   };
 
