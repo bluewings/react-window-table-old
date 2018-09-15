@@ -159,6 +159,7 @@ class App extends Component {
         </Scrollarea> */}
         <TmpTable
           columns={columns.slice(0, 100)}
+          rows={rows.slice(0, 20000)}
           enhancer={withColumns}
           // scrollbarTrackStyle={scrollbarTrackStyle}
           // scrollbarHandleStyle={scrollbarHandleStyle}

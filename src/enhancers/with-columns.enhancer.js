@@ -49,6 +49,8 @@ const withColumns = compose(
         return;
       }
 
+      console.log('> rows', rows);
+
       let getRowHeight;
 
       if (typeof _rowHeight === 'function') {
@@ -147,7 +149,7 @@ const withColumns = compose(
 
       return {
         rows,
-        // rowCount,
+        rowCount,
         // columnCount,
         // columnWidth,
         // rowHeight,
