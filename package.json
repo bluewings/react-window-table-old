@@ -50,6 +50,7 @@
     "object.entries": "^1.0.4",
     "postcss-flexbugs-fixes": "3.2.0",
     "postcss-loader": "2.0.8",
+    "prettier-eslint": "^8.8.2",
     "promise": "8.0.1",
     "prop-types": "^15.6.2",
     "pug-as-jsx-loader": "^1.0.57",
@@ -71,12 +72,14 @@
     "whatwg-fetch": "2.0.3",
     "with-hocs": "^1.0.0"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "prettier-eslint-cli": "^4.7.1"
+  },
   "scripts": {
     "start": "node scripts/start.js",
     "build": "node scripts/build.js",
     "test": "node scripts/test.js --env=jsdom",
-    "prettier": "prettier --write 'src/**/*.{js,jsx,json,css}'"
+    "prettier": "prettier-eslint --write 'src/**/*.{js,jsx,json,css}'"
   },
   "jest": {
     "collectCoverageFrom": [

@@ -186,7 +186,6 @@ class WindowTable extends PureComponent {
     return low > 0 ? low - 1 : 0;
   };
 
-
   itemCache = memoizeOne((_, __) => ({}));
 
   _getItemStyleCache = memoizeOne((_, __) => ({}));
@@ -351,7 +350,11 @@ class WindowTable extends PureComponent {
         items[section] = [];
 
         for (let rowIndex = rowFr; rowIndex < rowTo; rowIndex += 1) {
-          for (let columnIndex = colFr; columnIndex < colTo; columnIndex += 1) {
+          for (
+            let columnIndex = colFr;
+            columnIndex < colTo;
+            columnIndex += 1
+          ) {
             items[section].push(createElement(this.props.children, {
               columnIndex,
               isScrolling,

@@ -3,11 +3,12 @@ import React, { Component, PureComponent } from 'react';
 // import logo from './logo.svg';
 import './App.css';
 import WindowTable from './components/WindowTable';
-// import TmpTable from './components/HungryJacks';
-import TmpTable from './components/WithColumns';
+import TmpTable from './components/HungryJacks';
+// import TmpTable from './components/WithColumns';
 import Scrollarea from './components/Scrollarea';
 import sampleImg from './sample.png';
 import { columns, rows } from './examples/data/pokedex';
+import { withColumns } from './enhancers';
 
 // const columns = [...Array(50)].map((e, i) => ({ name: `col-${i}`, width: 100 }));
 
@@ -152,6 +153,8 @@ class App extends Component {
           <img src={sampleImg} />
         </Scrollarea> */}
         <TmpTable
+          columns={columns.slice(0, 100)}
+          enhancer={withColumns}
           // scrollbarTrackStyle={scrollbarTrackStyle}
           // scrollbarHandleStyle={scrollbarHandleStyle}
           // guidelineStyle={guidelineStyle}

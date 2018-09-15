@@ -3,6 +3,7 @@
 import React, { PureComponent } from 'react';
 import { withPropsOnChange } from 'recompose';
 import WindowTable from '../HungryJacks';
+// import ./wi
 
 const enhance = [
   withPropsOnChange(['children'], ({ children }) => {
