@@ -41,6 +41,121 @@ const withColumns = compose(
     },
   ),
   withPropsOnChange(['columns'], ({ columns }) => ({ columns })),
+
+  withPropsOnChange(
+    ['columns', 'rows', 'rowHeight'],
+    ({ columns, rows, rowHeight: _rowHeight }) => {
+      if (!Array.isArray(rows)) {
+        return;
+      }
+
+      let getRowHeight;
+
+      if (typeof _rowHeight === 'function') {
+        getRowHeight = index => _rowHeight(index - 1);
+      } else if (typeof _rowHeight === 'number') {
+        getRowHeight = () => _rowHeight;
+      } else {
+        getRowHeight = () => 50;
+      }
+
+      rows = rows.map(row => {
+        let _row;
+        if (Array.isArray(row)) {
+          _row = columns.reduce(
+            (prev, e, i) => ({
+              ...prev,
+              [e.name]: row[i],
+            }),
+            {},
+          );
+        } else {
+          _row = { ...row };
+        }
+
+        const data = {
+          org: { ..._row },
+          arr: columns.map(e => {
+            let value = _row[e.name];
+            if (typeof e.getValue === 'function') {
+              value = e.getValue(value);
+            }
+            if (typeof value === 'string' || typeof value === 'number') {
+              return value;
+            }
+            return '-';
+          }),
+        };
+
+        return data;
+      });
+
+      rows = [
+        {
+          org: {},
+          _isHeader: true,
+          arr: columns.map(e => e.name),
+        },
+        ...rows,
+      ].map((e, i) => ({
+        ...e,
+        _height: getRowHeight(i, e),
+      }));
+
+      // const te = new Date();
+      // console.info('data count', rows.length * columns.length, 'elapsed', te - ts);
+
+      const rowCount = (rows || []).length;
+
+      const columnCount = (columns || []).length;
+
+      const columnWidthFn = index => {
+        let { width } = columns[index];
+        width = isNaN(width) ? 120 : width;
+        return width;
+      };
+
+      const rowHeightFn = index => rows[index]._height;
+
+      const overallWidth = (columns || []).reduce(
+        (prev, column, index) => prev + columnWidthFn(index, column),
+        0,
+      );
+
+      const overallHeight = (rows || []).reduce(
+        (prev, row, index) => prev + rowHeightFn(index, row),
+        0,
+      );
+
+      const columnWidth = (from, limit = 1) => {
+        limit = limit > 0 ? limit : 0;
+
+        return new Array(limit)
+          .fill(true)
+          .map((e, i) => from + i)
+          .reduce((prev, i) => prev + columnWidthFn(i), 0);
+      };
+
+      const rowHeight = (from, limit = 1) => {
+        limit = limit > 0 ? limit : 0;
+
+        return new Array(limit)
+          .fill(true)
+          .map((e, i) => from + i)
+          .reduce((prev, i) => prev + rowHeightFn(i), 0);
+      };
+
+      return {
+        rows,
+        // rowCount,
+        // columnCount,
+        // columnWidth,
+        // rowHeight,
+        // overallWidth,
+        // overallHeight,
+      };
+    },
+  ),
 );
 
 export default withColumns;
