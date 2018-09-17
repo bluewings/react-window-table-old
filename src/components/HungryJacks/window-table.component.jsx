@@ -1,6 +1,6 @@
 /* eslint-disable
   no-underscore-dangle,
-
+  react/no-unused-state,
   react/prop-types,
   react/no-unused-prop-types,
   no-prototype-builtins,
@@ -46,13 +46,13 @@ class WindowTable extends PureComponent {
 
     this.containerRef = React.createRef();
 
-    this.gridRef = {
-      center: React.createRef(),
-      top: React.createRef(),
-      bottom: React.createRef(),
-      left: React.createRef(),
-      right: React.createRef(),
-    };
+    // this.gridRef = {
+    //   center: React.createRef(),
+    //   top: React.createRef(),
+    //   bottom: React.createRef(),
+    //   left: React.createRef(),
+    //   right: React.createRef(),
+    // };
 
     this.scrollbarRef = {
       x: React.createRef(),
@@ -70,8 +70,8 @@ class WindowTable extends PureComponent {
       isScrolling: false,
       scrollTop: props.scrollTop || 0,
       scrollLeft: props.scrollLeft || 0,
-      // scrollX: props.scrollLeft / props.maxScrollX,
-      // scrollY: props.scrollTop / props.maxScrollY,
+      scrollX: props.scrollLeft / props.maxScrollX,
+      scrollY: props.scrollTop / props.maxScrollY,
     };
 
     this.tableRef = React.createRef();
@@ -98,9 +98,9 @@ class WindowTable extends PureComponent {
       if (this.scrollbarRef.y.current) {
         this.scrollbarRef.y.current.scrollTo(this.state);
       }
-      // Object.keys(this.guidelineRef)
-      //   .filter(key => this.guidelineRef[key].current)
-      //   .forEach(key => this.guidelineRef[key].current.update(this.state));
+      Object.keys(this.guidelineRef)
+        .filter(key => this.guidelineRef[key].current)
+        .forEach(key => this.guidelineRef[key].current.update(this.state));
       // });
     }
   }
@@ -212,8 +212,9 @@ class WindowTable extends PureComponent {
         width,
         background:
           (rowIndex + columnIndex) % 2 === 0
-            ? 'rgba(0,0,0,.05)'
-            : 'rgba(0,0,0,.1',
+            ? '#fff' : '#eee',
+        // ? 'rgba(0,0,0,.05)'
+        // : 'rgba(0,0,0,.1',
       };
     }
     // ? '#fff' // 'rgba(0,0,0,.05)'
@@ -236,8 +237,8 @@ class WindowTable extends PureComponent {
           isScrolling: true,
           scrollTop: _scrollTop,
           scrollLeft: _scrollLeft,
-          // scrollY: _scrollTop / this.props.maxScrollY,
-          // scrollX: _scrollLeft / this.props.maxScrollX,
+          scrollY: _scrollTop / this.props.maxScrollY,
+          scrollX: _scrollLeft / this.props.maxScrollX,
         }),
         this.resetIsScrollingDebounced,
       );
@@ -399,6 +400,12 @@ class WindowTable extends PureComponent {
         scrollbarX,
         scrollbarY,
         totalHeight,
+        leftOffset,
+        rightOffset,
+        topOffset,
+        maxScrollX,
+        maxScrollY,
+        bottomOffset,
         totalWidth,
       },
       state: { scrollLeft, scrollTop, isScrolling },
@@ -429,11 +436,16 @@ class WindowTable extends PureComponent {
 
     return template.call(this, {
       // variables
+      bottomOffset,
       containerStyle,
       contentHeight,
       contentWidth,
-      unused_guidelineStyle: guidelineStyle,
+      guidelineStyle,
       items,
+      leftOffset,
+      maxScrollX,
+      maxScrollY,
+      rightOffset,
       scrollLeft,
       scrollTop,
       scrollbarHandleStyle,
@@ -441,10 +453,11 @@ class WindowTable extends PureComponent {
       scrollbarWidth,
       scrollbarX,
       scrollbarY,
+      topOffset,
       totalHeight,
       totalWidth,
-      unused_Guideline: Guideline,
       // components
+      Guideline,
       Scrollarea,
       Scrollbar,
     });
@@ -682,8 +695,9 @@ const enhance = compose(
       width,
 
       totalWidth,
-      // contentWidth,
-      // contentHeight,
+      totalHeight,
+      contentWidth,
+      contentHeight,
       // columnCount,
 
       // rowCount,
@@ -692,6 +706,7 @@ const enhance = compose(
       fixedBottomCount: bottomCount,
       fixedLeftCount,
       fixedRightCount,
+      getSize,
       // getSize,
       // getSize,
     }) => {
@@ -702,6 +717,11 @@ const enhance = compose(
         leftCount = 0;
         rightCount = 0;
       }
+
+      const leftOffset = getSize('column', leftCount);
+      const rightOffset = getSize('column', rightCount * -1);
+      const topOffset = getSize('row', topCount);
+      const bottomOffset = getSize('row', bottomCount * -1);
 
       // const center = {
       //   // width:
@@ -719,6 +739,12 @@ const enhance = compose(
         bottomCount,
         leftCount,
         rightCount,
+        leftOffset,
+        rightOffset,
+        topOffset,
+        bottomOffset,
+        maxScrollX: totalWidth - contentWidth,
+        maxScrollY: totalHeight - contentHeight,
         // maxScrollX: 0,
         // _maxScrollX: Math.max(
         //   0,

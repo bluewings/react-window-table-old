@@ -47,7 +47,7 @@ class Guideline extends PureComponent {
   guidelineStyle = memoize((type, distance, length, customStyle) => {
     let styles = {
       position: 'absolute',
-      zIndex: 1,
+      zIndex: 3,
       width: defaults.width,
       height: defaults.width,
       background: defaults.background[type],
@@ -67,8 +67,8 @@ class Guideline extends PureComponent {
     });
   });
 
-  update = abc => {
-    const { scrollX, scrollY } = abc;
+  update = ({ scrollX, scrollY }) => {
+    // const { scrollX, scrollY } = abc;
     // console.log(abc);
     // console.log(aaa);
     this.scrollX = scrollX;

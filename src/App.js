@@ -58,10 +58,13 @@ const scrollbarTrackStyle = base => {
   };
 };
 
-columns[2] = {
-  name: columns[2],
-  width: 40,
-}
+// columns[3] = {
+//   name: columns[3],
+//   width: 140,
+//   render: (value) => {
+//     return <img src={value} height={120} />
+//   }
+// }
 
 const scrollbarHandleStyle = base => {
   return {
@@ -170,12 +173,14 @@ class App extends Component {
 
           // columns={columns.slice(0, 100)} rows={rows.slice(0, 20000)}
 
-          width={640}
-          height={380}
+          width={940}
+          height={680}
           columnCount={50}
           rowCount={100}
           rowHeight={rowHeight_}
+          rowHeight={40}
           columnWidth={columnWidth}
+          columnWidth={100}
           fixedLeftCount={1}
           fixedRightCount={1}
           fixedTopCount={1}

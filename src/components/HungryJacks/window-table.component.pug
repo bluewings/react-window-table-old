@@ -7,19 +7,31 @@ div
     h1 {rowStartIndex} ~ {rowStopIndex}
     //- pre {JSON.stringify(this.props.rows, null, 2)}
     //- h2 {items.topLeftItems.length}
-  h1 {JSON.stringify(this.state.isScrolling)}
+  //- h1 {JSON.stringify(this.state.isScrolling)}
+  //- h1 {contentWidth}, {contentHeight}
+  //- h1 {totalWidth}, {totalHeight}
+  //- h1 {maxScrollX}, {maxScrollY}
+  //- h1 {scrollLeft}, {scrollTop}
+  //- h1 {this.props.topOffset}, {this.props.bottomOffset}, {this.props.leftOffset}, {this.props.rightOffset}
   div(className='{cx(styles.root, containerStyle)}',
     ref='{this.containerRef}')
     table(className='{styles.table}', border='{0}', cellPadding='{0}', cellSpacing='{0}', ref='{this.tableRef}')
       tbody
         tr
           td
+            //- div(className='{styles.guideLines}')
+
             Scrollarea(width='{contentWidth}', height='{contentHeight}',
               scrollTop='{scrollTop}'
               scrollLeft='{scrollLeft}'
               contentWidth='{totalWidth}',
               contentHeight='{totalHeight}',
               onScroll='{this.scrollTo}')
+                Guideline(@if='topOffset > 0',    ref='{this.guidelineRef.top}',    type='top',    guidelineStyle='{guidelineStyle}', length='{contentWidth}',  maxScroll='{maxScrollY}', distance='{topOffset}')
+                Guideline(@if='bottomOffset > 0', ref='{this.guidelineRef.bottom}', type='bottom', guidelineStyle='{guidelineStyle}', length='{contentWidth}',  maxScroll='{maxScrollY}', distance='{bottomOffset}')
+                Guideline(@if='leftOffset > 0',   ref='{this.guidelineRef.left}',   type='left',   guidelineStyle='{guidelineStyle}', length='{contentHeight}', maxScroll='{maxScrollX}', distance='{leftOffset}')
+                Guideline(@if='rightOffset > 0',  ref='{this.guidelineRef.right}',  type='right',  guidelineStyle='{guidelineStyle}', length='{contentHeight}', maxScroll='{maxScrollX}', distance='{rightOffset}')
+
 
                 //- scroll-y, scroll-x
                 div(ref='{this.secRef}', style='{{ transform: "translate3d(" + (scrollLeft * -1) + "px, " + (scrollTop * -1) + "px, 0)" }}')
@@ -52,13 +64,6 @@ div
 
 
 
-              //- div
-                Guideline(@if='top',    ref='{this.guidelineRef.top}',    type='top',    guidelineStyle='{guidelineStyle}', length='{contentWidth}',  distance='{top.height}')
-                //- Guideline(@if='bottom', ref='{this.guidelineRef.bottom}', type='bottom', guidelineStyle='{guidelineStyle}', length='{contentWidth}',  distance='{bottom.height + (scrollbarX ? scrollbarWidth : 0)}')
-                Guideline(@if='bottom', ref='{this.guidelineRef.bottom}', type='bottom', guidelineStyle='{guidelineStyle}', length='{contentWidth}',  distance='{bottom.height}')
-                Guideline(@if='left',   ref='{this.guidelineRef.left}',   type='left',   guidelineStyle='{guidelineStyle}', length='{contentHeight}', distance='{left.width}')
-                //- Guideline(@if='right',  ref='{this.guidelineRef.right}',  type='right',  guidelineStyle='{guidelineStyle}', length='{contentHeight}', distance='{right.width + (scrollbarY ? scrollbarWidth : 0)}')
-                Guideline(@if='right',  ref='{this.guidelineRef.right}',  type='right',  guidelineStyle='{guidelineStyle}', length='{contentHeight}', distance='{right.width}')
                 //- table(className='{styles.table}', border='{0}', cellPadding='{0}', cellSpacing='{0}',
                   )
                   tbody
