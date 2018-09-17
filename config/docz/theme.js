@@ -5,6 +5,7 @@ export default {
     // primary: '#7cb342',
     primary: '#1e88e5',
     blue: '#1e88e5',
+    link: '#1e88e5',
   },
   styles: {
     h1: {
@@ -64,8 +65,39 @@ export default {
     },
     body: {
       fontFamily: 'Roboto,-apple-system,BlinkMacSystemFont,"Helvetica Neue",Helvetica,sans-serif',
+      '#root > div > div > nav': {
+        div: {
+          marginTop: '0 !important',
+        },
+        a: {
+          // background: 'yellow',
+          boxSizing: 'border-box',
+          // border: '1px solid black',
+          fontSize: 16,
+          fontWeight: 400,
+          lineHeight: '34px',
+          height: 36,
+          paddingTop: 0,
+          paddingBottom: 0,
+
+          '&.active': {
+            fontWeight: 800,
+
+            '&:before': {
+              top: 6,
+              width: 3,
+              height: 24,
+            },
+            // width: 4px;
+            // bottom: 0;
+            // height: 40px;
+          },
+        },
+      },
+
       '.react-live-preview': {
         // border: '5px solid black',
+        fontSize: 12,
         '.cell': {
           // fontSize: '12px',
           display: 'flex',
@@ -73,6 +105,15 @@ export default {
           justifyContent: 'center',
         },
 
+      },
+      '.example': {
+        fontSize: 12,
+        '.cell': {
+          // fontSize: '12px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+        },
       },
     },
   },

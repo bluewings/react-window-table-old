@@ -9,61 +9,52 @@ import { columns, rows } from '../../examples/data/pokedex';
 
 # WindowTable
 
-<WindowTable
-          width={497}
-          height={297}
-          columnCount={50}
-          rowCount={100}
-          rowHeight={35}
-          columnWidth={80}
-          fixedLeftCount={1}
-          fixedRightCount={1}
-          fixedTopCount={1}
-          fixedBottomCount={1} >
-          {({ columnIndex, rowIndex, style }) => {
-           return (
-       <div className="cell" style={style}>
-                      {rowIndex} , {columnIndex}
-                    </div>
-           )  
-          }}
-</WindowTable>
+<div className="example">
+  <WindowTable
+    width={497}
+    height={297}
+    rowCount={500}
+    rowHeight={35}
+    columnCount={500}
+    columnWidth={80}
+    fixedLeftCount={1}
+    fixedRightCount={1}
+    fixedTopCount={1}
+    fixedBottomCount={1} >
+    {({ columnIndex, rowIndex, style }) => (
+      <div className="cell" style={style}>
+        {rowIndex} , {columnIndex}
+      </div>
+    )}
+  </WindowTable>
+</div>
 
-React components for efficiently rendering large lists and tabular data React components for efficiently rendering large lists and tabular data React components for efficiently rendering large lists and tabular data
+React table component that supports fixed columns inspired by [react-window](https://github.com/bvaughn/react-window).
 
-React components for efficiently rendering large lists and tabular data
-
-
-## Getting Started
-
+[![NPM registry](https://img.shields.io/npm/v/react-window-table.svg?style=for-the-badge)](https://www.npmjs.com/package/react-window-table) ![NPM license](https://img.shields.io/badge/license-mit-red.svg?style=for-the-badge)
 
 ## Properties
 
 <PropsTable of={WindowTable} />
 
-console.log(WindowTable)
-
-## Playground
+## Basic Usage
 
 <Playground>
-    <WindowTable
-          width={600}
-          height={400}
-          columnCount={50}
-          rowCount={100}
-          rowHeight={50}
-          columnWidth={100}
-          fixedLeftCount={1}
-          fixedRightCount={1}
-          fixedTopCount={1}
-          fixedBottomCount={1} >
-          {({ columnIndex, rowIndex, style }) => {
-           return (
-       <div className="cell" style={style}>
-                      {rowIndex} , {columnIndex}
-                    </div>
-           )  
-          }}
-          </WindowTable>
-        
+  <WindowTable
+    width={497}
+    height={297}
+    rowCount={500}
+    rowHeight={35}
+    columnCount={500}
+    columnWidth={80}
+    fixedLeftCount={1}
+    fixedRightCount={0}
+    fixedTopCount={1}
+    fixedBottomCount={0} >
+    {({ columnIndex, rowIndex, style }) => (
+      <div className="cell" style={style}>
+        {rowIndex} , {columnIndex}
+      </div>
+    )}
+  </WindowTable>
 </Playground>
