@@ -783,8 +783,14 @@ class Tmp extends PureComponent {
 }
 
 Tmp.propTypes = {
+  /**
+   * Description of prop "bar" (a custom validation function).
+   */  
   width: PropTypes.number.isRequired,
   height: PropTypes.number.isRequired,
+  /**
+   * Description of prop "bar" (a custom validation function).
+   */
   columnCount: PropTypes.number.isRequired,
   columnWidth: PropTypes.number.isRequired,
   rowCount: PropTypes.number.isRequired,

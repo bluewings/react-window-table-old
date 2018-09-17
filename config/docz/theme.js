@@ -51,6 +51,7 @@ export default {
       thead: {
         th: {
           padding: '0.5rem 0.75rem',
+          lineHeight: 1.5,
         },
       },
       tbody: {
@@ -59,6 +60,7 @@ export default {
         // },
         td: {
           padding: '0.5rem 0.75rem',
+          lineHeight: 1.5,
         },
       },
 
