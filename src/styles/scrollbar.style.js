@@ -27,8 +27,11 @@ const defaultScrollbarClassNames = Map({
 
 const baseTrackStyle = ({
   classNames,
-  axis, handleLength, trackWidth,
-  width, height,
+  axis,
+  handleLength,
+  trackWidth,
+  width,
+  height,
 }) => {
   const styles = {
     position: 'relative',
@@ -51,8 +54,11 @@ const baseTrackStyle = ({
 
 const baseHandleStyle = ({
   classNames,
-  axis, handleLength, trackWidth,
-  width, height,
+  axis,
+  handleLength,
+  trackWidth,
+  width,
+  height,
 }) => {
   const baseStyle = {
     // ...base,
@@ -95,7 +101,11 @@ const baseHandleStyle = ({
 };
 
 const scrollbarTrackStyle = ({
-  classNames, axis, trackLength, trackWidth, customStyleFn,
+  classNames,
+  axis,
+  trackLength,
+  trackWidth,
+  customStyleFn,
 }) => {
   const width = axis === 'x' ? trackLength : trackWidth;
   const height = axis === 'x' ? trackWidth : trackLength;
@@ -119,7 +129,11 @@ const scrollbarTrackStyle = ({
 };
 
 const scrollbarHandleStyle = ({
-  classNames, axis, handleLength, trackWidth, customStyleFn,
+  classNames,
+  axis,
+  handleLength,
+  trackWidth,
+  customStyleFn,
 }) => {
   const width = axis === 'x' ? handleLength : trackWidth;
   const height = axis === 'x' ? trackWidth : handleLength;
@@ -147,7 +161,6 @@ const scrollbarHandleStyle = ({
     height,
   });
 };
-
 
 // const cellStyle = (classNames, customStyleFnFn) => {
 //   let styleObj = {

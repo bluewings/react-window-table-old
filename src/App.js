@@ -1,12 +1,14 @@
 /* eslint-disable */
-import React, { Component } from 'react';
+import React, { Component, PureComponent } from 'react';
 // import logo from './logo.svg';
 import './App.css';
 import WindowTable from './components/WindowTable';
-import TmpTable from './components/TmpTable';
+import TmpTable from './components/HungryJacks';
+// import TmpTable from './components/WithColumns';
 import Scrollarea from './components/Scrollarea';
 import sampleImg from './sample.png';
 import { columns, rows } from './examples/data/pokedex';
+import { withColumns } from './enhancers';
 
 // const columns = [...Array(50)].map((e, i) => ({ name: `col-${i}`, width: 100 }));
 
@@ -49,14 +51,22 @@ import { columns, rows } from './examples/data/pokedex';
 
 // columns[3].textAlign = 'center';
 
-const scrollbarTrackStyle = (base) => {
+const scrollbarTrackStyle = base => {
   return {
     ...base,
     background: 'yellow',
-  }
-}
+  };
+};
 
-const scrollbarHandleStyle = (base) => {
+// columns[3] = {
+//   name: columns[3],
+//   width: 140,
+//   render: (value) => {
+//     return <img src={value} height={120} />
+//   }
+// }
+
+const scrollbarHandleStyle = base => {
   return {
     ...base,
     background: 'transparent',
@@ -67,7 +77,7 @@ const scrollbarHandleStyle = (base) => {
       width: base.width - 6,
       height: base.height - 6,
       margin: 3,
-      borderRadius: ((base.height - 6) / 2) + 'px',
+      borderRadius: (base.height - 6) / 2 + 'px',
       // background: 'red',
       transition: 'background 0.1s',
       // background: 'rgba(204,204,204,0.4)',
@@ -78,8 +88,8 @@ const scrollbarHandleStyle = (base) => {
         // background: 'blue',
         // background: 'rgba(204,204,204,0.8)',
         background: 'rgba(0,0,0,0.5)',
-        // boxShadow: 'inset 0 0 6px rgba(0,0,0,0.5)', 
-      }
+        // boxShadow: 'inset 0 0 6px rgba(0,0,0,0.5)',
+      },
     },
     '&.dragging > div': {
       // background: 'blue',
@@ -87,10 +97,10 @@ const scrollbarHandleStyle = (base) => {
       background: 'rgba(0,0,0,0.5)',
       // boxShadow: 'inset 0 0 6px rgba(0,0,0,0.5)',
     },
-  }
-}
+  };
+};
 
-const guidelineStyle = (base) => {
+const guidelineStyle = base => {
   return {
     ...base,
     width: 1,
@@ -98,29 +108,51 @@ const guidelineStyle = (base) => {
     background: 'black',
     opacity: '1 !important',
     // zIndex: 1,
-  }
-}
+  };
+};
 
-const cellStyle = (base) => {
+const cellStyle = base => {
   return {
     ...base,
-    borderBottom: '1px solid silver'
-  }
-}
+    borderBottom: '1px solid silver',
+  };
+};
 
-const headerStyle = (base) => {
+const headerStyle = base => {
   return {
     ...base,
     background: '#e8e8e8',
     // borderBottom: '1px solid silver'
+  };
+};
+
+const rowHeight_ = index => {
+  // console.log(index, index % 3, 40 + (index % 3) * 10)
+  return 40 + (index % 3) * 10;
+};
+
+class ItemRenderer extends PureComponent {
+  render() {
+    const { isScrolling } = this.props;
+    // if (isScrolling) return null;
+    return (
+      <div style={this.props.style}>
+        {isScrolling
+          ? 'scrolling'
+          : this.props.rowIndex + ' , ' + this.props.columnIndex}
+        {/* {this.props.rowIndex} , {this.props.columnIndex} */}
+      </div>
+    );
   }
 }
 
-const rowHeight = (index) => {
-  // console.log(index, index % 3, 40 + (index % 3) * 10)
-  return 40 + (index % 3) * 10;
-}
+const columnWidth = (index, column) => {
+  return column.width || (120 + (index % 3) * 20);
+};
 
+const rowHeight = index => {
+  return 20 + (index % 3) * 10;
+};
 class App extends Component {
   render() {
     return (
@@ -128,21 +160,39 @@ class App extends Component {
         {/* <Scrollarea contentHeight={1000}>
           <img src={sampleImg} />
         </Scrollarea> */}
-                <TmpTable
-                  // scrollbarTrackStyle={scrollbarTrackStyle}
-                  // scrollbarHandleStyle={scrollbarHandleStyle}
-                  // guidelineStyle={guidelineStyle}
-                  // headerStyle={headerStyle}
-                  // cellStyle={cellStyle}
-                  // rowHeight={rowHeight}
-                  columns={columns.slice(0, 15)} rows={rows.slice(0, 20000)} width={1000} height={516}
-                  rowHeight={50}
-                  columnWidth={200}
-                  fixedLeftCount={1} 
-                  fixedRightCount={1} 
-                  fixedTopCount={1} 
-                  fixedBottomCount={1} 
-                  />
+        <TmpTable
+          columns={columns.slice(0, 100)}
+          rows={rows.slice(0, 20000)}
+          enhancer={withColumns}
+          // scrollbarTrackStyle={scrollbarTrackStyle}
+          // scrollbarHandleStyle={scrollbarHandleStyle}
+          // guidelineStyle={guidelineStyle}
+          // headerStyle={headerStyle}
+          // cellStyle={cellStyle}
+          // rowHeight={rowHeight}
+
+          // columns={columns.slice(0, 100)} rows={rows.slice(0, 20000)}
+
+          width={940}
+          height={680}
+          columnCount={50}
+          rowCount={100}
+          rowHeight={rowHeight_}
+          rowHeight={40}
+          columnWidth={columnWidth}
+          columnWidth={100}
+          fixedLeftCount={1}
+          fixedRightCount={1}
+          fixedTopCount={1}
+          fixedBottomCount={1}
+        >
+          {ItemRenderer}
+          {/* {({ columnIndex, rowIndex, style }) => (
+                    <div style={style}>
+                      {rowIndex} , {columnIndex}
+                    </div>
+                  )} */}
+        </TmpTable>
         {/* <table border={1} cellPadding={10}>
           <tbody>
             <tr>
@@ -172,8 +222,7 @@ class App extends Component {
             </tr>
           </tbody>
         </table> */}
-        
-        
+
         {/* <header className="App-header">
           <img src={logo} className="App-logo" alt="logo" />
           <h1 className="App-title">Welcome to React</h1>

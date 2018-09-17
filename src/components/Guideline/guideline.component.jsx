@@ -7,7 +7,7 @@ import Draggable from 'react-draggable';
 
 // import template from './scrollbar.component.pug';
 
-const getClientRect = (elem) => {
+const getClientRect = elem => {
   const rect = elem.getBoundingClientRect();
   return {
     top: rect.top,
@@ -28,16 +28,12 @@ const defaults = {
     bottom: 'linear-gradient(to top, ' + SHADOW_GRADIENT + ')',
     left: 'linear-gradient(to right, ' + SHADOW_GRADIENT + ')',
     right: 'linear-gradient(to left, ' + SHADOW_GRADIENT + ')',
-  
-  }
-}
-
-
+  },
+};
 
 class Guideline extends PureComponent {
-  
   constructor(props) {
-    super(props)
+    super(props);
     this.scrollX = 0;
     this.scrollY = 0;
     this.aaaRef = React.createRef();
@@ -58,51 +54,50 @@ class Guideline extends PureComponent {
       [type]: distance,
       transition: 'opacity 0.2s',
       '&.scroll-0': {
-        opacity: 0
-      }
-    }
-    styles[(type === 'top' || type === 'bottom') ? 'width' : 'height'] = length;
+        opacity: 0,
+      },
+    };
+    styles[type === 'top' || type === 'bottom' ? 'width' : 'height'] = length;
     if (typeof customStyle === 'function') {
       styles = customStyle(styles, { type, distance, length });
     }
     return css({
       ...styles,
-      [(type === 'top' || type === 'bottom') ? 'width' : 'height']: length,
+      [type === 'top' || type === 'bottom' ? 'width' : 'height']: length,
     });
-  })
+  });
 
-  update = (abc)=> {
-    const { scrollX, scrollY } = abc;
+  update = ({ scrollX, scrollY }) => {
+    // const { scrollX, scrollY } = abc;
     // console.log(abc);
     // console.log(aaa);
     this.scrollX = scrollX;
     this.scrollY = scrollY;
     this.aaa();
-    
-  }
+  };
 
   aaa = () => {
     if (this.aaaRef.current) {
       let ccc;
       switch (this.props.type) {
         case 'top':
-        ccc = this.scrollY
+          ccc = this.scrollY;
           break;
-          case 'bottom':
-          ccc = 1 - this.scrollY
+        case 'bottom':
+          ccc = 1 - this.scrollY;
           break;
-          case 'left':
-          ccc = this.scrollX
+        case 'left':
+          ccc = this.scrollX;
           break;
-          case 'right':
-          ccc = 1 - this.scrollX
+        case 'right':
+          ccc = 1 - this.scrollX;
           break;
       }
       // this.aaaRef.current.innerText = parseInt(ccc * 100, 10) / 100;
       // this.aaaRef.current.innerText = parseInt(ccc * 100, 10) / 100 || 0;
       this.bbbRef.current.classList.remove('scroll-0', 'scroll-100');
       if (isNaN(ccc)) {
-        ccc = 0
+        ccc = 0;
       }
       if (ccc === 0) {
         this.bbbRef.current.classList.add('scroll-0');
@@ -110,15 +105,18 @@ class Guideline extends PureComponent {
         this.bbbRef.current.classList.add('scroll-100');
       }
     }
-  }
+  };
 
   render() {
     const { type, distance, length, guidelineStyle } = this.props;
     return (
-    <div ref={this.bbbRef} className={this.guidelineStyle(type, distance, length, guidelineStyle)}>
-      <div ref={this.aaaRef }/>
-    </div>
-    )
+      <div
+        ref={this.bbbRef}
+        className={this.guidelineStyle(type, distance, length, guidelineStyle)}
+      >
+        <div ref={this.aaaRef} />
+      </div>
+    );
   }
 }
 

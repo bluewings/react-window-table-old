@@ -6,7 +6,4 @@ const columns = pokemons
 
 const rows = pokemons;
 
-export {
-  columns,
-  rows,
-};
+export { columns, rows };

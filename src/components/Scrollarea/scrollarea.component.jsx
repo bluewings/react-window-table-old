@@ -1,8 +1,8 @@
 /* eslint-disable react/prop-types, no-underscore-dangle, react/no-unused-state */
+/* eslint-disable */
 import React, { PureComponent } from 'react';
 import { compose, defaultProps } from 'recompose';
 // import sampleImg from './sample.png';
-
 
 // jsx, styles
 import template from './scrollarea.component.pug';
@@ -42,20 +42,22 @@ class Scrollarea extends PureComponent {
     // console.log('www');
     if (this.bumperRef.current && this.scrollWrapRef.current) {
       // // // console.log(this.bumperRef.current.style.width);
-      this.scrollWrapRef.current.style.width = `${this.bumperRef.current.getBoundingClientRect().width}px`;
+      this.scrollWrapRef.current.style.width = `${
+        this.bumperRef.current.getBoundingClientRect().width
+      }px`;
     }
   }
 
-  handleValueChange = (fieldValue) => {
+  handleValueChange = fieldValue => {
     this.setState({ fieldValue });
-  }
+  };
 
   // handleTouchstart = (event) => {
   //   // // console.log('%c touchstart', 'background:yellow');
   //   // // console.log(event);
   // }
 
-  handleMousewheel = (event) => {
+  handleMousewheel = event => {
     // // // console.log(this.scrollContent)
 
     // var wheelDistance = function(evt){
@@ -67,21 +69,25 @@ class Scrollarea extends PureComponent {
     //   } else return w/120;             // IE/Safari/Chrome TODO: /3 for Chrome OS X
     // };
     // // // console.log(event.deltaX, event.deltaY);
-    const contentHeight = this.props.contentHeight ||
+    const contentHeight =
+      this.props.contentHeight ||
       this.scrollContentRef.current.getBoundingClientRect().height;
-    const scrollHeight = contentHeight - this.scrollWrapRef.current.getBoundingClientRect().height;
+    const scrollHeight =
+      contentHeight - this.scrollWrapRef.current.getBoundingClientRect().height;
 
-    const contentWidth = this.props.contentWidth ||
+    const contentWidth =
+      this.props.contentWidth ||
       this.scrollContentRef.current.getBoundingClientRect().width;
 
-    const scrollWidth = Math.max(contentWidth -
-      this.scrollWrapRef.current.getBoundingClientRect().width, 0);
+    const scrollWidth = Math.max(
+      contentWidth - this.scrollWrapRef.current.getBoundingClientRect().width,
+      0,
+    );
 
     let { deltaX, deltaY } = event;
 
     // deltaX *= 1.2;
     // deltaY *= 1.2;
-
 
     const _deltaX = Math.abs(deltaX);
     const _deltaY = Math.abs(deltaY);
@@ -94,7 +100,6 @@ class Scrollarea extends PureComponent {
     // if (Math.abs(deltaX > 0 ?))
     // if (Math.ab)
 
-
     let { scrollLeft, scrollTop } = this.props;
     scrollTop += deltaY;
     if (scrollTop < 0) {
@@ -104,7 +109,6 @@ class Scrollarea extends PureComponent {
     if (scrollTop > scrollHeight) {
       scrollTop = scrollHeight;
     }
-
 
     scrollLeft += deltaX;
 
@@ -123,7 +127,10 @@ class Scrollarea extends PureComponent {
     // // // console.log(_scrollTop / _scrollLeft)
     // // console.log(scrollLeft, scrollTop);
 
-    if (scrollTop !== this.state.scrollTop || scrollLeft !== this.state.scrollLeft) {
+    if (
+      scrollTop !== this.state.scrollTop ||
+      scrollLeft !== this.state.scrollLeft
+    ) {
       // // // console.log('>>> moving...');
       // this.state.scrollLeft = scrollLeft;
       // this.state.scrollTop = scrollTop;
@@ -153,20 +160,15 @@ class Scrollarea extends PureComponent {
     // return undefined;
     // event.preventDefault();
     // event.stopPropagation();
-  }
+  };
 
   render() {
-    const {
-      width, height,
-    } = this.props;
-    const {
-      fieldValue,
-      scrollLeft,
-      scrollTop,
-    } = this.state;
+    const { width, height } = this.props;
+    const { fieldValue, scrollLeft, scrollTop } = this.state;
 
     const scrollWrapStyle = {
-      width, height,
+      width,
+      height,
     };
 
     return template.call(this, {
@@ -179,12 +181,13 @@ class Scrollarea extends PureComponent {
   }
 }
 
-const enhance = compose(defaultProps({
-  width: 500,
-  height: 400,
-  contentWidth: null,
-  contentHeight: null,
-}));
-
+const enhance = compose(
+  defaultProps({
+    width: 500,
+    height: 400,
+    contentWidth: null,
+    contentHeight: null,
+  }),
+);
 
 export default enhance(Scrollarea);
