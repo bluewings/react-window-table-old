@@ -21,7 +21,6 @@ import Guideline from '../Guideline';
 import { cellStyle, defaultCellClassNames } from '../../styles';
 
 import template from './window-table.component.pug';
-import WidgetTable from '../WindowTable';
 
 const IS_SCROLLING_DEBOUNCE_INTERVAL = 150;
 
