@@ -47,7 +47,7 @@ class Guideline extends PureComponent {
   guidelineStyle = memoize((type, distance, length, customStyle) => {
     let styles = {
       position: 'absolute',
-      zIndex: 3,
+      zIndex: 1,
       width: defaults.width,
       height: defaults.width,
       background: defaults.background[type],

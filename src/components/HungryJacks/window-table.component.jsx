@@ -44,7 +44,7 @@ class WindowTable extends PureComponent {
   constructor(props) {
     super(props);
 
-    this.containerRef = React.createRef();
+    // this.containerRef = React.createRef();
 
     // this.gridRef = {
     //   center: React.createRef(),
@@ -75,7 +75,7 @@ class WindowTable extends PureComponent {
     };
 
     this.tableRef = React.createRef();
-    this.titleRef = React.createRef();
+    // this.titleRef = React.createRef();
 
     this.secRef = React.createRef();
   }
@@ -630,11 +630,13 @@ const enhance = compose(
       totalHeight,
       scrollbarWidth,
     }) => {
+      // console.log(_width, _height);
       let containerStyle = css({
         border: '1px solid #c4c4c4',
         boxSizing: 'border-box',
         width: _width,
         height: _height,
+        // maxHeight: _height,
       });
 
       const { width, height } = measure(containerStyle, _width, _height);

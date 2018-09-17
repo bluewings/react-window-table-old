@@ -1,0 +1,32 @@
+---
+name: Hungry
+---
+
+import { Playground } from 'docz';
+import WindowTable from './index';
+import { columns, rows } from '../../examples/data/pokedex';
+
+# WindowTable
+
+## Properties
+
+<Playground>
+    <WindowTable
+          width={600}
+          height={400}
+          columnCount={50}
+          rowCount={100}
+          rowHeight={40}
+          columnWidth={100}
+          fixedLeftCount={1}
+          fixedRightCount={1}
+          fixedTopCount={1}
+          fixedBottomCount={1} >
+          {({ columnIndex, rowIndex, style }) => (
+                    <div style={style}>
+                      {rowIndex} , {columnIndex}
+                    </div>
+                  )}
+          </WindowTable>
+        
+</Playground>

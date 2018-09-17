@@ -1,121 +1,68 @@
 // @import .scss => styles
-div
-  //- pre {JSON.stringify(this.props.cellClassNames, null, 2)}
-  //- pre {this.props.maxScrollX}, {this.props.maxScrollY}
-  //- div
-    h1 {columnStartIndex} ~ {columnStopIndex}
-    h1 {rowStartIndex} ~ {rowStopIndex}
-    //- pre {JSON.stringify(this.props.rows, null, 2)}
-    //- h2 {items.topLeftItems.length}
-  //- h1 {JSON.stringify(this.state.isScrolling)}
-  //- h1 {contentWidth}, {contentHeight}
-  //- h1 {totalWidth}, {totalHeight}
-  //- h1 {maxScrollX}, {maxScrollY}
-  //- h1 {scrollLeft}, {scrollTop}
-  //- h1 {this.props.topOffset}, {this.props.bottomOffset}, {this.props.leftOffset}, {this.props.rightOffset}
-  div(className='{cx(styles.root, containerStyle)}',
-    ref='{this.containerRef}')
-    table(className='{styles.table}', border='{0}', cellPadding='{0}', cellSpacing='{0}', ref='{this.tableRef}')
-      tbody
-        tr
-          td
-            //- div(className='{styles.guideLines}')
+div(className='{cx(styles.root, containerStyle)}')
+  table(className='{styles.table}', border='{0}', cellPadding='{0}', cellSpacing='{0}', ref='{this.tableRef}')
+    tbody
+      tr
+        td
+          Scrollarea(width='{contentWidth}', height='{contentHeight}',
+            contentWidth='{totalWidth}', contentHeight='{totalHeight}',
+            scrollLeft='{scrollLeft}', scrollTop='{scrollTop}', 
+            onScroll='{this.scrollTo}')
+              //- scroll-y, scroll-x
+              div(ref='{this.secRef}', style='{{ transform: "translate3d(" + (scrollLeft * -1) + "px, " + (scrollTop * -1) + "px, 0)" }}')
+                | {items.middle_center}
 
-            Scrollarea(width='{contentWidth}', height='{contentHeight}',
-              scrollTop='{scrollTop}'
-              scrollLeft='{scrollLeft}'
-              contentWidth='{totalWidth}',
-              contentHeight='{totalHeight}',
-              onScroll='{this.scrollTo}')
-                Guideline(@if='topOffset > 0',    ref='{this.guidelineRef.top}',    type='top',    guidelineStyle='{guidelineStyle}', length='{contentWidth}',  maxScroll='{maxScrollY}', distance='{topOffset}')
-                Guideline(@if='bottomOffset > 0', ref='{this.guidelineRef.bottom}', type='bottom', guidelineStyle='{guidelineStyle}', length='{contentWidth}',  maxScroll='{maxScrollY}', distance='{bottomOffset}')
-                Guideline(@if='leftOffset > 0',   ref='{this.guidelineRef.left}',   type='left',   guidelineStyle='{guidelineStyle}', length='{contentHeight}', maxScroll='{maxScrollX}', distance='{leftOffset}')
-                Guideline(@if='rightOffset > 0',  ref='{this.guidelineRef.right}',  type='right',  guidelineStyle='{guidelineStyle}', length='{contentHeight}', maxScroll='{maxScrollX}', distance='{rightOffset}')
+              //- scroll-x
+              div(style='{{ position: "absolute", zIndex: 1, transform: "translate3d(" + (scrollLeft * -1) + "px, 0, 0)" }}')
+                | {items.top_center}
+              div(style='{{ position: "absolute", zIndex: 1, bottom: 0, transform: "translate3d(" + (scrollLeft * -1) + "px, 0, 0)" }}')
+                | {items.bottom_center}
 
+              //- scroll-x
+              div(style='{{ position: "absolute", zIndex: 1, transform: "translate3d(0, " + (scrollTop * -1) + "px, 0)" }}')
+                | {items.middle_left}
+              div(style='{{ position: "absolute", zIndex: 1, right: 0, transform: "translate3d(0, " + (scrollTop * -1) + "px, 0)" }}')
+                | {items.middle_right}
 
-                //- scroll-y, scroll-x
-                div(ref='{this.secRef}', style='{{ transform: "translate3d(" + (scrollLeft * -1) + "px, " + (scrollTop * -1) + "px, 0)" }}')
-                  | {items.middle_center}
+              //- scroll-none
+              div(style='{{ position: "absolute", zIndex: 1, transform: "translate3d(0, 0, 0)" }}')
+                | {items.top_left}
+              div(style='{{ position: "absolute", zIndex: 1, right: 0, transform: "translate3d(0, 0, 0)" }}')
+                | {items.top_right}
+              div(style='{{ position: "absolute", zIndex: 1, bottom: 0, transform: "translate3d(0, 0, 0)" }}')
+                | {items.bottom_left}
+              div(style='{{ position: "absolute", zIndex: 1, right: 0, bottom: 0, transform: "translate3d(0, 0, 0)" }}')
+                | {items.bottom_right}
 
-                //- scroll-x
-                div(style='{{ position: "absolute", zIndex: 2, transform: "translate3d(" + (scrollLeft * -1) + "px, 0, 0)" }}')
-                  | {items.top_center}
-                div(style='{{ position: "absolute", zIndex: 2, bottom: 0, transform: "translate3d(" + (scrollLeft * -1) + "px, 0, 0)" }}')
-                  | {items.bottom_center}
+              //- guidelines
+              Guideline(@if='topOffset > 0',    ref='{this.guidelineRef.top}',    type='top',    guidelineStyle='{guidelineStyle}', length='{contentWidth}',  maxScroll='{maxScrollY}', distance='{topOffset}')
+              Guideline(@if='bottomOffset > 0', ref='{this.guidelineRef.bottom}', type='bottom', guidelineStyle='{guidelineStyle}', length='{contentWidth}',  maxScroll='{maxScrollY}', distance='{bottomOffset}')
+              Guideline(@if='leftOffset > 0',   ref='{this.guidelineRef.left}',   type='left',   guidelineStyle='{guidelineStyle}', length='{contentHeight}', maxScroll='{maxScrollX}', distance='{leftOffset}')
+              Guideline(@if='rightOffset > 0',  ref='{this.guidelineRef.right}',  type='right',  guidelineStyle='{guidelineStyle}', length='{contentHeight}', maxScroll='{maxScrollX}', distance='{rightOffset}')
 
-                //- scroll-x
-                div(style='{{ position: "absolute", zIndex: 2, transform: "translate3d(0, " + (scrollTop * -1) + "px, 0)" }}')
-                  | {items.middle_left}
-                div(style='{{ position: "absolute", zIndex: 2, right: 0, transform: "translate3d(0, " + (scrollTop * -1) + "px, 0)" }}')
-                  | {items.middle_right}
+        td(@if='scrollbarY')
+          Scrollbar(
+            axis='y',
+            ref='{this.scrollbarRef.y}',
+            scrollbarLength='{contentHeight}',
+            scrollLength='{totalHeight}',
+            scrollbarWidth='{scrollbarWidth}',
+            onScroll='{this.scrollTo}',
+            trackStyle='{scrollbarTrackStyle}',
+            handleStyle='{scrollbarHandleStyle}')
 
-                //- scroll-none
-                div(style='{{ position: "absolute", zIndex: 3, transform: "translate3d(0, 0, 0)" }}')
-                  | {items.top_left}
-                div(style='{{ position: "absolute", zIndex: 3, right: 0, transform: "translate3d(0, 0, 0)" }}')
-                  | {items.top_right}
-                div(style='{{ position: "absolute", zIndex: 3, bottom: 0, transform: "translate3d(0, 0, 0)" }}')
-                  | {items.bottom_left}
-                div(style='{{ position: "absolute", zIndex: 3, right: 0, bottom: 0, transform: "translate3d(0, 0, 0)" }}')
-                  | {items.bottom_right}
+      tr(@if='scrollbarX')
+        td
+          Scrollbar(
+            axis='x',
+            ref='{this.scrollbarRef.x}',
+            scrollbarLength='{contentWidth}',
+            scrollLength='{totalWidth}',
+            scrollbarWidth='{scrollbarWidth}',
+            onScroll='{this.scrollTo}',
+            trackStyle='{scrollbarTrackStyle}',
+            handleStyle='{scrollbarHandleStyle}')
+        td(@if='scrollbarY')
 
-
-                
-
-
-
-                //- table(className='{styles.table}', border='{0}', cellPadding='{0}', cellSpacing='{0}',
-                  )
-                  tbody
-                    tr(@if='top')
-                      td(@if='left')
-                        | {this.renderGrid({ section: ['top', 'left'], ...top, ...left })}
-                      td
-                        | {this.renderGrid({ section: ['top', 'center'], ...center, ...top })}
-                      td(@if='right')
-                        | {this.renderGrid({ section: ['top', 'right'], ...top, ...right })}
-                    tr
-                      td(@if='left')
-                        | {this.renderGrid({ section: ['middle', 'left'], ...center, ...left })}
-                      td
-                        | {this.renderGrid({ section: ['middle', 'center'], ...center })}
-                      td(@if='right')
-                        | {this.renderGrid({ section: ['middle', 'right'], ...center, ...right })}
-                    tr(@if='bottom')
-                      td(@if='left')
-                        | {this.renderGrid({ section: ['bottom', 'left'], ...bottom, ...left })}
-                      td
-                        | {this.renderGrid({ section: ['bottom', 'center'], ...center, ...bottom })}
-                      td(@if='right')
-                        | {this.renderGrid({ section: ['bottom', 'right'], ...bottom, ...right })}
-
-          td(@if='scrollbarY')
-            Scrollbar(
-              axis='y',
-              ref='{this.scrollbarRef.y}',
-              scrollbarLength='{contentHeight}',
-              scrollLength='{totalHeight}',
-              scrollbarWidth='{scrollbarWidth}',
-              onScroll='{this.scrollTo}',
-              trackStyle='{scrollbarTrackStyle}',
-              handleStyle='{scrollbarHandleStyle}')
-
-        tr(@if='scrollbarX')
-          td
-            Scrollbar(
-              axis='x',
-              ref='{this.scrollbarRef.x}',
-              scrollbarLength='{contentWidth}',
-              scrollLength='{totalWidth}',
-              scrollbarWidth='{scrollbarWidth}',
-              onScroll='{this.scrollTo}',
-              trackStyle='{scrollbarTrackStyle}',
-              handleStyle='{scrollbarHandleStyle}')
-          td
-
-
-  //- pre {JSON.stringify(this.props._rows, null, 2)}
-
-
-  br
-  strong(ref='{this.titleRef}', style='{{ textAlign: "left" }}')
+  //- br
+  //- strong(ref='{this.titleRef}', style='{{ textAlign: "left" }}')
