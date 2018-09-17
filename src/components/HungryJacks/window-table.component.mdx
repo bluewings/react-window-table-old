@@ -9,6 +9,26 @@ import { columns, rows } from '../../examples/data/pokedex';
 
 # WindowTable
 
+<WindowTable
+          width={497}
+          height={297}
+          columnCount={50}
+          rowCount={100}
+          rowHeight={35}
+          columnWidth={80}
+          fixedLeftCount={1}
+          fixedRightCount={1}
+          fixedTopCount={1}
+          fixedBottomCount={1} >
+          {({ columnIndex, rowIndex, style }) => {
+           return (
+       <div className="cell" style={style}>
+                      {rowIndex} , {columnIndex}
+                    </div>
+           )  
+          }}
+</WindowTable>
+
 React components for efficiently rendering large lists and tabular data React components for efficiently rendering large lists and tabular data React components for efficiently rendering large lists and tabular data
 
 React components for efficiently rendering large lists and tabular data

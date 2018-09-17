@@ -32,11 +32,38 @@ export default {
     paragraph: {
       fontSize: 16,
       lineHeight: 1.5,
+      background: 'yellow',
     },
     // h1: {
     //   fontSize: 100,
     // },
+    table: {
+      // overflowY: ['hidden', 'hidden', 'hidden', 'initial'],
+      // display: ['block', 'block', 'block', 'table'],
+      // width: '100%',
+      // marginBottom: [20, 40],
+      // fontFamily: '"Source Code Pro", monospace',
+      // fontFamily: 'Roboto,-apple-system,BlinkMacSystemFont,"Helvetica Neue",Helvetica,sans-serif',
+      fontSize: 16,
+      borderRadius: 0,
+      // background: 'yellow',
+      thead: {
+        th: {
+          padding: '0.5rem 0.75rem',
+        },
+      },
+      tbody: {
+        // th: {
+        //   padding: '0.75rem',
+        // },
+        td: {
+          padding: '0.5rem 0.75rem',
+        },
+      },
+
+    },
     body: {
+      fontFamily: 'Roboto,-apple-system,BlinkMacSystemFont,"Helvetica Neue",Helvetica,sans-serif',
       '.react-live-preview': {
         // border: '5px solid black',
         '.cell': {

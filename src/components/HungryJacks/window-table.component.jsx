@@ -783,8 +783,26 @@ class Tmp extends PureComponent {
 }
 
 Tmp.propTypes = {
-  name: PropTypes.string.isRequired,
+  width: PropTypes.number.isRequired,
+  height: PropTypes.number.isRequired,
+  columnCount: PropTypes.number.isRequired,
+  columnWidth: PropTypes.number.isRequired,
+  rowCount: PropTypes.number.isRequired,
+  rowHeight: PropTypes.number.isRequired,
+  fixedLeftCount: PropTypes.number,
+  fixedRightCount: PropTypes.number,
+  fixedTopCount: PropTypes.number,
+  fixedBottomCount: PropTypes.number,
 };
+
+Tmp.defaultProps = {
+  fixedLeftCount: 0,
+  fixedRightCount: 0,
+  fixedTopCount: 0,
+  fixedBottomCount: 0,
+}
+
+
 
 
 export default Tmp;

@@ -5,6 +5,8 @@ import modifyBundlerConfig from './config/docz/modifyBundler';
 const autoprefixer = require('autoprefixer');
 
 export default {
+  title: 'react-window-table',
+  description: 'My awesome app using Docz',
   themeConfig,
   modifyBundlerConfig,
   // modifyBundlerConfig: (config) => {
