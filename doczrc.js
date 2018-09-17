@@ -9,6 +9,9 @@ export default {
   description: 'My awesome app using Docz',
   themeConfig,
   modifyBundlerConfig,
+  hashRouter: true,
+  dest: 'docs',
+  base: '/react-window-table/',
   // modifyBundlerConfig: (config) => {
   //   config.resolve.extensions.push('.pug');
   //   config.module.rules.push({
