@@ -21,6 +21,7 @@ import Guideline from '../Guideline';
 import { cellStyle, defaultCellClassNames } from '../../styles';
 
 import template from './window-table.component.pug';
+import WidgetTable from '../WindowTable';
 
 const IS_SCROLLING_DEBOUNCE_INTERVAL = 150;
 
@@ -771,4 +772,20 @@ const enhance = compose(
   ),
 );
 
-export default enhance(WindowTable);
+// export default enhance(WindowTable);
+
+const Enhance = enhance(WindowTable);
+
+/* eslint-disable */
+class Tmp extends PureComponent {
+  render() {
+    return <Enhance {...this.props} />;
+  }
+}
+
+Tmp.propTypes = {
+  name: PropTypes.string.isRequired,
+};
+
+
+export default Tmp;

@@ -2,13 +2,20 @@
 name: Hungry
 ---
 
-import { Playground } from 'docz';
-import WindowTable from './index';
+
+import { PropsTable, Playground } from 'docz';
+import WindowTable from './window-table.component.jsx';
 import { columns, rows } from '../../examples/data/pokedex';
 
 # WindowTable
 
 ## Properties
+
+<PropsTable of={WindowTable} />
+
+console.log(WindowTable)
+
+## Playground
 
 <Playground>
     <WindowTable
@@ -22,11 +29,13 @@ import { columns, rows } from '../../examples/data/pokedex';
           fixedRightCount={1}
           fixedTopCount={1}
           fixedBottomCount={1} >
-          {({ columnIndex, rowIndex, style }) => (
-                    <div className="cell" style={style}>
+          {({ columnIndex, rowIndex, style }) => {
+           return (
+       <div className="cell" style={style}>
                       {rowIndex} , {columnIndex}
                     </div>
-                  )}
+           )  
+          }}
           </WindowTable>
         
 </Playground>
