@@ -2,6 +2,25 @@
 const autoprefixer = require('autoprefixer');
 
 export default {
+  themeConfig: {
+    styles: {
+      // h1: {
+      //   fontSize: 100,
+      // },
+      body: {
+        '.react-live-preview': {
+          // border: '5px solid black',
+          '.cell': {
+            // fontSize: '12px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          },
+
+        },
+      },
+    },
+  },
   modifyBundlerConfig: (config) => {
     config.resolve.extensions.push('.pug');
     config.module.rules.push({
