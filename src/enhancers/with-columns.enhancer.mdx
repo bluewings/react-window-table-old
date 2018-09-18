@@ -1,5 +1,5 @@
 ---
-name: WithColumns
+name: withColumnsAndRows (HOC)
 ---
 
 import { PropsTable, Playground } from 'docz';
@@ -7,18 +7,17 @@ import WindowTable from '../components/WindowTable';
 import { columns, rows } from '../examples/data/fake-users';
 import withColumns from './with-columns.enhancer';
 
-# WithColumns (HOC)
+# withColumnsAndRows (HOC)
 
 <Playground>
   <WindowTable
+    enhancer={withColumns}
     width={760}
     height={400}
     columns={columns}
-    rows={rows}
-    enhancer={withColumns}
-              
-    rowHeight={50}
     columnWidth={120}
+    rows={rows}
+    rowHeight={50}
     fixedTopCount={1}
     fixedLeftCount={3}
   >
