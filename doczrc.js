@@ -8,6 +8,11 @@ export default {
   title: 'react-window-table',
   description: 'My awesome app using Docz',
   themeConfig,
+  htmlContext: {
+    head: {
+      links: [{ rel: 'stylesheet', href: 'https://fonts.googleapis.com/css?family=Roboto+Mono|Roboto:400,500,700' }]
+    }
+  },
   modifyBundlerConfig,
   hashRouter: true,
   dest: 'docs',
