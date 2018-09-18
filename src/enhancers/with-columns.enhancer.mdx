@@ -9,22 +9,18 @@ import withColumns from './with-columns.enhancer';
 
 # WithColumns (HOC)
 
-<div>
-  {JSON.stringify(columns)}
+<Playground>
   <WindowTable
-    width={600}
+    width={760}
     height={400}
     columns={columns}
     rows={rows}
     enhancer={withColumns}
               
-    rowHeight={40}
-    columnWidth={100}
+    rowHeight={50}
+    columnWidth={120}
+    fixedTopCount={1}
+    fixedLeftCount={3}
   >
-      {({ columnIndex, rowIndex, style }) => (
-      <div className={(columnIndex + rowIndex) % 2 ? 'cell-even' : 'cell-odd'} style={style}>
-        {rowIndex} , {columnIndex}
-      </div>
-    )}
   </WindowTable>
-</div>
+</Playground>

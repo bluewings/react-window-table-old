@@ -1,12 +1,14 @@
+/* eslint-disable react/jsx-filename-extension */
+import React from 'react';
 import faker from 'faker';
 
 const generate = index => ({
-  id: index,
+  // id: index,
   avatar: faker.image.avatar(),
-  city: faker.address.city(),
-  email: faker.internet.email(),
   firstName: faker.name.firstName(),
   lastName: faker.name.lastName(),
+  city: faker.address.city(),
+  email: faker.internet.email(),
   street: faker.address.streetName(),
   zipCode: faker.address.zipCode(),
   date: faker.date.past(),
@@ -17,9 +19,24 @@ const generate = index => ({
   sentence: faker.lorem.sentence(),
 });
 
+const columnDef = {
+  id: {
+    width: 50,
+  },
+  avatar: {
+    width: 50,
+    render: src => <img src={src} height={50} alt="avatar" />,
+  },
+};
+
 const getFakeData = (size = 1000) => {
   const rows = new Array(size).fill(true).map((e, i) => generate(i));
-  const columns = Object.keys(rows[0]);
+  const columns = Object.keys(rows[0]).map((name) => {
+    if (columnDef[name]) {
+      return { name, ...columnDef[name] };
+    }
+    return name;
+  });
   return { columns, rows };
 };
 
