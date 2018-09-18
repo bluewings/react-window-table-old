@@ -4,10 +4,27 @@ name: WithColumns
 
 import { PropsTable, Playground } from 'docz';
 import WindowTable from '../components/WindowTable';
-import { columns, rows } from '../examples/data/fake-users.js';
+import { columns, rows } from '../examples/data/fake-users';
+import withColumns from './with-columns.enhancer';
 
 # WithColumns (HOC)
 
 <div>
   {JSON.stringify(columns)}
+  <WindowTable
+    width={600}
+    height={400}
+    columns={columns}
+    rows={rows}
+    enhancer={withColumns}
+              
+    rowHeight={40}
+    columnWidth={100}
+  >
+      {({ columnIndex, rowIndex, style }) => (
+      <div className={(columnIndex + rowIndex) % 2 ? 'cell-even' : 'cell-odd'} style={style}>
+        {rowIndex} , {columnIndex}
+      </div>
+    )}
+  </WindowTable>
 </div>
