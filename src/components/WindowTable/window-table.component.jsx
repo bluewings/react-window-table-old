@@ -210,9 +210,7 @@ class WindowTable extends PureComponent {
         top,
         height,
         width,
-        background:
-          (rowIndex + columnIndex) % 2 === 0
-            ? '#fff' : '#eee',
+        background: (rowIndex + columnIndex) % 2 === 0 ? '#fff' : '#eee',
         // ? 'rgba(0,0,0,.05)'
         // : 'rgba(0,0,0,.1',
       };
@@ -785,7 +783,8 @@ class Tmp extends PureComponent {
 Tmp.propTypes = {
   /**
    * Description of prop "bar" (a custom validation function).
-   */  
+   */
+
   width: PropTypes.number.isRequired,
   height: PropTypes.number.isRequired,
   /**
@@ -806,9 +805,6 @@ Tmp.defaultProps = {
   fixedRightCount: 0,
   fixedTopCount: 0,
   fixedBottomCount: 0,
-}
-
-
-
+};
 
 export default Tmp;

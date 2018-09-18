@@ -147,7 +147,7 @@ class ItemRenderer extends PureComponent {
 }
 
 const columnWidth = (index, column) => {
-  return column.width || (120 + (index % 3) * 20);
+  return column.width || 120 + (index % 3) * 20;
 };
 
 const rowHeight = index => {

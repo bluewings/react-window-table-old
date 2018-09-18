@@ -1,20 +1,15 @@
 const autoprefixer = require('autoprefixer');
 
-export default (config) => {
+const modifyBundlerConfig = (config) => {
   config.resolve.extensions.push('.pug');
   config.module.rules.push({
     test: /\.pug$/,
-    // use: ['style-loader', 'css-loader', 'sass-loader'],
     use: [
       require.resolve('babel-loader'),
       {
         loader: require.resolve('pug-as-jsx-loader'),
         options: {
-          // resolveComponents: {
-          //   Intl: 'useIntl/FormattedMessage',
-          // },
           resolveVariables: {
-            // intl: 'useIntl/intl',
             cx: 'classnames',
           },
           transpiledFile: true,
@@ -23,7 +18,6 @@ export default (config) => {
       },
     ],
   });
-
   config.module.rules.push({
     test: /\.(css|scss)$/,
     include: /\/src\/components\//,
@@ -46,7 +40,6 @@ export default (config) => {
           ident: 'postcss',
           plugins: () => [
             require('postcss-flexbugs-fixes'),
-            // 'postcss-flexbugs-fixes',
             autoprefixer({
               browsers: [
                 '>1%',
@@ -63,6 +56,9 @@ export default (config) => {
     ],
   });
 
-
   return config;
 };
+
+export default modifyBundlerConfig;
+
+export { modifyBundlerConfig };

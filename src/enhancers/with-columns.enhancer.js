@@ -7,15 +7,19 @@ const withColumns = compose(
     ['columns', 'columnWidth'],
     ({ columns: _columns, columnWidth: _columnWidth, children: _children }) => {
       const columns = (_columns || [])
-        .filter(column =>
-          column &&
-            (typeof column === 'string' || typeof column === 'object'))
-        .map(column =>
-          (typeof column === 'string' ? { name: column } : { ...column }))
+        .filter(
+          column =>
+            column &&
+            (typeof column === 'string' || typeof column === 'object'),
+        )
+        .map(
+          column =>
+            typeof column === 'string' ? { name: column } : { ...column },
+        )
         .filter(column => column.name);
       console.log('>>>', columns);
 
-      const children = (props) => {
+      const children = props => {
         if (props.rowIndex === 0) {
           const name = columns[props.columnIndex].name;
           return <div style={props.style}>{name}</div>;
@@ -27,7 +31,7 @@ const withColumns = compose(
         // children,
         columns,
         columnCount: columns.length,
-        columnWidth: (columnIndex) => {
+        columnWidth: columnIndex => {
           const column = columns[columnIndex];
           return typeof _columnWidth === 'function'
             ? _columnWidth(columnIndex, column)
@@ -149,7 +153,7 @@ const withColumns = compose(
         rowCount,
 
         rowCount: rows.length,
-        rowHeight: (rowIndex) => {
+        rowHeight: rowIndex => {
           const row = rows[rowIndex];
           return typeof _rowHeight === 'function'
             ? _rowHeight(rowIndex, row)
@@ -164,11 +168,12 @@ const withColumns = compose(
     },
   ),
 
-  withPropsOnChange(['columns', 'rows', 'children'], ({ columns, rows, children: _children }) => {
-
-    const children = (props) => {
-      const { rowIndex, columnIndex } = props;
-      // if (rowIndex === 0) {
+  withPropsOnChange(
+    ['columns', 'rows', 'children'],
+    ({ columns, rows, children: _children }) => {
+      const children = props => {
+        const { rowIndex, columnIndex } = props;
+        // if (rowIndex === 0) {
         // const name = columns[props.columnIndex].name;
         let content = rows[rowIndex].arr[columnIndex];
         if (typeof columns[columnIndex].render === 'function') {
@@ -177,18 +182,19 @@ const withColumns = compose(
           content = rows[rowIndex].arr[columnIndex];
         }
         return (
-        <div style={props.style} key={props.key}>
-          {content}
-        </div>
-        )
+          <div style={props.style} key={props.key}>
+            {content}
+          </div>
+        );
 
-      // }
-      // return createElement(_children, props);
-    };
-    return {
-      children
-    }
-  }),
+        // }
+        // return createElement(_children, props);
+      };
+      return {
+        children,
+      };
+    },
+  ),
 );
 
 export default withColumns;
