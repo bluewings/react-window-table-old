@@ -31,7 +31,8 @@ const themeConfig = {
       },
     },
     body: {
-      fontFamily: 'Roboto,-apple-system,BlinkMacSystemFont,"Helvetica Neue",Helvetica,sans-serif',
+      fontFamily:
+        'Roboto,-apple-system,BlinkMacSystemFont,"Helvetica Neue",Helvetica,sans-serif',
       '#root > div > div > nav': {
         div: {
           marginTop: '0 !important',
@@ -56,10 +57,16 @@ const themeConfig = {
       },
       '.react-live-preview, .example': {
         fontSize: 12,
-        '.cell': {
+        'table td div div div div div': {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
+          '&.cell-odd': {
+            backgroundColor: '#fff',
+          },
+          '&.cell-even': {
+            backgroundColor: '#eef1f5',
+          },
         },
       },
     },
@@ -69,7 +76,11 @@ const themeConfig = {
 const htmlContext = {
   head: {
     links: [
-      { rel: 'stylesheet', href: 'https://fonts.googleapis.com/css?family=Roboto+Mono|Roboto:400,500,700' },
+      {
+        rel: 'stylesheet',
+        href:
+          'https://fonts.googleapis.com/css?family=Roboto+Mono|Roboto:400,500,700',
+      },
     ],
   },
 };

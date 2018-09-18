@@ -21,7 +21,7 @@ import { columns, rows } from '../../examples/data/pokedex';
     fixedTopCount={1}
     fixedBottomCount={1} >
     {({ columnIndex, rowIndex, style }) => (
-      <div className="cell" style={style}>
+      <div className={(columnIndex + rowIndex) % 2 ? 'cell-even' : 'cell-odd'} style={style}>
         {rowIndex} , {columnIndex}
       </div>
     )}
@@ -51,7 +51,7 @@ React table component that supports fixed columns inspired by [react-window](htt
     fixedTopCount={1}
     fixedBottomCount={0} >
     {({ columnIndex, rowIndex, style }) => (
-      <div className="cell" style={style}>
+      <div className={(columnIndex + rowIndex) % 2 ? 'cell-even' : 'cell-odd'} style={style}>
         {rowIndex} , {columnIndex}
       </div>
     )}

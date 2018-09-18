@@ -210,7 +210,7 @@ class WindowTable extends PureComponent {
         top,
         height,
         width,
-        background: (rowIndex + columnIndex) % 2 === 0 ? '#fff' : '#eee',
+        // background: (rowIndex + columnIndex) % 2 === 0 ? '#fff' : '#eee',
         // ? 'rgba(0,0,0,.05)'
         // : 'rgba(0,0,0,.1',
       };
