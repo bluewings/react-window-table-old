@@ -56,8 +56,6 @@ class Scrollarea extends PureComponent {
     let scrollTop = this.scrollInfo.get('scrollTop');
     let scrollLeft = this.scrollInfo.get('scrollLeft');
 
-    // let { scrollLeft, scrollTop } = this.props;
-
     scrollTop += deltaY;
     if (scrollTop < 0) {
       scrollTop = 0;
@@ -72,16 +70,18 @@ class Scrollarea extends PureComponent {
       scrollLeft = scrollWidth;
     }
 
-    const scrollInfo = this.scrollInfo.set('scrollTop', scrollTop).set('scrollLeft', scrollLeft);
+    const scrollInfo = this.scrollInfo
+      .set('scrollTop', scrollTop)
+      .set('scrollLeft', scrollLeft);
 
     if (this.scrollInfo !== scrollInfo) {
       event.preventDefault();
       event.stopPropagation();
+      this.handleThrottledScroll(scrollInfo);
       if (typeof this.props.onScroll === 'function') {
         this.props.onScroll({ scrollLeft, scrollTop });
       }
       this.scrollInfo = scrollInfo;
-      this.handleThrottledScroll(scrollInfo);
     }
   };
 
@@ -91,7 +91,11 @@ class Scrollarea extends PureComponent {
     if (!this._scrollId) {
       this._scrollId = setInterval(this.throttledScroll, THROTTLED_SCROLL);
       this._scrollCount = 0;
-      this._scrollStart = new Date();
+      this._scrollStart = {
+        time: new Date(),
+        scrollTop: this.scrollInfo.get('scrollTop'),
+        scrollLeft: this.scrollInfo.get('scrollLeft'),
+      };
       this.throttledScroll();
     }
     this._clearScrollId = setTimeout(() => {
@@ -99,12 +103,15 @@ class Scrollarea extends PureComponent {
       this.throttledScroll();
       delete this._scrollId;
       // show scroll stats
-      const stats = {
-        elapsed: new Date() - this._scrollStart,
-        throttled: THROTTLED_SCROLL,
-        events: this._scrollCount,
-      };
-      console.table(stats);
+      // const stats = {
+      //   elapsed: new Date() - this._scrollStart.time,
+      //   throttled: THROTTLED_SCROLL,
+      //   events: this._scrollCount,
+      //   movedX:
+      //     this.scrollInfo.get('scrollLeft') - this._scrollStart.scrollLeft,
+      //   movedY: this.scrollInfo.get('scrollTop') - this._scrollStart.scrollTop,
+      // };
+      // console.table(stats);
     }, THROTTLED_SCROLL + 50);
   };
 

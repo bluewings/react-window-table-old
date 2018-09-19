@@ -17,7 +17,7 @@ const withColumns = compose(
             typeof column === 'string' ? { name: column } : { ...column },
         )
         .filter(column => column.name);
-      console.log('>>>', columns);
+      // console.log('>>>', columns);
 
       const children = props => {
         if (props.rowIndex === 0) {
@@ -48,7 +48,7 @@ const withColumns = compose(
         return;
       }
 
-      console.log('> rows', rows);
+      // console.log('> rows', rows);
 
       // let getRowHeight;
 
@@ -146,7 +146,7 @@ const withColumns = compose(
       //     .reduce((prev, i) => prev + rowHeightFn(i), 0);
       // };
 
-      console.log(rows);
+      // console.log(rows);
 
       return {
         rows,
