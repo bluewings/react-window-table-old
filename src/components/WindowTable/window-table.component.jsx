@@ -7,7 +7,7 @@
   no-unused-vars,
 */
 /* eslint-disabl */
-import React, { PureComponent, createElement } from 'react';
+import React, { Fragment, PureComponent, createElement } from 'react';
 import PropTypes from 'prop-types';
 import { compose, defaultProps, withPropsOnChange } from 'recompose';
 import memoizeOne from 'memoize-one';
@@ -24,7 +24,7 @@ import template from './window-table.component.pug';
 
 const IS_SCROLLING_DEBOUNCE_INTERVAL = 150;
 
-const measure = (className, width, height) => {
+const measureDiv = (className, width, height) => {
   const divEl = document.createElement('div');
   divEl.classList.add(className);
   document.body.appendChild(divEl);
@@ -151,8 +151,8 @@ class WindowTable extends PureComponent {
     return stopIndex;
   };
 
-  getRangeToRender = () => {
-    const { scrollTop, scrollLeft } = this.state;
+  getRangeToRender = (scrollTop, scrollLeft) => {
+    // const { scrollTop, scrollLeft } = this.state;
     const rowStartIndex = this.getStartIndexForOffset('row', scrollTop);
     const rowStopIndex = this.getStopIndexForStartIndex(
       'row',
@@ -220,7 +220,38 @@ class WindowTable extends PureComponent {
     return itemStyleCache[key];
   };
 
+  handleThrottledScroll = ({ scrollTop, scrollLeft }) => {
+    // console.log('%c throttled scroll ', 'background:blue;color:#fff');
+    const random = parseInt((Math.random() * 9000) + 1000, 10);
+
+
+    // console.log(`%c scroll ${random} `, 'background:blue;color:#fff');
+    // console.log(scrollInfo);
+    const [
+      rowStartIndex,
+      rowStopIndex,
+      columnStartIndex,
+      columnStopIndex,
+    ] = this.getRangeToRender(scrollTop, scrollLeft);
+
+    // console.log(
+    //   rowStartIndex,
+    //   rowStopIndex,
+    //   columnStartIndex,
+    //   columnStopIndex,
+    // );
+    this.setState(prevState => ({
+      ...prevState,
+      rowStartIndex,
+      rowStopIndex,
+      columnStartIndex,
+      columnStopIndex,
+    }));
+  }
+
   scrollTo = ({ scrollTop, scrollLeft }) => {
+    const random = parseInt((Math.random() * 9000) + 1000, 10);
+    // console.log(`%c scroll ${random} `, 'background:red;color:#fff');
     const _scrollTop =
       typeof scrollTop === 'number' ? scrollTop : this.state.scrollTop;
     const _scrollLeft =
@@ -406,31 +437,40 @@ class WindowTable extends PureComponent {
         bottomOffset,
         totalWidth,
       },
-      state: { scrollLeft, scrollTop, isScrolling },
+      state: {
+        scrollLeft, scrollTop, isScrolling,
+        rowStartIndex,
+        rowStopIndex,
+        columnStartIndex,
+        columnStopIndex,
+      },
     } = this;
 
-    const [
-      rowStartIndex,
-      rowStopIndex,
-      columnStartIndex,
-      columnStopIndex,
-    ] = this.getRangeToRender();
+    // const [
+    //   rowStartIndex,
+    //   rowStopIndex,
+    //   columnStartIndex,
+    //   columnStopIndex,
+    // ] = this.getRangeToRender(scrollTop, scrollLeft);
+    let items;
 
-    const items = this.items(
-      totalHeight,
-      totalWidth,
-      rowCount,
-      rowStartIndex,
-      rowStopIndex,
-      columnCount,
-      columnStartIndex,
-      columnStopIndex,
-      fixedTopCount,
-      fixedBottomCount,
-      fixedLeftCount,
-      fixedRightCount,
-      isScrolling,
-    );
+    if (rowStartIndex !== rowStopIndex) {
+      items = this.items(
+        totalHeight,
+        totalWidth,
+        rowCount,
+        rowStartIndex,
+        rowStopIndex,
+        columnCount,
+        columnStartIndex,
+        columnStopIndex,
+        fixedTopCount,
+        fixedBottomCount,
+        fixedLeftCount,
+        fixedRightCount,
+        isScrolling,
+      );
+    }
 
     return template.call(this, {
       // variables
@@ -455,6 +495,7 @@ class WindowTable extends PureComponent {
       totalHeight,
       totalWidth,
       // components
+      Fragment,
       Guideline,
       Scrollarea,
       Scrollbar,
@@ -637,7 +678,7 @@ const enhance = compose(
         // maxHeight: _height,
       });
 
-      const { width, height } = measure(containerStyle, _width, _height);
+      const { width, height } = measureDiv(containerStyle, _width, _height);
 
       containerStyle = css({
         border: '1px solid #c4c4c4',
