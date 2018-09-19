@@ -133,8 +133,8 @@ class Scrollarea extends PureComponent {
   };
 
   scrollWrapStyle = memoizeOne((width, height) => ({
-    // position: 'relative',
-    // overflow: 'hidden',
+    position: 'relative',
+    overflow: 'hidden',
     width,
     height,
   }));
