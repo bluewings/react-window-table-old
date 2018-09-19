@@ -1,0 +1,54 @@
+---
+name: withClassNames (HOC)
+---
+
+import { PropsTable, Playground } from 'docz';
+import WindowTable from '../../components/WindowTable';
+import { columns, rows } from '../../examples/data/fake-users';
+import withClassNames from './with-class-names.enhancer';
+import withColumns from '../withColumns';
+
+# withClassNames (HOC)
+
+<Playground>
+  <WindowTable
+    enhancer={withClassNames}
+    cellClassNames={{
+      oddRow: 'row-odd',    // background: yellow;
+      evenRow: 'row-even',  // background: yellow;
+    }}
+    width={497}
+    height={297}
+    rowCount={500}
+    rowHeight={35}
+    columnCount={500}
+    columnWidth={80}
+    fixedLeftCount={1}
+    fixedRightCount={1}
+    fixedTopCount={1}
+    fixedBottomCount={1} >
+    {({ columnIndex, rowIndex, className, style }) => (
+      <div style={style} className={className} >
+        {rowIndex} , {columnIndex}
+      </div>
+    )}
+  </WindowTable>
+</Playground>
+
+<Playground>
+  <WindowTable
+    enhancer={[withClassNames, withColumns]}
+    cellClassNames={{
+      
+    }}
+    width={760}
+    height={400}
+    columns={columns}
+    columnWidth={120}
+    rows={rows}
+    rowHeight={50}
+    fixedTopCount={1}
+    fixedLeftCount={3}
+  >
+  </WindowTable>
+</Playground>
