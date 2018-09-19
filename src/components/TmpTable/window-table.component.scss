@@ -8,6 +8,18 @@
   padding: 0;
   margin: 0;
   border-spacing: 0;
+  :global(.rwtc-even-row) {
+    background:yellow;
+  }
+  :global(.rwtc-odd-row) {
+    background:#fff;
+  }
+  :global(.rwtc-h-first) {
+    background:blue;
+  }
+  :global(.rwtc-h-last) {
+    background:green;
+  }
   td {
     :global(.section-top) {
       background:yellow;

@@ -286,6 +286,41 @@ class WindowTable extends PureComponent {
     return css({ ...styleObj });
   });
 
+  itemClassName = (
+    classNames, vArea, hArea, rowEven, columnEven,
+    horizontalFirst,
+    verticalFirst,
+    horizontalLast,
+    verticalLast,
+  ) => {
+    // const cls = 'aaa';
+    const className = [
+      classNames.root,
+      classNames[vArea],
+      classNames[hArea],
+      rowEven ? classNames.rowEven : classNames.rowOdd,
+      columnEven ? classNames.columnEven : classNames.columnOdd,
+      horizontalFirst && classNames.horizontalFirst,
+      verticalFirst && classNames.verticalFirst,
+      horizontalLast && classNames.horizontalLast,
+      verticalLast && classNames.verticalLast,
+    ].filter(e => e).join(' ');
+
+
+    // const applyStyle = [
+    //   this.props.cellStyle,
+    //   sectionClass,
+    //   columnIndex === 0 && classNames.horizontalFirst,
+    //   rowIndex === 0 && classNames.verticalFirst,
+    //   columnIndex === columnCount - 1 && classNames.horizontalLast,
+    //   rowIndex === rowCount - 1 && classNames.verticalLast,
+    //   _colIndex % 2 ? classNames.columnOdd : classNames.columnEven,
+    //   _rowIndex % 2 ? classNames.rowOdd : classNames.rowEven,
+    //   `cell-text-align-${column.textAlign}`,
+    // ].join(' ');
+    return className;
+  }
+
   itemStyle = (type, rowIndex, columnIndex, totalHeight, totalWidth) => {
     const styles = this._getItemStyle(rowIndex, columnIndex);
     const _row = this.props.getItemMetadata('row', rowIndex);
@@ -337,22 +372,22 @@ class WindowTable extends PureComponent {
     isScrolling,
   ) => {
     const rowRanges = [
-      ['top', 0, fixedTopCount],
-      ['middle', rowStartIndex, rowStopIndex + 1],
-      ['bottom', rowCount - fixedBottomCount, rowCount],
+      ['top', 0, fixedTopCount, 0, fixedTopCount],
+      ['middle', rowStartIndex, rowStopIndex + 1, fixedTopCount, rowCount - fixedBottomCount],
+      ['bottom', rowCount - fixedBottomCount, rowCount, rowCount - fixedBottomCount, rowCount],
     ];
     const columnRanges = [
-      ['left', 0, fixedLeftCount],
-      ['center', columnStartIndex, columnStopIndex + 1],
-      ['right', columnCount - fixedRightCount, columnCount],
+      ['left', 0, fixedLeftCount, 0, fixedLeftCount],
+      ['center', columnStartIndex, columnStopIndex + 1, fixedLeftCount, columnCount - fixedRightCount],
+      ['right', columnCount - fixedRightCount, columnCount, columnCount - fixedRightCount, columnCount],
     ];
 
     const items = {};
 
     const itemCache = this.itemCache(0, 0);
 
-    rowRanges.forEach(([rType, rowFr, rowTo]) => {
-      columnRanges.forEach(([cType, colFr, colTo]) => {
+    rowRanges.forEach(([rType, rowFr, rowTo, rowAllFr, rowAllTo]) => {
+      columnRanges.forEach(([cType, colFr, colTo, colAllFr, colAllTo]) => {
         const section = `${rType}_${cType}`;
         const rangeKey = `${rowFr}_${rowTo}_${colFr}_${colTo}`;
 
@@ -376,6 +411,20 @@ class WindowTable extends PureComponent {
               isScrolling,
               key: `${rowIndex}_${columnIndex}`,
               rowIndex,
+              className: this.itemClassName(
+                this.props.cellClassNames,
+                rType,
+                cType,
+
+                rowIndex % 2 === 0, // rowEven
+                columnIndex % 2 === 0, // columnEven
+                columnIndex === colAllFr,
+                rowIndex === rowAllFr,
+                columnIndex === colAllTo - 1,
+                rowIndex === rowAllTo - 1,
+
+
+              ),
               style: this.itemStyle(
                 section,
                 rowIndex,

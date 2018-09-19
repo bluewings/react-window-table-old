@@ -1,36 +1,57 @@
 .root {
-  position: relative;
-  // border: orange 5px solid;
-
-  
+  position: relative; // border: orange 5px solid;
 }
+
 .guideLines {
   // position: ;
   z-index: 3;
   pointer-events: none;
 }
+
 .table {
   padding: 0;
   margin: 0;
   border-spacing: 0;
+  // :global(.rwtc-even-row) {
+  //   background:lightyellow;
+  // }
+  // :global(.rwtc-odd-row) {
+  //   background:#fff;
+  // }
+  // :global(.rwtc-middle), :global(.rwtc-center) {
+  //   &:global(.rwtc-h-first) {
+  //     background: lightblue;
+  //   }
+  //   &:global(.rwtc-h-last) {
+  //     // background:lightblue;
+  //     color: red;
+  //   }
+  //   &:global(.rwtc-v-first) {
+  //     background: lightgreen;
+  //   }
+  //   &:global(.rwtc-v-last) {
+  //     // background:lightblue;
+  //     color: blue;
+  //   }
+  // } // :global(.rwtc-h-last) {
+  //   background:green;
+  // }
   td {
     :global(.section-top) {
-      background:yellow;
+      background: yellow;
     }
     :global(.section-left) {
-      background:orange;
+      background: orange;
     }
     :global(.section-right) {
-      background:lightyellow;
+      background: lightyellow;
     }
     :global(.section-bottom) {
-      background:lightgreen;
-      // border-bottom: none;
+      background: lightgreen; // border-bottom: none;
     }
     :global(.section-center) {
-      background:lightblue;
-    }
-    // :global(.cell-h-first) {
+      background: lightblue;
+    } // :global(.cell-h-first) {
     //   background: yellow;
     // }
     // :global(.cell-h-last) {
@@ -40,16 +61,16 @@
     //   background: green;
     // }
     margin: 0;
-    vertical-align: top;
-    // div {
+    vertical-align: top; // div {
     //   overflow: hidden !important;
     // }
     position: relative;
-    .gridWrap >div {
+    .gridWrap>div {
       position: absolute;
       display: flex;
-      overflow:hidden !important;
-      -webkit-overflow-scrolling: touch;  -webkit-overflow-scrolling: touch ;
+      overflow: hidden !important;
+      -webkit-overflow-scrolling: touch;
+      -webkit-overflow-scrolling: touch;
     }
     ::-webkit-scrollbar {
       display: none !important;
@@ -57,61 +78,61 @@
       height: 0 !important;
       background-color: transparent;
       -webkit-appearance: none;
-      --webkit-appearance: none;
-      // opacity: 0;
-      
+      --webkit-appearance: none; // opacity: 0;
     }
-
-
     ::-webkit-scrollbar:vertical {
       display: none !important;
       width: 0 !important;
       height: 0 !important;
       background-color: transparent;
-      -webkit-appearance: none;
-      // opacity: 0;
-  }
-    ::-webkit-scrollbar-button{height:0;width:0}
+      -webkit-appearance: none; // opacity: 0;
+    }
+    ::-webkit-scrollbar-button {
+      height: 0;
+      width: 0
+    }
     ::-webkit-scrollbar-thumb {
       width: 1px !important;
       display: none !important;
     }
-    ::-webkit-scrollbar-track{
+    ::-webkit-scrollbar-track {
       width: 1px !important;
       display: none !important;
     }
-
-    -webkit-overflow-scrolling: touch!important; 
-    -ms-overflow-style: -ms-autohiding-scrollbar!important;
+    -webkit-overflow-scrolling: touch !important;
+    -ms-overflow-style: -ms-autohiding-scrollbar !important;
   }
 }
+
 :global(.no-scroll) {
   background: blue !important;
 }
+
 :global(.full-scroll) {
   background: red !important;
 }
+
 :global(.drr) {
   border: 5px green solid;
 }
-.bg_50, :global(.odd) {
-  // background: #E1F5FE;
 
+.bg_50,
+:global(.odd) {
+  // background: #E1F5FE;
   background: #fff;
   display: flex;
   align-items: center;
-  
   justify-content: center;
 }
 
-.bg_100, :global(.even) {
+.bg_100,
+:global(.even) {
   // background: #B3E5FC;
   background: #E1F5FE;
   background: #f8f8f0;
   background: yellow;
   display: flex;
   align-items: center;
-  
   justify-content: center;
 }
 
