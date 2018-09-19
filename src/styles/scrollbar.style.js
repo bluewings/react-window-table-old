@@ -35,6 +35,7 @@ const baseTrackStyle = ({
 }) => {
   const styles = {
     position: 'relative',
+    zIndex: 1,
     width,
     height,
     // background: 'rgba(0, 0, 0, .1)',

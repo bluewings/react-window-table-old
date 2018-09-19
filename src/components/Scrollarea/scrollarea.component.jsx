@@ -86,10 +86,11 @@ class Scrollarea extends PureComponent {
   };
 
   handleThrottledScroll = (scrollInfo) => {
+    const { throttle } = this.props;
     clearTimeout(this._clearScrollId);
     this.throttledScrollInfo = scrollInfo;
     if (!this._scrollId) {
-      this._scrollId = setInterval(this.throttledScroll, THROTTLED_SCROLL);
+      this._scrollId = setInterval(this.throttledScroll, throttle);
       this._scrollCount = 0;
       this._scrollStart = {
         time: new Date(),
@@ -116,7 +117,7 @@ class Scrollarea extends PureComponent {
         scrollTop: this.scrollInfo.get('scrollTop'),
         scrollLeft: this.scrollInfo.get('scrollLeft'),
       });
-    }, THROTTLED_SCROLL + 50);
+    }, throttle + 50);
   };
 
   throttledScroll = () => {
@@ -155,11 +156,13 @@ Scrollarea.propTypes = {
   height: PropTypes.number.isRequired,
   contentWidth: PropTypes.number.isRequired,
   contentHeight: PropTypes.number.isRequired,
+  throttle: PropTypes.number,
   onScroll: PropTypes.func,
   onThrottledScroll: PropTypes.func,
 };
 
 Scrollarea.defaultProps = {
+  throttle: THROTTLED_SCROLL,
   onScroll: null,
   onThrottledScroll: null,
 };

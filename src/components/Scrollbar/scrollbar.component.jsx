@@ -2,8 +2,9 @@
 import React, { PureComponent, Fragment } from 'react';
 import PropTypes from 'prop-types';
 import memoize from 'memoize-one';
-import { css } from 'emotion';
-import { compose, defaultProps, withPropsOnChange } from 'recompose';
+// import { css } from 'emotion';
+import { Map } from 'immutable';
+import { compose, withPropsOnChange } from 'recompose';
 import Draggable from 'react-draggable';
 import forwardRef from '../../hocs/forward-ref.hoc';
 import {
@@ -14,7 +15,9 @@ import {
 
 import template from './scrollbar.component.pug';
 
-const getClientRect = elem => {
+const THROTTLED_SCROLL = 100;
+
+const getClientRect = (elem) => {
   const rect = elem.getBoundingClientRect();
   return {
     top: rect.top,
@@ -98,72 +101,69 @@ class Scrollbar extends PureComponent {
     this.trackRef = React.createRef();
     this.handleRef = React.createRef();
     this.cache = {};
+    this.scrollInfo = Map();
   }
 
   scrollTo = ({ scrollTop, scrollLeft }) => {
     this.setState(prevState => ({ ...prevState, scrollTop, scrollLeft }));
   };
 
-  trackStyle = memoize(
-    (classNames, axis, trackLength, trackWidth, customStyleFn) => {
-      return scrollbarTrackStyle({
-        classNames,
-        axis,
-        trackLength,
-        trackWidth,
-        customStyleFn,
-      });
+  trackStyle = memoize((classNames, axis, trackLength, trackWidth, customStyleFn) =>
+    scrollbarTrackStyle({
+      classNames,
+      axis,
+      trackLength,
+      trackWidth,
+      customStyleFn,
+    }),
 
-      // // , scrollbarHandleStyle
-      // const width = axis === 'x' ? trackLength : trackWidth;
-      // const height = axis === 'x' ? trackWidth : trackLength;
-      // let styles = scrollbarTrackStyle({
-      //   axis, trackLength, trackWidth,
-      //   width, height,
-      // })
-      // if (typeof customStyleFn === 'function') {
-      //   styles = customStyleFn(styles, { axis, trackLength, trackWidth });
-      // }
-      // return css({
-      //   ...styles,
-      //   position: 'relative',
-      //   width,
-      //   height,
-      // });
-    },
+    // // , scrollbarHandleStyle
+    // const width = axis === 'x' ? trackLength : trackWidth;
+    // const height = axis === 'x' ? trackWidth : trackLength;
+    // let styles = scrollbarTrackStyle({
+    //   axis, trackLength, trackWidth,
+    //   width, height,
+    // })
+    // if (typeof customStyleFn === 'function') {
+    //   styles = customStyleFn(styles, { axis, trackLength, trackWidth });
+    // }
+    // return css({
+    //   ...styles,
+    //   position: 'relative',
+    //   width,
+    //   height,
+    // });
   );
 
-  handleStyle = memoize(
-    (classNames, axis, handleLength, trackWidth, customStyleFn) => {
-      return scrollbarHandleStyle({
-        classNames,
-        axis,
-        handleLength,
-        trackWidth,
-        customStyleFn,
-      });
-      // const width = axis === 'x' ? handleLength : trackWidth;
-      // const height = axis === 'x' ? trackWidth : handleLength;
-      // let styles = scrollbarHandleStyle({
-      //   axis, handleLength, trackWidth,
-      //   width, height,
-      // })
-      // // const width = axis === 'x' ? handleLength : trackWidth;
-      // // const height = axis === 'x' ? trackWidth : handleLength;
-      // // let styles = {
-      // //   width,
-      // //   height,
-      // //   background: 'green',
-      // // };
-      // if (typeof customStyleFn === 'function') {
-      //   styles = customStyleFn(styles, { axis, handleLength, trackWidth });
-      // }
-      // return css({
-      //   ...styles,
-      //   width,
-      //   height,
-      // });
-    },
+  handleStyle = memoize((classNames, axis, handleLength, trackWidth, customStyleFn) =>
+    scrollbarHandleStyle({
+      classNames,
+      axis,
+      handleLength,
+      trackWidth,
+      customStyleFn,
+    }),
+    // const width = axis === 'x' ? handleLength : trackWidth;
+    // const height = axis === 'x' ? trackWidth : handleLength;
+    // let styles = scrollbarHandleStyle({
+    //   axis, handleLength, trackWidth,
+    //   width, height,
+    // })
+    // // const width = axis === 'x' ? handleLength : trackWidth;
+    // // const height = axis === 'x' ? trackWidth : handleLength;
+    // // let styles = {
+    // //   width,
+    // //   height,
+    // //   background: 'green',
+    // // };
+    // if (typeof customStyleFn === 'function') {
+    //   styles = customStyleFn(styles, { axis, handleLength, trackWidth });
+    // }
+    // return css({
+    //   ...styles,
+    //   width,
+    //   height,
+    // });
   );
 
   _handleLength = memoize((scrollLength, scrollbarLength, minHandleLength) => {
@@ -176,10 +176,8 @@ class Scrollbar extends PureComponent {
     return this._handleLength(scrollLength, scrollbarLength, minHandleLength);
   };
 
-  _scale = memoize(
-    (scrollLength, scrollbarLength, handleLength) =>
-      (scrollbarLength - handleLength) / (scrollLength - scrollbarLength),
-  );
+  _scale = memoize((scrollLength, scrollbarLength, handleLength) =>
+    (scrollbarLength - handleLength) / (scrollLength - scrollbarLength));
 
   scale = () => {
     const { scrollLength, scrollbarLength } = this.props;
@@ -204,10 +202,54 @@ class Scrollbar extends PureComponent {
         data = { ...data, scrollTop: point };
       }
     }
+    // if (typeof this.props.onScroll === 'function') {
+    this.handleThrottledScroll(data);
     this.props.onScroll(data);
+    // }
+    // this.props.onScroll(data);
   };
 
-  handleClick = event => {
+
+  handleThrottledScroll = (scrollInfo) => {
+    const { throttle } = this.props;
+    clearTimeout(this._clearScrollId);
+    this.throttledScrollInfo = scrollInfo;
+    if (!this._scrollId) {
+      this._scrollId = setInterval(this.throttledScroll, throttle);
+      this._scrollCount = 0;
+      this._scrollStart = {
+        time: new Date(),
+        scrollTop: this.scrollInfo.get('scrollTop'),
+        scrollLeft: this.scrollInfo.get('scrollLeft'),
+      };
+      this.throttledScroll();
+    }
+    this._clearScrollId = setTimeout(() => {
+      clearInterval(this._scrollId);
+      this.throttledScroll();
+      delete this._scrollId;
+      this.props.onThrottledScroll({
+        scrollTop: this.scrollInfo.get('scrollTop'),
+        scrollLeft: this.scrollInfo.get('scrollLeft'),
+      });
+    }, throttle + 50);
+  };
+
+  throttledScroll = () => {
+    if (this.throttledScrollInfo) {
+      // if (typeof this.props.onThrottledScroll === 'function') {
+      // const scrollTop = this.throttledScrollInfo.get('scrollTop');
+      // const scrollLeft = this.throttledScrollInfo.get('scrollLeft');
+      const scrollTop = this.throttledScrollInfo.scrollTop;
+      const scrollLeft = this.throttledScrollInfo.scrollLeft;
+      this.props.onThrottledScroll({ scrollLeft, scrollTop });
+      // }
+      delete this.throttledScrollInfo;
+      this._scrollCount += 1;
+    }
+  };
+
+  handleClick = (event) => {
     if (this.trackRef.current === event.target) {
       const { axis } = this.props;
       const { top, left } = getClientRect(this.trackRef.current);
@@ -218,7 +260,7 @@ class Scrollbar extends PureComponent {
     }
   };
 
-  scaled = point => {
+  scaled = (point) => {
     const scale = this.scale();
     const key = `${scale}_${point}`;
     if (!this.cache[key]) {
@@ -242,14 +284,12 @@ class Scrollbar extends PureComponent {
     // this.updateStatus('dragst')
   };
 
-  updateStatus = status => {
+  updateStatus = (status) => {
     if (this.state.status !== status) {
-      this.setState(prevState => {
-        return {
-          ...prevState,
-          status,
-        };
-      });
+      this.setState(prevState => ({
+        ...prevState,
+        status,
+      }));
     }
   };
 
@@ -342,11 +382,19 @@ class Scrollbar extends PureComponent {
 Scrollbar.propTypes = {
   scrollbarWidth: PropTypes.number,
   minHandleLength: PropTypes.number,
+
+  throttle: PropTypes.number,
+  onScroll: PropTypes.func,
+  onThrottledScroll: PropTypes.func,
 };
 
 Scrollbar.defaultProps = {
   scrollbarWidth: 40,
   minHandleLength: 40,
+
+  throttle: THROTTLED_SCROLL,
+  onScroll: () => null,
+  onThrottledScroll: () => null,
 };
 
 const enhance = compose(

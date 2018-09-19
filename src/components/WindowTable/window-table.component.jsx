@@ -228,36 +228,12 @@ class WindowTable extends PureComponent {
   };
 
   handleThrottledScroll = ({ scrollTop, scrollLeft }) => {
-    // console.log('%c throttled scroll ', 'background:blue;color:#fff');
-    // const random = parseInt(Math.random() * 9000 + 1000, 10);
-
-    // console.log(`%c scroll ${random} `, 'background:blue;color:#fff');
-    // console.log(scrollInfo);
-    // const [
-    //   rowStartIndex,
-    //   rowStopIndex,
-    //   columnStartIndex,
-    //   columnStopIndex,
-    // ] = this.getRangeToRender(scrollTop, scrollLeft);
-
     this.props.updateScrollInfo({ scrollTop, scrollLeft });
-
-    // console.log(
-    //   rowStartIndex,
-    //   rowStopIndex,
-    //   columnStartIndex,
-    //   columnStopIndex,
-    // );
-    // this.setState(prevState => ({
-    //   ...prevState,
-    //   rowStartIndex,
-    //   rowStopIndex,
-    //   columnStartIndex,
-    //   columnStopIndex,
-    // }));
+    // this.props.updateScrollInfo({ scrollTop, scrollLeft });
   };
 
   scrollTo = ({ scrollTop, scrollLeft }) => {
+    // console.log(scrollTop, scrollLeft);
     // const random = parseInt(Math.random() * 9000 + 1000, 10);
     // console.log(`%c scroll ${random} `, 'background:red;color:#fff');
     const _scrollTop =
@@ -843,11 +819,14 @@ const enhance = compose(
 
   withHandlers({
     updateScrollInfo: ({ scrollInfo, _updateScrollInfo }) => ({
-      scrollTop,
-      scrollLeft,
+      scrollTop: _scrollTop,
+      scrollLeft: _scrollLeft,
     }) => {
       const prevScrollTop = scrollInfo.get('scrollTop');
       const prevScrollLeft = scrollInfo.get('scrollLeft');
+
+      const scrollTop = typeof _scrollTop === 'number' ? _scrollTop : prevScrollTop;
+      const scrollLeft = typeof _scrollLeft === 'number' ? _scrollLeft : prevScrollLeft;
 
       const DIRECTION_CRITERIA = 5;
 
@@ -942,40 +921,6 @@ const enhance = compose(
         return stopIndex;
       };
 
-      return {
-        getStartIndexForOffset,
-        getStopIndexForStartIndex,
-      };
-    },
-  ),
-
-  withPropsOnChange(
-    ['scrollInfo', 'getStartIndexForOffset', 'getStopIndexForStartIndex'],
-    ({
-      scrollInfo,
-      getStartIndexForOffset: getStartIndex,
-      getStopIndexForStartIndex: getStopIndex,
-      overscanCount,
-      columnCount,
-      rowCount,
-      fixedTopCount,
-      fixedBottomCount,
-      fixedLeftCount,
-      fixedRightCount,
-    }) => {
-      const scrollTop = scrollInfo.get('scrollTop');
-      const scrollLeft = scrollInfo.get('scrollLeft');
-      const vScrollDirection = scrollInfo.get('vScrollDirection');
-      const hScrollDirection = scrollInfo.get('hScrollDirection');
-      const rowStartIndex = getStartIndex('row', scrollTop);
-      const rowStopIndex = getStopIndex('row', rowStartIndex, scrollTop);
-      const columnStartIndex = getStartIndex('column', scrollLeft);
-      const columnStopIndex = getStopIndex(
-        'column',
-        columnStartIndex,
-        scrollLeft,
-      );
-
       const getOverscanCount = (
         direction,
         startIndex,
@@ -996,6 +941,63 @@ const enhance = compose(
           ),
         };
       };
+
+      return {
+        getStartIndexForOffset,
+        getStopIndexForStartIndex,
+        getOverscanCount,
+      };
+    },
+  ),
+
+  withPropsOnChange(
+    ['scrollInfo', 'getStartIndexForOffset', 'getStopIndexForStartIndex'],
+    ({
+      scrollInfo,
+      getStartIndexForOffset: getStartIndex,
+      getStopIndexForStartIndex: getStopIndex,
+      overscanCount,
+      columnCount,
+      rowCount,
+      fixedTopCount,
+      fixedBottomCount,
+      fixedLeftCount,
+      fixedRightCount,
+      getOverscanCount,
+    }) => {
+      const scrollTop = scrollInfo.get('scrollTop');
+      const scrollLeft = scrollInfo.get('scrollLeft');
+      const vScrollDirection = scrollInfo.get('vScrollDirection');
+      const hScrollDirection = scrollInfo.get('hScrollDirection');
+      const rowStartIndex = getStartIndex('row', scrollTop);
+      const rowStopIndex = getStopIndex('row', rowStartIndex, scrollTop);
+      const columnStartIndex = getStartIndex('column', scrollLeft);
+      const columnStopIndex = getStopIndex(
+        'column',
+        columnStartIndex,
+        scrollLeft,
+      );
+
+      // const getOverscanCount = (
+      //   direction,
+      //   startIndex,
+      //   stopIndex,
+      //   minIndex,
+      //   maxIndex,
+      //   _overscanCount,
+      // ) => {
+      //   const overscanBackward =
+      //     direction === 'backward' ? Math.max(1, _overscanCount) : 1;
+      //   const overscanForward =
+      //     direction === 'forward' ? Math.max(1, _overscanCount) : 1;
+      //   return {
+      //     overscanStartIndex: Math.max(0, minIndex, startIndex - overscanBackward),
+      //     overscanStopIndex: Math.max(
+      //       0,
+      //       Math.min(maxIndex, stopIndex + overscanForward),
+      //     ),
+      //   };
+      // };
 
       const {
         overscanStartIndex: overscanRowStartIndex,
@@ -1046,10 +1048,20 @@ const enhance = compose(
         overscanRowStopIndex,
         overscanColumnStartIndex,
         overscanColumnStopIndex,
-        rowStartIndex,
-        rowStopIndex,
-        columnStartIndex,
-        columnStopIndex,
+        visibleRowStartIndex: rowStartIndex,
+        visibleRowStopIndex: rowStopIndex,
+        visibleColumnStartIndex: columnStartIndex,
+        visibleColumnStopIndex: columnStopIndex,
+        rangeToRender: {
+          overscanRowStartIndex,
+          overscanRowStopIndex,
+          overscanColumnStartIndex,
+          overscanColumnStopIndex,
+          visibleRowStartIndex: rowStartIndex,
+          visibleRowStopIndex: rowStopIndex,
+          visibleColumnStartIndex: columnStartIndex,
+          visibleColumnStopIndex: columnStopIndex,
+        },
       };
     },
   ),

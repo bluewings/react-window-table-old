@@ -1,6 +1,7 @@
 // @import .scss => styles
 div
- pre {JSON.stringify(this.props.scrollInfo, null, 2)}
+ //-  pre {JSON.stringify(this.props.scrollInfo, null, 2)}
+ //-  pre {JSON.stringify(this.props.rangeToRender, null, 2)}
  div(className='{cx(styles.root, containerStyle)}')
 
   table(className='{styles.table}', border='{0}', cellPadding='{0}', cellSpacing='{0}', ref='{this.tableRef}')
@@ -53,6 +54,7 @@ div
             scrollLength='{totalHeight}',
             scrollbarWidth='{scrollbarWidth}',
             onScroll='{this.scrollTo}',
+            onThrottledScroll='{this.handleThrottledScroll}',
             trackStyle='{scrollbarTrackStyle}',
             handleStyle='{scrollbarHandleStyle}')
 
@@ -65,6 +67,7 @@ div
             scrollLength='{totalWidth}',
             scrollbarWidth='{scrollbarWidth}',
             onScroll='{this.scrollTo}',
+            onThrottledScroll='{this.handleThrottledScroll}',
             trackStyle='{scrollbarTrackStyle}',
             handleStyle='{scrollbarHandleStyle}')
         td(@if='scrollbarY')
