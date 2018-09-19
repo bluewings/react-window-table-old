@@ -173,12 +173,12 @@ class App extends Component {
 
           // columns={columns.slice(0, 100)} rows={rows.slice(0, 20000)}
 
-          width={840}
-          height={580}
+          width={540}
+          height={280}
           columnCount={50}
           rowCount={100}
           rowHeight={rowHeight_}
-          rowHeight={80}
+          rowHeight={40}
           columnWidth={columnWidth}
           columnWidth={100}
           fixedLeftCount={1}

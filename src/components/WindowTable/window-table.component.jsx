@@ -9,7 +9,14 @@
 /* eslint-disabl */
 import React, { Fragment, PureComponent, createElement } from 'react';
 import PropTypes from 'prop-types';
-import { compose, defaultProps, withPropsOnChange } from 'recompose';
+import {
+  compose,
+  defaultProps,
+  withPropsOnChange,
+  withState,
+  withHandlers,
+} from 'recompose';
+import { Map } from 'immutable';
 import memoizeOne from 'memoize-one';
 import entries from 'object.entries';
 import { css } from 'emotion';
@@ -111,8 +118,8 @@ class WindowTable extends PureComponent {
     }
   }
 
-  getItemCount = itemType =>
-    (itemType === 'row' ? this.props.rowCount : this.props.columnCount);
+  // getItemCount = itemType =>
+  //   (itemType === 'row' ? this.props.rowCount : this.props.columnCount);
 
   getStartIndexForOffset = (itemType, offset) => {
     const { fixedTopCount, fixedLeftCount, getItemMetadata } = this.props;
@@ -142,7 +149,7 @@ class WindowTable extends PureComponent {
     const itemMetadata = getItemMetadata(itemType, startIndex);
     let currOffset = itemMetadata.offset + itemMetadata.size;
     let stopIndex = startIndex;
-    const itemCount = this.getItemCount(itemType);
+    const itemCount = this.props.getItemCount(itemType);
     while (stopIndex < itemCount - 1 && currOffset < maxOffset) {
       stopIndex += 1;
       currOffset += getItemMetadata(itemType, stopIndex).size;
@@ -151,27 +158,27 @@ class WindowTable extends PureComponent {
     return stopIndex;
   };
 
-  getRangeToRender = (scrollTop, scrollLeft) => {
-    // const { scrollTop, scrollLeft } = this.state;
-    const rowStartIndex = this.getStartIndexForOffset('row', scrollTop);
-    const rowStopIndex = this.getStopIndexForStartIndex(
-      'row',
-      rowStartIndex,
-      scrollTop,
-    );
-    const columnStartIndex = this.getStartIndexForOffset('column', scrollLeft);
-    const columnStopIndex = this.getStopIndexForStartIndex(
-      'column',
-      columnStartIndex,
-      scrollLeft,
-    );
-    return [rowStartIndex, rowStopIndex, columnStartIndex, columnStopIndex];
-  };
+  // getRangeToRender = (scrollTop, scrollLeft) => {
+  //   // const { scrollTop, scrollLeft } = this.state;
+  //   const rowStartIndex = this.getStartIndexForOffset('row', scrollTop);
+  //   const rowStopIndex = this.getStopIndexForStartIndex(
+  //     'row',
+  //     rowStartIndex,
+  //     scrollTop,
+  //   );
+  //   const columnStartIndex = this.getStartIndexForOffset('column', scrollLeft);
+  //   const columnStopIndex = this.getStopIndexForStartIndex(
+  //     'column',
+  //     columnStartIndex,
+  //     scrollLeft,
+  //   );
+  //   return [rowStartIndex, rowStopIndex, columnStartIndex, columnStopIndex];
+  // };
 
   // binary search
   findNearestItem = (itemType, offset) => {
     let low = 0;
-    let high = this.getItemCount(itemType) - 1;
+    let high = this.props.getItemCount(itemType) - 1;
     while (low <= high) {
       const middle = low + Math.floor((high - low) / 2);
       const currentOffset = this.props.getItemMetadata(itemType, middle).offset;
@@ -222,17 +229,18 @@ class WindowTable extends PureComponent {
 
   handleThrottledScroll = ({ scrollTop, scrollLeft }) => {
     // console.log('%c throttled scroll ', 'background:blue;color:#fff');
-    const random = parseInt((Math.random() * 9000) + 1000, 10);
-
+    // const random = parseInt(Math.random() * 9000 + 1000, 10);
 
     // console.log(`%c scroll ${random} `, 'background:blue;color:#fff');
     // console.log(scrollInfo);
-    const [
-      rowStartIndex,
-      rowStopIndex,
-      columnStartIndex,
-      columnStopIndex,
-    ] = this.getRangeToRender(scrollTop, scrollLeft);
+    // const [
+    //   rowStartIndex,
+    //   rowStopIndex,
+    //   columnStartIndex,
+    //   columnStopIndex,
+    // ] = this.getRangeToRender(scrollTop, scrollLeft);
+
+    this.props.updateScrollInfo({ scrollTop, scrollLeft });
 
     // console.log(
     //   rowStartIndex,
@@ -240,17 +248,17 @@ class WindowTable extends PureComponent {
     //   columnStartIndex,
     //   columnStopIndex,
     // );
-    this.setState(prevState => ({
-      ...prevState,
-      rowStartIndex,
-      rowStopIndex,
-      columnStartIndex,
-      columnStopIndex,
-    }));
-  }
+    // this.setState(prevState => ({
+    //   ...prevState,
+    //   rowStartIndex,
+    //   rowStopIndex,
+    //   columnStartIndex,
+    //   columnStopIndex,
+    // }));
+  };
 
   scrollTo = ({ scrollTop, scrollLeft }) => {
-    const random = parseInt((Math.random() * 9000) + 1000, 10);
+    // const random = parseInt(Math.random() * 9000 + 1000, 10);
     // console.log(`%c scroll ${random} `, 'background:red;color:#fff');
     const _scrollTop =
       typeof scrollTop === 'number' ? scrollTop : this.state.scrollTop;
@@ -436,13 +444,24 @@ class WindowTable extends PureComponent {
         maxScrollY,
         bottomOffset,
         totalWidth,
+        // rowStartIndex,
+        // rowStopIndex,
+        // columnStartIndex,
+        // columnStopIndex,
+
+        overscanRowStartIndex: rowStartIndex,
+        overscanRowStopIndex: rowStopIndex,
+        overscanColumnStartIndex: columnStartIndex,
+        overscanColumnStopIndex: columnStopIndex,
       },
       state: {
-        scrollLeft, scrollTop, isScrolling,
-        rowStartIndex,
-        rowStopIndex,
-        columnStartIndex,
-        columnStopIndex,
+        scrollLeft,
+        scrollTop,
+        isScrolling,
+        // rowStartIndex,
+        // rowStopIndex,
+        // columnStartIndex,
+        // columnStopIndex,
       },
     } = this;
 
@@ -494,8 +513,8 @@ class WindowTable extends PureComponent {
       topOffset,
       totalHeight,
       totalWidth,
+      unused_Fragment: Fragment,
       // components
-      Fragment,
       Guideline,
       Scrollarea,
       Scrollbar,
@@ -565,6 +584,7 @@ const enhance = compose(
     scrollTop: 0,
     scrollLeft: 0,
     rows: null,
+    overscanCount: 3,
   }),
 
   withHOCs({ importAs: 'enhancer' }),
@@ -624,6 +644,9 @@ const enhance = compose(
     }) => ({
       getItemMetadata: (itemType, itemIndex) =>
         (itemType === 'column' ? columnMetadataMap : rowMetadataMap)[itemIndex],
+
+      getItemCount: itemType => (itemType === 'row' ? rowCount : columnCount),
+
       getSize: (itemType, count) => {
         const itemMetadataMap =
           itemType === 'column' ? columnMetadataMap : rowMetadataMap;
@@ -808,6 +831,245 @@ const enhance = compose(
       };
     },
   ),
+
+  withState('scrollInfo', '_updateScrollInfo', ({ scrollTop, scrollLeft }) =>
+    Map({
+      scrollTop: scrollTop || 0,
+      scrollLeft: scrollLeft || 0,
+      vScrollDirection: 'neutral',
+      hScrollDirection: 'neutral',
+      isScrolling: false,
+    })),
+
+  withHandlers({
+    updateScrollInfo: ({ scrollInfo, _updateScrollInfo }) => ({
+      scrollTop,
+      scrollLeft,
+    }) => {
+      const prevScrollTop = scrollInfo.get('scrollTop');
+      const prevScrollLeft = scrollInfo.get('scrollLeft');
+
+      const DIRECTION_CRITERIA = 5;
+
+      const deltaY = scrollTop - prevScrollTop;
+      const deltaX = scrollLeft - prevScrollLeft;
+
+      let vScrollDirection;
+      if (deltaY > DIRECTION_CRITERIA) {
+        vScrollDirection = 'forward';
+      } else if (deltaY < DIRECTION_CRITERIA * -1) {
+        vScrollDirection = 'backward';
+      } else {
+        vScrollDirection = 'neutral';
+      }
+
+      let hScrollDirection;
+      if (deltaX > DIRECTION_CRITERIA) {
+        hScrollDirection = 'forward';
+      } else if (deltaX < DIRECTION_CRITERIA * -1) {
+        hScrollDirection = 'backward';
+      } else {
+        hScrollDirection = 'neutral';
+      }
+
+      const nextScrollInfo = scrollInfo
+        .set('scrollTop', scrollTop)
+        .set('scrollLeft', scrollLeft)
+        .set('vScrollDirection', vScrollDirection)
+        .set('hScrollDirection', hScrollDirection);
+      if (scrollInfo !== nextScrollInfo) {
+        _updateScrollInfo(nextScrollInfo);
+      }
+    },
+  }),
+
+  withPropsOnChange(
+    ['fixedTopCount', 'fixedBottomCount', 'fixedLeftCount', 'fixedRightCount'],
+    ({
+      fixedTopCount,
+      fixedBottomCount,
+      fixedLeftCount,
+      fixedRightCount,
+      getItemCount,
+      getItemMetadata,
+      contentWidth,
+      contentHeight,
+      getSize,
+    }) => {
+      // binary search
+      const findNearestItem = (itemType, offset) => {
+        let low = 0;
+        let high = getItemCount(itemType) - 1;
+        while (low <= high) {
+          const middle = low + Math.floor((high - low) / 2);
+          const currentOffset = getItemMetadata(itemType, middle).offset;
+          if (currentOffset === offset) {
+            return middle;
+          } else if (currentOffset < offset) {
+            low = middle + 1;
+          } else if (currentOffset > offset) {
+            high = middle - 1;
+          }
+        }
+        return low > 0 ? low - 1 : 0;
+      };
+
+      const getStartIndexForOffset = (itemType, offset) => {
+        // const { fixedTopCount, fixedLeftCount, getItemMetadata } = this.props;
+        const itemIndex = itemType === 'row' ? fixedTopCount : fixedLeftCount;
+        const itemMetadata = getItemMetadata(itemType, itemIndex);
+        return findNearestItem(itemType, offset + itemMetadata.offset);
+      };
+
+      const getStopIndexForStartIndex = (itemType, startIndex, offset) => {
+        let maxOffset =
+          (itemType === 'row' ? contentHeight : contentWidth) + offset;
+        const postfixCount =
+          itemType === 'row' ? fixedBottomCount : fixedRightCount;
+        if (postfixCount > 0) {
+          maxOffset -= getSize(itemType, postfixCount * -1);
+        }
+
+        const itemMetadata = getItemMetadata(itemType, startIndex);
+        let currOffset = itemMetadata.offset + itemMetadata.size;
+        let stopIndex = startIndex;
+        const itemCount = getItemCount(itemType);
+        while (stopIndex < itemCount - 1 && currOffset < maxOffset) {
+          stopIndex += 1;
+          currOffset += getItemMetadata(itemType, stopIndex).size;
+        }
+
+        return stopIndex;
+      };
+
+      return {
+        getStartIndexForOffset,
+        getStopIndexForStartIndex,
+      };
+    },
+  ),
+
+  withPropsOnChange(
+    ['scrollInfo', 'getStartIndexForOffset', 'getStopIndexForStartIndex'],
+    ({
+      scrollInfo,
+      getStartIndexForOffset: getStartIndex,
+      getStopIndexForStartIndex: getStopIndex,
+      overscanCount,
+      columnCount,
+      rowCount,
+      fixedTopCount,
+      fixedBottomCount,
+      fixedLeftCount,
+      fixedRightCount,
+    }) => {
+      const scrollTop = scrollInfo.get('scrollTop');
+      const scrollLeft = scrollInfo.get('scrollLeft');
+      const vScrollDirection = scrollInfo.get('vScrollDirection');
+      const hScrollDirection = scrollInfo.get('hScrollDirection');
+      const rowStartIndex = getStartIndex('row', scrollTop);
+      const rowStopIndex = getStopIndex('row', rowStartIndex, scrollTop);
+      const columnStartIndex = getStartIndex('column', scrollLeft);
+      const columnStopIndex = getStopIndex(
+        'column',
+        columnStartIndex,
+        scrollLeft,
+      );
+
+      const getOverscanCount = (
+        direction,
+        startIndex,
+        stopIndex,
+        minIndex,
+        maxIndex,
+        _overscanCount,
+      ) => {
+        const overscanBackward =
+          direction === 'backward' ? Math.max(1, _overscanCount) : 1;
+        const overscanForward =
+          direction === 'forward' ? Math.max(1, _overscanCount) : 1;
+        return {
+          overscanStartIndex: Math.max(0, minIndex, startIndex - overscanBackward),
+          overscanStopIndex: Math.max(
+            0,
+            Math.min(maxIndex, stopIndex + overscanForward),
+          ),
+        };
+      };
+
+      const {
+        overscanStartIndex: overscanRowStartIndex,
+        overscanStopIndex: overscanRowStopIndex,
+      } = getOverscanCount(
+        vScrollDirection,
+        rowStartIndex,
+        rowStopIndex,
+        fixedTopCount,
+        rowCount - fixedBottomCount - 1,
+        overscanCount,
+      );
+
+      const {
+        overscanStartIndex: overscanColumnStartIndex,
+        overscanStopIndex: overscanColumnStopIndex,
+      } = getOverscanCount(
+        hScrollDirection,
+        columnStartIndex,
+        columnStopIndex,
+        fixedLeftCount,
+        columnCount - fixedRightCount - 1,
+        overscanCount,
+      );
+
+      // getOverscanCount
+
+      // Overscan by one item in each direction so that tab/focus works.
+      // If there isn't at least one extra item, tab loops back around.
+      // const overscanBackward =
+      //   horizontalScrollDirection === 'backward'
+      //     ? Math.max(1, overscanCount)
+      //     : 1;
+      // const overscanForward =
+      //   horizontalScrollDirection === 'forward'
+      //     ? Math.max(1, overscanCount)
+      //     : 1;
+
+      // return [
+      //   Math.max(0, startIndex - overscanBackward),
+      //   Math.max(0, Math.min(columnCount - 1, stopIndex + overscanForward)),
+      //   startIndex,
+      //   stopIndex,
+      // ];
+
+      return {
+        overscanRowStartIndex,
+        overscanRowStopIndex,
+        overscanColumnStartIndex,
+        overscanColumnStopIndex,
+        rowStartIndex,
+        rowStopIndex,
+        columnStartIndex,
+        columnStopIndex,
+      };
+    },
+  ),
+
+  // getRangeToRender = (scrollTop, scrollLeft) => {
+  //   // const { scrollTop, scrollLeft } = this.state;
+  //   const rowStartIndex = this.getStartIndexForOffset('row', scrollTop);
+  //   const rowStopIndex = this.getStopIndexForStartIndex(
+  //     'row',
+  //     rowStartIndex,
+  //     scrollTop,
+  //   );
+  //   const columnStartIndex = this.getStartIndexForOffset('column', scrollLeft);
+  //   const columnStopIndex = this.getStopIndexForStartIndex(
+  //     'column',
+  //     columnStartIndex,
+  //     scrollLeft,
+  //   );
+  //   return [rowStartIndex, rowStopIndex, columnStartIndex, columnStopIndex];
+  // };
 );
 
 // export default enhance(WindowTable);

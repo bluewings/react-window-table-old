@@ -1,5 +1,8 @@
 // @import .scss => styles
-div(className='{cx(styles.root, containerStyle)}')
+div
+ pre {JSON.stringify(this.props.scrollInfo, null, 2)}
+ div(className='{cx(styles.root, containerStyle)}')
+
   table(className='{styles.table}', border='{0}', cellPadding='{0}', cellSpacing='{0}', ref='{this.tableRef}')
     tbody
       tr
@@ -9,32 +12,32 @@ div(className='{cx(styles.root, containerStyle)}')
             scrollLeft='{scrollLeft}', scrollTop='{scrollTop}', 
             onScroll='{this.scrollTo}',
             onThrottledScroll='{this.handleThrottledScroll}')
-              Fragment(@if='items')
-                //- scroll-y, scroll-x
-                div(ref='{this.secRef}', style='{{ transform: "translate3d(" + (scrollLeft * -1) + "px, " + (scrollTop * -1) + "px, 0)" }}')
-                  | {items.middle_center}
+              //- Fragment(@if='items')
+              //- scroll-y, scroll-x
+              div(ref='{this.secRef}', style='{{ transform: "translate3d(" + (scrollLeft * -1) + "px, " + (scrollTop * -1) + "px, 0)" }}')
+                | {items.middle_center}
 
-                //- scroll-x
-                div(style='{{ position: "absolute", zIndex: 1, transform: "translate3d(" + (scrollLeft * -1) + "px, 0, 0)" }}')
-                  | {items.top_center}
-                div(style='{{ position: "absolute", zIndex: 1, bottom: 0, transform: "translate3d(" + (scrollLeft * -1) + "px, 0, 0)" }}')
-                  | {items.bottom_center}
+              //- scroll-x
+              div(style='{{ position: "absolute", zIndex: 1, transform: "translate3d(" + (scrollLeft * -1) + "px, 0, 0)" }}')
+                | {items.top_center}
+              div(style='{{ position: "absolute", zIndex: 1, bottom: 0, transform: "translate3d(" + (scrollLeft * -1) + "px, 0, 0)" }}')
+                | {items.bottom_center}
 
-                //- scroll-x
-                div(style='{{ position: "absolute", zIndex: 1, transform: "translate3d(0, " + (scrollTop * -1) + "px, 0)" }}')
-                  | {items.middle_left}
-                div(style='{{ position: "absolute", zIndex: 1, right: 0, transform: "translate3d(0, " + (scrollTop * -1) + "px, 0)" }}')
-                  | {items.middle_right}
+              //- scroll-x
+              div(style='{{ position: "absolute", zIndex: 1, transform: "translate3d(0, " + (scrollTop * -1) + "px, 0)" }}')
+                | {items.middle_left}
+              div(style='{{ position: "absolute", zIndex: 1, right: 0, transform: "translate3d(0, " + (scrollTop * -1) + "px, 0)" }}')
+                | {items.middle_right}
 
-                //- scroll-none
-                div(style='{{ position: "absolute", zIndex: 1, transform: "translate3d(0, 0, 0)" }}')
-                  | {items.top_left}
-                div(style='{{ position: "absolute", zIndex: 1, right: 0, transform: "translate3d(0, 0, 0)" }}')
-                  | {items.top_right}
-                div(style='{{ position: "absolute", zIndex: 1, bottom: 0, transform: "translate3d(0, 0, 0)" }}')
-                  | {items.bottom_left}
-                div(style='{{ position: "absolute", zIndex: 1, right: 0, bottom: 0, transform: "translate3d(0, 0, 0)" }}')
-                  | {items.bottom_right}
+              //- scroll-none
+              div(style='{{ position: "absolute", zIndex: 1, transform: "translate3d(0, 0, 0)" }}')
+                | {items.top_left}
+              div(style='{{ position: "absolute", zIndex: 1, right: 0, transform: "translate3d(0, 0, 0)" }}')
+                | {items.top_right}
+              div(style='{{ position: "absolute", zIndex: 1, bottom: 0, transform: "translate3d(0, 0, 0)" }}')
+                | {items.bottom_left}
+              div(style='{{ position: "absolute", zIndex: 1, right: 0, bottom: 0, transform: "translate3d(0, 0, 0)" }}')
+                | {items.bottom_right}
 
               //- guidelines
               Guideline(@if='topOffset > 0',    ref='{this.guidelineRef.top}',    type='top',    guidelineStyle='{guidelineStyle}', length='{contentWidth}',  maxScroll='{maxScrollY}', distance='{topOffset}')

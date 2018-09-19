@@ -112,6 +112,10 @@ class Scrollarea extends PureComponent {
       //   movedY: this.scrollInfo.get('scrollTop') - this._scrollStart.scrollTop,
       // };
       // console.table(stats);
+      this.props.onThrottledScroll({
+        scrollTop: this.scrollInfo.get('scrollTop'),
+        scrollLeft: this.scrollInfo.get('scrollLeft'),
+      });
     }, THROTTLED_SCROLL + 50);
   };
 
@@ -127,7 +131,13 @@ class Scrollarea extends PureComponent {
     }
   };
 
-  scrollWrapStyle = memoizeOne((width, height) => ({ width, height }));
+  scrollWrapStyle = memoizeOne((width, height) => ({
+    // position: 'relative',
+    // overflow: 'hidden',
+    width,
+    height,
+  }));
+
 
   render() {
     return template.call(this, {
