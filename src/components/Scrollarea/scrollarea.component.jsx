@@ -1,7 +1,6 @@
-/* eslint-disable react/prop-types, no-underscore-dangle, react/no-unused-state */
-/* eslint-disabl */
+/* eslint-disable no-underscore-dangle */
 import React, { PureComponent } from 'react';
-import { compose, defaultProps } from 'recompose';
+import PropTypes from 'prop-types';
 import { Map } from 'immutable';
 import memoizeOne from 'memoize-one';
 
@@ -17,7 +16,6 @@ class Scrollarea extends PureComponent {
     this.shimRef = React.createRef();
     this.scrollWrapRef = React.createRef();
     this.scrollContentRef = React.createRef();
-    this.state = { scrollTop: 0, scrollLeft: 0 };
     this.scrollInfo = Map({ scrollTop: 0, scrollLeft: 0 });
   }
 
@@ -55,7 +53,10 @@ class Scrollarea extends PureComponent {
       deltaX = 0;
     }
 
-    let { scrollLeft, scrollTop } = this.props;
+    let scrollTop = this.scrollInfo.get('scrollTop');
+    let scrollLeft = this.scrollInfo.get('scrollLeft');
+
+    // let { scrollLeft, scrollTop } = this.props;
 
     scrollTop += deltaY;
     if (scrollTop < 0) {
@@ -109,6 +110,11 @@ class Scrollarea extends PureComponent {
 
   throttledScroll = () => {
     if (this.throttledScrollInfo) {
+      if (typeof this.props.onThrottledScroll === 'function') {
+        const scrollTop = this.throttledScrollInfo.get('scrollTop');
+        const scrollLeft = this.throttledScrollInfo.get('scrollLeft');
+        this.props.onThrottledScroll({ scrollLeft, scrollTop });
+      }
       delete this.throttledScrollInfo;
       this._scrollCount += 1;
     }
@@ -127,11 +133,18 @@ class Scrollarea extends PureComponent {
   }
 }
 
-const enhance = compose(defaultProps({
-  width: 500,
-  height: 400,
-  contentWidth: null,
-  contentHeight: null,
-}));
+Scrollarea.propTypes = {
+  width: PropTypes.number.isRequired,
+  height: PropTypes.number.isRequired,
+  contentWidth: PropTypes.number.isRequired,
+  contentHeight: PropTypes.number.isRequired,
+  onScroll: PropTypes.func,
+  onThrottledScroll: PropTypes.func,
+};
 
-export default enhance(Scrollarea);
+Scrollarea.defaultProps = {
+  onScroll: null,
+  onThrottledScroll: null,
+};
+
+export default Scrollarea;
