@@ -21,12 +21,6 @@ import template from './window-table.component.pug';
 import styles from './window-table.component.scss';
 
 // const defaultCellClassNames = Map({
-//   // row
-//   oddRow: 'rwtc-odd-row',
-//   evenRow: 'rwtc-even-row',
-//   // column
-//   oddColumn: 'rwtc-odd-col',
-//   evenColumn: 'rwtc-even-col',
 //   // area
 //   top: 'rwtc-top',
 //   middle: 'rwtc-middle',
@@ -231,8 +225,8 @@ class WindowTable extends PureComponent {
               rowIndex === 0 && classNames.verticalFirst,
               columnIndex === columnCount - 1 && classNames.horizontalLast,
               rowIndex === rowCount - 1 && classNames.verticalLast,
-              _colIndex % 2 ? classNames.oddColumn : classNames.evenColumn,
-              _rowIndex % 2 ? classNames.oddRow : classNames.evenRow,
+              _colIndex % 2 ? classNames.columnOdd : classNames.columnEven,
+              _rowIndex % 2 ? classNames.rowOdd : classNames.rowEven,
               `cell-text-align-${column.textAlign}`,
             ].join(' ');
             // if (_rowIndex === -1) {

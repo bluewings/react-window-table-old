@@ -3,11 +3,11 @@ import { css } from 'emotion';
 
 const defaultCellClassNames = Map({
   // row
-  oddRow: 'rwtc-odd-row',
-  evenRow: 'rwtc-even-row',
+  rowOdd: 'rwtc-odd-row',
+  rowEven: 'rwtc-even-row',
   // column
-  oddColumn: 'rwtc-odd-col',
-  evenColumn: 'rwtc-even-col',
+  columnOdd: 'rwtc-odd-col',
+  columnEven: 'rwtc-even-col',
   // area
   top: 'rwtc-top',
   middle: 'rwtc-middle',
@@ -59,7 +59,7 @@ const cellStyle = ({ classNames, customStyleFn }) => {
         borderBottom: 'none',
       },
     },
-    [`&.${classNames.evenRow}`]: {
+    [`&.${classNames.rowEven}`]: {
       // background: 'lightyellow',
       // background: '#f0f0f0',
     },

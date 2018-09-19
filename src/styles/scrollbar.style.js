@@ -3,12 +3,6 @@ import { Map } from 'immutable';
 import { css } from 'emotion';
 
 const defaultScrollbarClassNames = Map({
-  // row
-  // oddRow: 'rwtc-odd-row',
-  // evenRow: 'rwtc-even-row',
-  // // column
-  // oddColumn: 'rwtc-odd-col',
-  // evenColumn: 'rwtc-even-col',
   // // area
   // top: 'rwtc-top',
   // middle: 'rwtc-middle',
@@ -201,7 +195,7 @@ const scrollbarHandleStyle = ({
 //       },
 
 //     },
-//     [`&.${classNames.evenRow}`]: {
+//     [`&.${classNames.rowEven}`]: {
 
 //       // background: 'lightyellow',
 //       // background: '#f0f0f0',
