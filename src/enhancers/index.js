@@ -1,5 +1,6 @@
-import withColumns from './with-columns.enhancer';
+import withClassNames from './withClassNames';
+import withColumns from './withColumns';
 
-export default { withColumns };
+export default { withClassNames, withColumns };
 
-export { withColumns };
+export { withClassNames, withColumns };

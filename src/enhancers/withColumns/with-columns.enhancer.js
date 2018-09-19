@@ -172,7 +172,7 @@ const withColumns = compose(
     ['columns', 'rows', 'children'],
     ({ columns, rows, children: _children }) => {
       const children = props => {
-        const { rowIndex, columnIndex } = props;
+        const { rowIndex, columnIndex, className } = props;
         // if (rowIndex === 0) {
         // const name = columns[props.columnIndex].name;
         let content = rows[rowIndex].arr[columnIndex];
@@ -182,7 +182,7 @@ const withColumns = compose(
           content = rows[rowIndex].arr[columnIndex];
         }
         return (
-          <div style={props.style} key={props.key}>
+          <div key={props.key} style={props.style} className={className}>
             {content}
           </div>
         );

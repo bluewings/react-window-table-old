@@ -452,6 +452,7 @@ class WindowTable extends PureComponent {
       topOffset,
       totalHeight,
       totalWidth,
+      unused_Fragment: Fragment,
       // components
       Guideline,
       Scrollarea,

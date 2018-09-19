@@ -57,6 +57,12 @@ const themeConfig = {
       },
       '.react-live-preview, .example': {
         fontSize: 12,
+        '.row-odd': {
+          background: '#EEF1F5',
+        },
+        '.row-even': {
+          background: '#fff',
+        },
         'table td div div div div div': {
           display: 'flex',
           alignItems: 'center',

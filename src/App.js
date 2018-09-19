@@ -2,13 +2,13 @@
 import React, { Component, PureComponent } from 'react';
 // import logo from './logo.svg';
 import './App.css';
-import WindowTable from './components/WindowTable';
-import TmpTable from './components/HungryJacks';
+// import WindowTable from './components/WindowTable';
+import TmpTable from './components/WindowTable';
 // import TmpTable from './components/WithColumns';
 import Scrollarea from './components/Scrollarea';
 import sampleImg from './sample.png';
 import { columns, rows } from './examples/data/pokedex';
-import { withColumns } from './enhancers';
+import { withColumns, withClassNames } from './enhancers';
 
 // const columns = [...Array(50)].map((e, i) => ({ name: `col-${i}`, width: 100 }));
 
@@ -136,7 +136,7 @@ class ItemRenderer extends PureComponent {
     const { isScrolling } = this.props;
     // if (isScrolling) return null;
     return (
-      <div style={this.props.style}>
+      <div style={this.props.style} className={this.props.className}>
         {isScrolling
           ? 'scrolling'
           : this.props.rowIndex + ' , ' + this.props.columnIndex}
@@ -163,7 +163,7 @@ class App extends Component {
         <TmpTable
           columns={columns.slice(0, 100)}
           rows={rows.slice(0, 20000)}
-          enhancer={withColumns}
+          enhancer={[withClassNames, withColumns]}
           // scrollbarTrackStyle={scrollbarTrackStyle}
           // scrollbarHandleStyle={scrollbarHandleStyle}
           // guidelineStyle={guidelineStyle}
@@ -187,11 +187,6 @@ class App extends Component {
           fixedBottomCount={1}
         >
           {ItemRenderer}
-          {/* {({ columnIndex, rowIndex, style }) => (
-                    <div style={style}>
-                      {rowIndex} , {columnIndex}
-                    </div>
-                  )} */}
         </TmpTable>
         {/* <table border={1} cellPadding={10}>
           <tbody>
