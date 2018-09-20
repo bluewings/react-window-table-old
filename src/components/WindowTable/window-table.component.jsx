@@ -53,13 +53,14 @@ class WindowTable extends PureComponent {
 
     // this.containerRef = React.createRef();
 
-    // this.gridRef = {
-    //   center: React.createRef(),
-    //   top: React.createRef(),
-    //   bottom: React.createRef(),
-    //   left: React.createRef(),
-    //   right: React.createRef(),
-    // };
+    this.gridRef = {
+      center: React.createRef(),
+      top: React.createRef(),
+      bottom: React.createRef(),
+      left: React.createRef(),
+      right: React.createRef(),
+    };
+    // console.log('> class WindowTable extends PureComponent');
 
     this.scrollbarRef = {
       x: React.createRef(),
@@ -233,29 +234,49 @@ class WindowTable extends PureComponent {
   };
 
   scrollTo = ({ scrollTop, scrollLeft }) => {
+    const translateXY = `translate3d(${scrollLeft * -1}px, ${scrollTop * -1}px, 0)`;
+    const translateX = `translate3d(${scrollLeft * -1}px, 0, 0)`;
+    const translateY = `translate3d(0, ${scrollTop * -1}px, 0)`;
+    if (this.secRef.current) {
+      this.secRef.current.style.transform = translateXY;
+    }
+    if (this.gridRef.top.current) {
+      this.gridRef.top.current.style.transform = translateX;
+    }
+    if (this.gridRef.bottom.current) {
+      this.gridRef.bottom.current.style.transform = translateX;
+    }
+    if (this.gridRef.right.current) {
+      this.gridRef.right.current.style.transform = translateY;
+    }
+    if (this.gridRef.left.current) {
+      this.gridRef.left.current.style.transform = translateY;
+    }
+
+    // transform: "translate3d(" + (scrollLeft * -1) + "px, " + (scrollTop * -1) + "px, 0)"
     // console.log(scrollTop, scrollLeft);
     // const random = parseInt(Math.random() * 9000 + 1000, 10);
     // console.log(`%c scroll ${random} `, 'background:red;color:#fff');
-    const _scrollTop =
-      typeof scrollTop === 'number' ? scrollTop : this.state.scrollTop;
-    const _scrollLeft =
-      typeof scrollLeft === 'number' ? scrollLeft : this.state.scrollLeft;
-    if (
-      this.state.scrollTop !== scrollTop ||
-      this.state.scrollLeft !== scrollLeft
-    ) {
-      this.setState(
-        prevState => ({
-          ...prevState,
-          isScrolling: true,
-          scrollTop: _scrollTop,
-          scrollLeft: _scrollLeft,
-          scrollY: _scrollTop / this.props.maxScrollY,
-          scrollX: _scrollLeft / this.props.maxScrollX,
-        }),
-        this.resetIsScrollingDebounced,
-      );
-    }
+    // const _scrollTop =
+    //   typeof scrollTop === 'number' ? scrollTop : this.state.scrollTop;
+    // const _scrollLeft =
+    //   typeof scrollLeft === 'number' ? scrollLeft : this.state.scrollLeft;
+    // if (
+    //   this.state.scrollTop !== scrollTop ||
+    //   this.state.scrollLeft !== scrollLeft
+    // ) {
+    //   this.setState(
+    //     prevState => ({
+    //       ...prevState,
+    //       isScrolling: true,
+    //       scrollTop: _scrollTop,
+    //       scrollLeft: _scrollLeft,
+    //       scrollY: _scrollTop / this.props.maxScrollY,
+    //       scrollX: _scrollLeft / this.props.maxScrollX,
+    //     }),
+    //     this.resetIsScrollingDebounced,
+    //   );
+    // }
   };
 
   resetIsScrollingDebounced = () => {
@@ -293,6 +314,8 @@ class WindowTable extends PureComponent {
     horizontalLast,
     verticalLast,
   ) => {
+    return 'aaa';
+    /* eslint-disable */
     // const cls = 'aaa';
     const className = [
       classNames.root,
@@ -386,6 +409,10 @@ class WindowTable extends PureComponent {
 
     const itemCache = this.itemCache(0, 0);
 
+    // const itemCache = this.itemCache(0, 0);
+    itemCache._tmp = itemCache._tmp || {};
+    let fromCache = 0;
+    let noCache = 0;
     rowRanges.forEach(([rType, rowFr, rowTo, rowAllFr, rowAllTo]) => {
       columnRanges.forEach(([cType, colFr, colTo, colAllFr, colAllTo]) => {
         const section = `${rType}_${cType}`;
@@ -400,46 +427,64 @@ class WindowTable extends PureComponent {
 
         items[section] = [];
 
+
+
         for (let rowIndex = rowFr; rowIndex < rowTo; rowIndex += 1) {
           for (
             let columnIndex = colFr;
             columnIndex < colTo;
             columnIndex += 1
           ) {
-            items[section].push(createElement(this.props.children, {
-              columnIndex,
-              isScrolling,
-              key: `${rowIndex}_${columnIndex}`,
-              rowIndex,
-              className: this.itemClassName(
-                this.props.cellClassNames,
-                rType,
-                cType,
-
-                rowIndex % 2 === 0, // rowEven
-                columnIndex % 2 === 0, // columnEven
-                columnIndex === colAllFr,
-                rowIndex === rowAllFr,
-                columnIndex === colAllTo - 1,
-                rowIndex === rowAllTo - 1,
-
-
-              ),
-              style: this.itemStyle(
-                section,
-                rowIndex,
+            // let cell;
+            const key = `${rowIndex}_${columnIndex}`;
+            if (!itemCache._tmp[key]) {
+              itemCache._tmp[key] = createElement(this.props.children, {
                 columnIndex,
-                totalHeight,
-                totalWidth,
-              ),
-            }));
+                isScrolling,
+                key: `${rowIndex}_${columnIndex}`,
+                rowIndex,
+                className: this.itemClassName(
+                  this.props.cellClassNames,
+                  rType,
+                  cType,
+  
+                  rowIndex % 2 === 0, // rowEven
+                  columnIndex % 2 === 0, // columnEven
+                  columnIndex === colAllFr,
+                  rowIndex === rowAllFr,
+                  columnIndex === colAllTo - 1,
+                  rowIndex === rowAllTo - 1,
+  
+  
+                ),
+                style: this.itemStyle(
+                  section,
+                  rowIndex,
+                  columnIndex,
+                  totalHeight,
+                  totalWidth,
+                ),
+              })
+            //   console.log('not cached');
+            noCache += 1;
+            } else {
+              fromCache += 1;
+            //   console.log('use cached');
+            }
+
+            const cell = itemCache._tmp[key];
+
+
+            items[section].push(cell);
           }
         }
+
+
 
         itemCache[section] = [rangeKey, items[section]];
       });
     });
-
+    // console.log({ fromCache, noCache });
     return items;
   });
 
@@ -530,11 +575,11 @@ class WindowTable extends PureComponent {
       rightOffset,
       scrollLeft,
       scrollTop,
-      scrollbarHandleStyle,
-      scrollbarTrackStyle,
-      scrollbarWidth,
-      scrollbarX,
-      scrollbarY,
+      unused_scrollbarHandleStyle: scrollbarHandleStyle,
+      unused_scrollbarTrackStyle: scrollbarTrackStyle,
+      unused_scrollbarWidth: scrollbarWidth,
+      unused_scrollbarX: scrollbarX,
+      unused_scrollbarY: scrollbarY,
       topOffset,
       totalHeight,
       totalWidth,
@@ -542,7 +587,7 @@ class WindowTable extends PureComponent {
       // components
       Guideline,
       Scrollarea,
-      Scrollbar,
+      unused_Scrollbar: Scrollbar,
     });
   }
 }
@@ -912,7 +957,10 @@ const enhance = compose(
   }),
 
   withPropsOnChange(
-    ['fixedTopCount', 'fixedBottomCount', 'fixedLeftCount', 'fixedRightCount'],
+    ['fixedTopCount', 'fixedBottomCount', 'fixedLeftCount', 'fixedRightCount',
+    'contentWidth',
+    'contentHeight',
+  ],
     ({
       fixedTopCount,
       fixedBottomCount,

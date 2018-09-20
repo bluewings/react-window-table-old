@@ -443,11 +443,11 @@ class WindowTable extends PureComponent {
       unused_rowStopIndex: rowStopIndex,
       scrollLeft,
       scrollTop,
-      scrollbarHandleStyle,
-      scrollbarTrackStyle,
-      scrollbarWidth,
-      scrollbarX,
-      scrollbarY,
+      unused_scrollbarHandleStyle: scrollbarHandleStyle,
+      unused_scrollbarTrackStyle: scrollbarTrackStyle,
+      unused_scrollbarWidth: scrollbarWidth,
+      unused_scrollbarX: scrollbarX,
+      unused_scrollbarY: scrollbarY,
       unused_top: top,
       topOffset,
       totalHeight,
@@ -456,7 +456,7 @@ class WindowTable extends PureComponent {
       // components
       Guideline,
       Scrollarea,
-      Scrollbar,
+      unused_Scrollbar: Scrollbar,
     });
   }
 }

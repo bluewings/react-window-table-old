@@ -1,5 +1,6 @@
 // @import .scss => styles
 div(className='{cx(styles.root, containerStyle, this.props.cellStyle)}')
+  //- h1 window table
   table(className='{styles.table}', border='{0}', cellPadding='{0}', cellSpacing='{0}', ref='{this.tableRef}')
     tbody
       tr
@@ -15,15 +16,15 @@ div(className='{cx(styles.root, containerStyle, this.props.cellStyle)}')
                 | {items.middle_center}
 
               //- scroll-x
-              div(style='{{ position: "absolute", zIndex: 1, transform: "translate3d(" + (scrollLeft * -1) + "px, 0, 0)" }}')
+              div(ref='{this.gridRef.top}', style='{{ position: "absolute", zIndex: 1, transform: "translate3d(" + (scrollLeft * -1) + "px, 0, 0)" }}')
                 | {items.top_center}
-              div(style='{{ position: "absolute", zIndex: 1, bottom: 0, transform: "translate3d(" + (scrollLeft * -1) + "px, 0, 0)" }}')
+              div(ref='{this.gridRef.bottom}', style='{{ position: "absolute", zIndex: 1, bottom: 0, transform: "translate3d(" + (scrollLeft * -1) + "px, 0, 0)" }}')
                 | {items.bottom_center}
 
               //- scroll-x
-              div(style='{{ position: "absolute", zIndex: 1, transform: "translate3d(0, " + (scrollTop * -1) + "px, 0)" }}')
+              div(ref='{this.gridRef.left}', style='{{ position: "absolute", zIndex: 1, transform: "translate3d(0, " + (scrollTop * -1) + "px, 0)" }}')
                 | {items.middle_left}
-              div(style='{{ position: "absolute", zIndex: 1, right: 0, transform: "translate3d(0, " + (scrollTop * -1) + "px, 0)" }}')
+              div(ref='{this.gridRef.right}', style='{{ position: "absolute", zIndex: 1, right: 0, transform: "translate3d(0, " + (scrollTop * -1) + "px, 0)" }}')
                 | {items.middle_right}
 
               //- scroll-none
@@ -42,7 +43,7 @@ div(className='{cx(styles.root, containerStyle, this.props.cellStyle)}')
               Guideline(@if='leftOffset > 0',   ref='{this.guidelineRef.left}',   type='left',   guidelineStyle='{guidelineStyle}', length='{contentHeight}', maxScroll='{maxScrollX}', distance='{leftOffset}')
               Guideline(@if='rightOffset > 0',  ref='{this.guidelineRef.right}',  type='right',  guidelineStyle='{guidelineStyle}', length='{contentHeight}', maxScroll='{maxScrollX}', distance='{rightOffset}')
 
-        td(@if='scrollbarY')
+        //- td(@if='scrollbarY')
           Scrollbar(
             axis='y',
             ref='{this.scrollbarRef.y}',
@@ -54,7 +55,7 @@ div(className='{cx(styles.root, containerStyle, this.props.cellStyle)}')
             trackStyle='{scrollbarTrackStyle}',
             handleStyle='{scrollbarHandleStyle}')
 
-      tr(@if='scrollbarX')
+      //- tr(@if='scrollbarX')
         td
           Scrollbar(
             axis='x',
